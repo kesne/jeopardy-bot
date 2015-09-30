@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JEOPARDYBOT LIVE BOARD</title>
+  <style type="text/css">
+
+  html {
+    box-sizing: border-box;
+  }
+  *, *:before, *:after {
+    box-sizing: inherit;
+  }
+
+  body {
+    background: black;
+    margin: 0;
+    padding: 0;
+  }
+
+  #board, #board th, #board td {
+    width: 100%;
+    border: 1px solid black;
+    table-layout: fixed;
+    border-spacing: 5px;
+    border-collapse: separate;
+  }
+
+  #board thead {
+    height: 150px;
+    border-bottom: 15px solid black;
+  }
+  #board tbody:before {
+    content: "";
+    display: block;
+  }
+
+  #board td, #board th {
+    height: 100px;
+    background: #12279A;
+    border-radius: 3px;
+    text-align: center;
+    vertical-align: middle;
+    color: #F4AC79;
+    padding: 10px;
+    font-family: Impact;
+
+    text-shadow: 0 2px 3px rgba(0, 0, 0, 0.6);
+  }
+
+  #board th {
+    font-size: 20px;
+    color: white;
+    text-transform: uppercase;
+  }
+
+  #board td {
+    font-size: 40px;
+    letter-spacing: 3px;
+  }
+
+  </style>
+</head>
+<body>
+  <table id="board">
+    <thead>
+      <tr>
+        <th colspan="1">
+          The letter "s".
+        </th>
+        <th colspan="1">
+          The letter "s".
+        </th>
+        <th colspan="1">
+          The letter "s".
+        </th>
+        <th colspan="1">
+          The letter "s".
+        </th>
+        <th colspan="1">
+          The letter "s".
+        </th>
+        <th colspan="1">
+          The letter "s".
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          $200
+        </td>
+        <td>
+          $200
+        </td>
+        <td>
+          $200
+        </td>
+        <td>
+          $200
+        </td>
+        <td>
+          $200
+        </td>
+        <td>
+          $200
+        </td>
+      </tr>
+      <tr>
+        <td>
+          $400
+        </td>
+        <td>
+          $400
+        </td>
+        <td>
+          $400
+        </td>
+        <td>
+          $400
+        </td>
+        <td>
+          $400
+        </td>
+        <td>
+          $400
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>
