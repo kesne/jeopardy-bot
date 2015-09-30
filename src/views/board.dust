@@ -34,7 +34,7 @@
   }
 
   #board td, #board th {
-    height: 70px;
+    height: 80px;
     background: #162387;
     border-radius: 3px;
     text-align: center;

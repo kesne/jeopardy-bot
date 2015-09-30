@@ -45,11 +45,13 @@
   </style>
 </head>
 <body>
-  Render at 720x420
+
+  <!-- Render at 720x420 -->
+
   <div class="full-width">
     <div class="clue-container">
       <div class="clue">
-        Speaking this way involves similies and metaphors
+        {clue.question}
       </div>
     </div>
   </div>

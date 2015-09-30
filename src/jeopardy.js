@@ -6,7 +6,8 @@ import { dust } from 'adaro';
 import { Game } from './models/Game';
 import { Person } from './models/Person';
 
-mongoose.connect('mongodb://localhost/test');
+const MONGO_URL = process.env.MONGOLAB_URI || 'mongodb://localhost/jeopardy'
+mongoose.connect(MONGO_URL);
 
 const app = express();
 
@@ -41,21 +42,6 @@ app.post('/command', (req, res) => {
 
 });
 
-app.get('/answer', (req, res) => {
-  Game.activeGame().then(game => {
-    const id = parseInt(req.query.id, 10);
-    game.questions.some((q) => {
-      if (q.id === id) {
-        q.answered = true;
-        return true;
-      }
-    });
-    return game.save();
-  }).then(() => {
-    res.send('done');
-  });
-});
-
 app.get('/', (req, res) => {
   Game.activeGame().then(game => {
     res.render('board', {
@@ -67,7 +53,30 @@ app.get('/', (req, res) => {
 });
 
 app.get('/clue', (req, res) => {
-  res.render('clue');
+  Game.activeGame().then(game => {
+    console.log(game.activeQuestion);
+    res.render('clue', {
+      clue: game.activeClue
+    });
+  });
+});
+
+app.get('/getclue/:title/:value', (req, res) => {
+  Game.getClue(req.params.title, req.params.value).then(clue => {
+    res.send('Got clue');
+  });
+});
+
+app.get('/guess/:whatis', (req, res) => {
+  Game.guess(req.params.whatis).then(valid => {
+    res.send(valid);
+  });
+});
+
+app.get('/answer', (req, res) => {
+  Game.answer().then(() => {
+    res.send('done');
+  });
 });
 
 app.get('/startgame', (req, res) => {

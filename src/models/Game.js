@@ -1,57 +1,59 @@
 import fetch from 'node-fetch';
-import {Schema, model} from 'mongoose';
+import { Schema, model } from 'mongoose';
+import { DiceCoefficient, JaroWinklerDistance } from 'natural';
 
 const PAGE_LENGTH = 6;
 const LAST_PAGE = 18412;
 
-const jServiceCategories = () => {
+const ACCEPTED_SIMILARITY = 0.7;
+const JARO_SIMILARITY = 0.9;
+const JARO_KICKER = 0.5;
+
+async function jServiceCategories() {
   const randomPage = Math.ceil(Math.random() * LAST_PAGE);
-  return fetch(`http://jservice.io/api/categories?count=${PAGE_LENGTH}&offset=${randomPage}`)
-    .then(res => res.json())
-    .then(categories => {
-      // Invalid category set for some reason. Try again.
-      if (categories.length !== 6) {
-        return jServiceCategories();
-      }
-      return categories;
-    });
+  let res = await fetch(`http://jservice.io/api/categories?count=${PAGE_LENGTH}&offset=${randomPage}`);
+  let categories = await res.json();
+  // Invalid category set for some reason. Try again.
+  if (categories.length !== 6) {
+    return jServiceCategories();
+  }
+  return categories;
 };
 
-const jServiceCategory = (id) => {
-  return fetch(`http://jservice.io/api/category?id=${id}`)
-    .then(res => res.json())
-    .then(res => {
-      let clues = [];
-      let reclaimed = [];
-      let found = 0;
-      res.clues.some(clue => {
-        if (clue.value) {
-          if (!clues[clue.value]) {
-            clues[clue.value] = clue;
-            found++;
-          }
-        } else {
-          // This question wasn't included because it doesn't have a value,
-          // but we could assign one in to "reclaim" this question:
-          reclaimed.push(clue);
-        }
-        return found === 5;
-      });
+async function jServiceCategory(id) {
+  let res = await fetch(`http://jservice.io/api/category?id=${id}`);
+  let category = await res.json();
 
-      // Bad category set, let's reclaim it!
-      if (found < 5) {
-        [200, 400, 600, 800, 1000].forEach((value) => {
-          if (!clues[value]) {
-            clues[value] = reclaimed.pop();
-            // Assign it the value we gave it:
-            clues[value].value = value;
-          }
-        });
+  let clues = [];
+  let reclaimed = [];
+  let found = 0;
+  category.clues.some(clue => {
+    if (clue.value) {
+      if (!clues[clue.value]) {
+        clues[clue.value] = clue;
+        found++;
       }
+    } else {
+      // This question wasn't included because it doesn't have a value,
+      // but we could assign one in to "reclaim" this question:
+      reclaimed.push(clue);
+    }
+    return found === 5;
+  });
 
-      // Return the clues:
-      return clues.filter(c => c);
+  // Bad category set, let's reclaim it!
+  if (found < 5) {
+    [200, 400, 600, 800, 1000].forEach(value => {
+      if (!clues[value]) {
+        clues[value] = reclaimed.pop();
+        // Assign it the value we gave it:
+        clues[value].value = value;
+      }
     });
+  }
+
+  // Return the clues:
+  return clues.filter(c => c);
 }
 
 async function jServiceQuestions(ids) {
@@ -72,6 +74,14 @@ export const schema = new Schema({
       required: true
     }
   }],
+
+  activeQuestion: {
+    type: Number
+  },
+
+  questonStart: {
+    type: Date
+  },
 
   questions: [{
     id: {
@@ -101,6 +111,12 @@ export const schema = new Schema({
   }]
 });
 
+schema.virtual('activeClue').get(function() {
+  return this.questions.find(q => {
+    return q.id === this.activeQuestion
+  });
+});
+
 // Grab the active game:
 schema.statics.activeGame = function() {
   return this.findOne({'questions': {$elemMatch: {answered: false}}});
@@ -113,8 +129,8 @@ schema.statics.end = function() {
 
 // Start a new game:
 schema.statics.start = async function() {
-  const active = await this.activeGame();
-  if (active) {
+  const game = await this.activeGame();
+  if (game) {
     throw new Error('An active game is already in progress.');
   }
   await Game.end();
@@ -124,25 +140,60 @@ schema.statics.start = async function() {
     categories,
     questions
   });
+};
 
+// Get a new clue for a given value and title
+schema.statics.getClue = async function(title, value) {
+  value = parseInt(value, 10);
+  const game = await this.activeGame();
+  if (!game) {
+    throw new Error('No active game.');
+  }
+  if (game.activeQuestion) {
+    throw new Error('There is already an active question.');
+  }
+  const category = game.categories.find(cat => {
+    return cat.title.toUpperCase() === title.toUpperCase();
+  });
+  const question = game.questions.find(q => {
+    return (q.category_id === category.id && q.value === value);
+  });
+  game.activeQuestion = question.id;
+  game.questionStart = Date.now();
+  return game.save();
+};
 
-  // return this.activeGame()
-  //   .then(active => {
-  //     if (active)
-  //       throw new Error('An active game is already in progress.');
-  //   })
-  //   .then(() => Game.end())
-  //   .then(() => jServiceCategories())
-  //   .then(categories => Promise.all([
-  //     categories,
-  //     ...categories.map(cat => jServiceQuestions(cat.id))
-  //   ]))
-  //   .then(([categories, ...questions]) => 
-  //     this.create({
-  //       categories,
-  //       questions: [].concat(...questions)
-  //     })
-  //   );
-}
+schema.statics.guess = async function(guess) {
+  const game = await this.activeGame();
+  if (!game) {
+    throw new Error('No active game.');
+  }
+  if (!game.activeQuestion) {
+    throw new Error('There is no active question.');
+  }
+  let answer = game.activeClue.answer;
+  let similarity = DiceCoefficient(guess, answer);
+  if (similarity >= ACCEPTED_SIMILARITY) {
+    return true;
+  } else if (similarity >= JARO_KICKER) {
+    let jaroSimilarity = JaroWinklerDistance(guess, answer);
+    return jaroSimilarity >= JARO_SIMILARITY;
+  } else {
+    return false;
+  }
+};
+
+schema.statics.answer = async function() {
+  const game = await this.activeGame();
+  game.questions.some(q => {
+    if (game.activeQuestion === q.id) {
+      q.answered = true;
+      return true;
+    }
+  });
+  game.activeQuestion = undefined;
+  game.questionStart = undefined;
+  return game.save();
+};
 
 export const Game = model('Game', schema);
