@@ -1,4 +1,4 @@
-import {Schema} from 'mongoose';
+import {Schema, model} from 'mongoose';
 
 export const schema = new Schema({
   categories: [{
@@ -7,7 +7,7 @@ export const schema = new Schema({
       required: true
     }
   }],
-  
+
   questions: [{
     id: {
       type: Number,
@@ -16,4 +16,4 @@ export const schema = new Schema({
   }]
 });
 
-export const Person = mongoose.model('Person', schema);
+export const Person = model('Game', schema);

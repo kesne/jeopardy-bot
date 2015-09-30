@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import express from 'express';
-import { Game } from 'models/Game';
-import { Person } from 'models/Person';
+import { Game } from './models/Game';
+import { Person } from './models/Person';
 
 mongoose.connect('mongodb://localhost/test');
 

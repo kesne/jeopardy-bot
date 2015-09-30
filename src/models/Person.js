@@ -1,4 +1,4 @@
-import {Schema} from 'mongoose';
+import {Schema, model} from 'mongoose';
 
 export const schema = new Schema({
   // Their slack username:
@@ -13,7 +13,7 @@ export const schema = new Schema({
   },
   // Their actual name (pretty printing):
   fullName: {
-    type: string,
+    type: String,
     required:true
   },
 
@@ -52,4 +52,4 @@ export const schema = new Schema({
   }
 });
 
-export const Person = mongoose.model('Person', schema);
+export const Person = model('Person', schema);
