@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import express from 'express';
+import Pageres from 'pageres';
 import { join } from 'path';
 import { dust } from 'adaro';
 import { Game } from './models/Game';
@@ -65,6 +66,10 @@ app.get('/', (req, res) => {
   });
 });
 
+app.get('/clue', (req, res) => {
+  res.render('clue');
+});
+
 app.get('/startgame', (req, res) => {
   Game.start().then(() => {
     res.send('ok');
@@ -80,6 +85,18 @@ app.get('/endgame', (req, res) => {
 });
 
 const port = process.env.PORT || 8000;
+
+
+app.get('/image', (req, res) => {
+  var pageres = new Pageres()
+    .src('localhost:' + port, ['1000x500'], {crop: false, filename: 'board'})
+    .dest(join(__dirname, 'images'));
+
+  pageres.run(function (err, items) {
+    res.sendFile(join(__dirname, 'images', 'board.png'));
+  });
+});
+
 app.listen(port, () => {
   console.log(`Jeopardy Bot listening on port ${port}`);
 });

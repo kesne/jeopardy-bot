@@ -26,7 +26,6 @@
   }
 
   #board thead {
-    height: 150px;
     border-bottom: 15px solid black;
   }
   #board tbody:before {
@@ -35,27 +34,26 @@
   }
 
   #board td, #board th {
-    height: 100px;
-    background: #12279A;
+    height: 70px;
+    background: #162387;
     border-radius: 3px;
     text-align: center;
     vertical-align: middle;
     color: #F4AC79;
     padding: 10px;
     font-family: Impact;
-
-    text-shadow: 0 2px 3px rgba(0, 0, 0, 0.6);
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.6);
   }
 
   #board th {
-    font-size: 20px;
+    font-size: 22px;
     color: white;
     text-transform: uppercase;
   }
 
   #board td {
-    font-size: 40px;
-    letter-spacing: 3px;
+    font-size: 50px;
+    letter-spacing: 2px;
   }
 
   </style>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JEOPARDY CLUE</title>
+  <style type="text/css">
+    html {
+      height: 100%;
+    }
+    body {
+      background: #26307f;
+      background: -moz-radial-gradient(center, ellipse cover,  #26307f 0%, #001182 100%);
+      background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,#26307f), color-stop(100%,#001182));
+      background: -webkit-radial-gradient(center, ellipse cover,  #26307f 0%,#001182 100%);
+      background: -o-radial-gradient(center, ellipse cover,  #26307f 0%,#001182 100%);
+      background: -ms-radial-gradient(center, ellipse cover,  #26307f 0%,#001182 100%);
+      background: radial-gradient(ellipse at center,  #26307f 0%,#001182 100%);
+
+      height: 100%;
+      padding: 0;
+      margin: 0;
+    }
+
+    .clue-container {
+      height: 100vh;
+      text-align: center;
+      display: table-cell;
+      vertical-align: middle;
+    }
+
+    .clue {
+      color: white;
+      text-shadow: 3px 3px 3px rgba(0, 0, 0, 1);
+      text-transform: uppercase;
+      font-family: Georgia, serif;
+      font-size: 40px;
+      width: 600px;
+      margin: 0 auto;
+    }
+
+    .full-width {
+      display: table;
+      width: 100%;
+    }
+
+  </style>
+</head>
+<body>
+  Render at 720x420
+  <div class="full-width">
+    <div class="clue-container">
+      <div class="clue">
+        Speaking this way involves similies and metaphors
+      </div>
+    </div>
+  </div>
+</body>
+</html>
