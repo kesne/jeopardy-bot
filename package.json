@@ -15,6 +15,7 @@
     "adaro": "^1.0.0",
     "babel-runtime": "^5.8.25",
     "express": "^4.13.3",
+    "imgur": "^0.1.6",
     "mongoose": "^4.1.9",
     "native-promise-only": "^0.8.1",
     "natural": "^0.2.1",

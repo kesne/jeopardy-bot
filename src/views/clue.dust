@@ -21,10 +21,8 @@
     }
 
     .clue-container {
-      height: 100vh;
+      height: 100%;
       text-align: center;
-      display: table-cell;
-      vertical-align: middle;
     }
 
     .clue {
@@ -35,6 +33,10 @@
       font-size: 40px;
       width: 600px;
       margin: 0 auto;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      -webkit-transform: translateX(-50%) translateY(-50%);
     }
 
     .full-width {

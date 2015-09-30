@@ -3,8 +3,14 @@ import express from 'express';
 import Pageres from 'pageres';
 import { join } from 'path';
 import { dust } from 'adaro';
+import { setClientId } from 'imgur';
 import { Game } from './models/Game';
 import { Person } from './models/Person';
+
+// Allow setting the imgur api:
+if (process.env.IMGUR_API) {
+  setClientId(process.env.IMGUR_API);
+}
 
 const MONGO_URL = process.env.MONGOLAB_URI || 'mongodb://localhost/jeopardy'
 mongoose.connect(MONGO_URL);
@@ -54,7 +60,6 @@ app.get('/', (req, res) => {
 
 app.get('/clue', (req, res) => {
   Game.activeGame().then(game => {
-    console.log(game.activeQuestion);
     res.render('clue', {
       clue: game.activeClue
     });
@@ -95,10 +100,19 @@ app.get('/endgame', (req, res) => {
 
 const port = process.env.PORT || 8000;
 
-
-app.get('/image', (req, res) => {
+app.get('/clue.png', (req, res) => {
   var pageres = new Pageres()
-    .src('localhost:' + port, ['1000x500'], {crop: false, filename: 'board'})
+    .src('localhost:' + port + '/clue', ['1000x654'], {crop: false, filename: 'clue'})
+    .dest(join(__dirname, 'images'));
+
+  pageres.run(function (err, items) {
+    res.sendFile(join(__dirname, 'images', 'clue.png'));
+  });
+});
+
+app.get('/board.png', (req, res) => {
+  var pageres = new Pageres()
+    .src('localhost:' + port, ['1000x654'], {crop: false, filename: 'board'})
     .dest(join(__dirname, 'images'));
 
   pageres.run(function (err, items) {
