@@ -5,15 +5,18 @@
   "main": "lib/jeopardy.js",
   "private": true,
   "scripts": {
-    "prepublish": "babel src --out-dir lib",
+    "prepublish": "babel src --out-dir lib --copy-files",
     "watch": "babel-node src/jeopardy",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "adaro": "^1.0.0",
+    "babel-runtime": "^5.8.25",
     "express": "^4.13.3",
     "mongoose": "^4.1.9",
+    "native-promise-only": "^0.8.1",
     "node-fetch": "^1.3.3"
   },
   "devDependencies": {

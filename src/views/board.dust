@@ -64,67 +64,23 @@
   <table id="board">
     <thead>
       <tr>
-        <th colspan="1">
-          The letter "s".
-        </th>
-        <th colspan="1">
-          The letter "s".
-        </th>
-        <th colspan="1">
-          The letter "s".
-        </th>
-        <th colspan="1">
-          The letter "s".
-        </th>
-        <th colspan="1">
-          The letter "s".
-        </th>
-        <th colspan="1">
-          The letter "s".
-        </th>
+        {#categories}
+          <th colspan="1">
+            {title}
+          </th>
+        {/categories}
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td>
-          $200
-        </td>
-        <td>
-          $200
-        </td>
-        <td>
-          $200
-        </td>
-        <td>
-          $200
-        </td>
-        <td>
-          $200
-        </td>
-        <td>
-          $200
-        </td>
-      </tr>
-      <tr>
-        <td>
-          $400
-        </td>
-        <td>
-          $400
-        </td>
-        <td>
-          $400
-        </td>
-        <td>
-          $400
-        </td>
-        <td>
-          $400
-        </td>
-        <td>
-          $400
-        </td>
-      </tr>
+      {#values}
+        <tr>
+          {#categories value=values[$idx]}
+            <td>
+              {@Card id=id value=value /}
+            </td>
+          {/categories}
+        </tr>
+      {/values}
     </tbody>
   </table>
 </body>
