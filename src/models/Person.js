@@ -30,7 +30,7 @@ export const schema = new Schema({
   currentMoney: {
     type: Number,
     default: 0
-  }
+  },
 
   // Simple stats:
   stats: {
