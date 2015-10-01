@@ -1,9 +1,11 @@
 import mongoose from 'mongoose';
 import express from 'express';
 import Pageres from 'pageres';
+import fetch from 'node-fetch';
 import { join } from 'path';
 import { dust } from 'adaro';
 import { setClientId } from 'imgur';
+import { upload } from './upload';
 import { Game } from './models/Game';
 import { Person } from './models/Person';
 
@@ -15,7 +17,15 @@ if (process.env.IMGUR_API) {
 const MONGO_URL = process.env.MONGOLAB_URI || 'mongodb://localhost/jeopardy'
 mongoose.connect(MONGO_URL);
 
+const port = process.env.PORT || 8000;
+
 const app = express();
+
+async function getImageUrl(file) {
+  await fetch(`http://localhost:${port}/${file}.png`);
+  let url = await upload(join(__dirname, 'images', `${file}.png`));
+  return url;
+};
 
 const options = {
   helpers: [
@@ -30,7 +40,7 @@ const options = {
         if (question.answered) {
           chunk.write('');
         } else {
-          chunk.write('$' + value);
+          chunk.write(`$${value}`);
         }
       }
     }
@@ -48,7 +58,7 @@ app.post('/command', (req, res) => {
 
 });
 
-app.get('/', (req, res) => {
+app.get('/board', (req, res) => {
   Game.activeGame().then(game => {
     res.render('board', {
       categories: game.categories,
@@ -98,11 +108,9 @@ app.get('/endgame', (req, res) => {
   });
 });
 
-const port = process.env.PORT || 8000;
-
 app.get('/clue.png', (req, res) => {
   var pageres = new Pageres()
-    .src('localhost:' + port + '/clue', ['1000x654'], {crop: false, filename: 'clue'})
+    .src(`localhost:${port}/clue`, ['1000x654'], {crop: false, filename: 'clue'})
     .dest(join(__dirname, 'images'));
 
   pageres.run(function (err, items) {
@@ -112,7 +120,7 @@ app.get('/clue.png', (req, res) => {
 
 app.get('/board.png', (req, res) => {
   var pageres = new Pageres()
-    .src('localhost:' + port, ['1000x654'], {crop: false, filename: 'board'})
+    .src(`localhost:${port}/board`, ['1000x654'], {crop: false, filename: 'board'})
     .dest(join(__dirname, 'images'));
 
   pageres.run(function (err, items) {

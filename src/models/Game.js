@@ -75,6 +75,10 @@ export const schema = new Schema({
     }
   }],
 
+  lastCategory: {
+    type: Number
+  },
+
   activeQuestion: {
     type: Number
   },
@@ -158,7 +162,16 @@ schema.statics.getClue = async function(title, value) {
   const question = game.questions.find(q => {
     return (q.category_id === category.id && q.value === value);
   });
+  game.lastCategory = category.id;
   game.activeQuestion = question.id;
+  return game.save();
+};
+
+schema.statics.clueSent = async function(title, value) {
+  const game = await this.activeGame();
+  if (!game) {
+    throw new Error('No active game.');
+  }
   game.questionStart = Date.now();
   return game.save();
 };
@@ -193,6 +206,7 @@ schema.statics.answer = async function() {
   });
   game.activeQuestion = undefined;
   game.questionStart = undefined;
+  game.lastCategory = undefined;
   return game.save();
 };
 

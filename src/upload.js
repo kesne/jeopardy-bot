@@ -8,7 +8,7 @@ export async function upload(file, attempt=1) {
     throw new Error('Error uploading image. Max number');
   }
   try {
-    let {data} = await uploadFile('/home/kai/kittens.png');
+    let {data} = await uploadFile(file);
     return data.link;
   } catch(e) {
     return upload(file, attempt + 1);
