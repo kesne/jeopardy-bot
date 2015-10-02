@@ -149,6 +149,9 @@ schema.statics.start = async function() {
 // Get a new clue for a given value and title
 schema.statics.getClue = async function(title, value) {
   value = parseInt(value, 10);
+  if (![200, 400, 600, 800, 1000].includes(value)) {
+    throw new RangeError('value');
+  }
   const game = await this.activeGame();
   if (!game) {
     throw new Error('No active game.');
@@ -156,12 +159,34 @@ schema.statics.getClue = async function(title, value) {
   if (game.activeQuestion) {
     throw new Error('There is already an active question.');
   }
-  const category = game.categories.find(cat => {
-    return cat.title.toUpperCase() === title.toUpperCase();
-  });
+  const category = game.categories.map(cat => {
+    return {
+      id: cat.id,
+      rank: JaroWinklerDistance(cat.title, title)
+    }
+  }).sort((a, b) => {
+    if (a.rank > b.rank) {
+      return -1;
+    } else if (b.rank > a.rank) {
+      return 1;
+    }
+    return 0;
+  }).filter(x => {
+    return x.rank > 0.5;
+  })[0];
+
+  // Invalid ask:
+  if (!category) {
+    throw new RangeError('category');
+  }
   const question = game.questions.find(q => {
     return (q.category_id === category.id && q.value === value);
   });
+
+  if (question.answered) {
+    throw new Error('Question has already been answered.');
+  }
+
   game.lastCategory = category.id;
   game.activeQuestion = question.id;
   return game.save();

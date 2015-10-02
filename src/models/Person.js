@@ -52,4 +52,8 @@ export const schema = new Schema({
   }
 });
 
+schema.statics.getUser = function(username) {
+
+};
+
 export const Person = model('Person', schema);
