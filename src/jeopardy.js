@@ -1,7 +1,9 @@
 import mongoose from 'mongoose';
 import express from 'express';
+import bodyParser from 'body-parser';
 import Pageres from 'pageres';
 import fetch from 'node-fetch';
+import { MessageReader } from './MessageReader';
 import { join } from 'path';
 import { dust } from 'adaro';
 import { setClientId } from 'imgur';
@@ -48,6 +50,7 @@ const options = {
 }
 
 app.engine('dust', dust(options));
+app.use(bodyParser.json());
 app.set('view engine', 'dust');
 app.set('views', join(__dirname, 'views'));
 
@@ -55,7 +58,10 @@ app.set('views', join(__dirname, 'views'));
 // TODO: Stateless, so we can resume back into an in-progress game.
 
 app.post('/command', (req, res) => {
-
+  const command = MessageReader.read(req.body);
+  console.log('command', command);
+  res.send('ok');
+  
 });
 
 app.get('/board', (req, res) => {
