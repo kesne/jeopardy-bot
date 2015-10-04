@@ -71,13 +71,14 @@ app.set('view engine', 'dust');
 app.set('views', join(__dirname, 'views'));
 
 const username = 'Jeopardy';
+const bot = 'USLACKBOT';
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/command', (req, res) => {
   // Ignore messages from ourself:
-  if (req.body.username === username) return;
+  if (req.body.user_id === bot) return;
 
   console.log('Processing...', req.body);
 

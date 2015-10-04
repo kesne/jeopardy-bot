@@ -45,12 +45,14 @@
   }
 
   #board th {
-    font-family: Helvetica;
-    font-size: 22px;
-    font-weight: bold;
-    line-height: 22px;
+    font-family: "League Gothic";
+    letter-spacing: 1px;
+    font-size: 30px;
+    font-weight: normal;
+    line-height: 28px;
     color: white;
     text-transform: uppercase;
+    overflow-wrap: break-word;
   }
 
   #board td {
