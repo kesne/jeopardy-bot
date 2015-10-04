@@ -59,7 +59,7 @@ const options = {
         if (question.answered) {
           chunk.write('');
         } else {
-          chunk.write(`$${value}`);
+          chunk.write(`<span class="dollar">$</span>${value}`);
         }
       }
     }
