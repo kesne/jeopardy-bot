@@ -28,9 +28,26 @@ export const commands = {
     return responses.help;
   },
 
-  async category(message) {
+  // TODO: On incoming requests, auto-generate this person object in mongo: (app.use)
+  // Pass it through commands for ease of use.
+  guess({guess, person}) {
+    const correct = await Game.guess(guess);
+    if (correct) {
+      const game = Game.activeGame();
+      // Award the value:
+      await person.correct(game.activeClue.value);
+      // Mark the question as answered:
+      await Game.answer();
+      return `That is correct, ${person.name}. Your score is $${person.score}.`;
+    } else {
+      await person.incorrect(game.activeClue.value);
+      return `That is incorrect, ${person.name}. Your score is now $${person.score}.`;
+    }
+  },
+
+  async category({category, value}) {
     try {
-      await Game.getClue(message.category, message.value);
+      await Game.getClue(category, value);
     } catch (e) {
       if (e.message.includes('already active')) {
         return `There's already an active clue. Wait your turn.`;
@@ -45,6 +62,8 @@ export const commands = {
       return ''
     }
     const url = await getImageUrl('clue');
+    // Mark that we're sending the clue now:
+    await Game.clueSent();
     return `Here's your clue. ${url}`;
   }
 };
