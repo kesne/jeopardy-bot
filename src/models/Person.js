@@ -19,8 +19,8 @@ export const schema = new Schema({
 
   // Trebek can be insulting to sassy users:
   sassFactory: {
-    type: Boolean,
-    default: false
+    type: Number,
+    default: 0
   },
 
   // The money a user has in the active game.
@@ -52,7 +52,21 @@ export const schema = new Schema({
   }
 });
 
-schema.statics.getUser = function(username) {
+schema.statics.won = async function(username) {
+  const user = await this.getUser(username);
+  user.won++;
+  return this.endGameForUser(username);
+};
+
+schema.schema.lost = async function(username) {
+
+};
+
+schema.statics.getUser = async function(username) {
+
+};
+
+schema.statics.endGameForUser = async function(username) {
 
 };
 
