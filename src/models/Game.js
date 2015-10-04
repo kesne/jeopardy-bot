@@ -130,7 +130,7 @@ schema.statics.activeGame = function() {
 schema.statics.end = async function() {
   const people = await this.model('Person').find();
   for (let person of people) {
-    await people.endGame();
+    await person.endGame();
   }
   return this.remove();
 };

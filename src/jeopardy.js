@@ -154,7 +154,8 @@ app.post('/command', (req, res) => {
           text
         });
       }
-    }).catch(() => {
+    }).catch((e) => {
+      console.log(e.stack);
       // Make sure we always send some response:
       res.end();
     });
