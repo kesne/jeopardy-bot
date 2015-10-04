@@ -41,23 +41,24 @@
     vertical-align: middle;
     color: #F4AC79;
     padding: 10px;
-    font-family: "League Gothic";
     text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.6);
   }
 
   #board th {
+    font-family: Helvetica;
     font-size: 22px;
     color: white;
     text-transform: uppercase;
   }
 
   #board td {
-    font-size: 50px;
+    font-family: "League Gothic";
+    font-size: 70px;
     letter-spacing: 2px;
   }
 
   #board .dollar {
-    font-size: 40px;
+    font-size: 60px;
     vertical-align: middle;
     margin-top: -8px;
     display: inline-block;
