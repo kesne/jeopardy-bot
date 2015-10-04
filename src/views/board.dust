@@ -47,6 +47,8 @@
   #board th {
     font-family: Helvetica;
     font-size: 22px;
+    font-weight: bold;
+    line-height: 20px;
     color: white;
     text-transform: uppercase;
   }
