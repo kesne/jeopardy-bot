@@ -30,10 +30,17 @@ export const commands = {
 
   // TODO: On incoming requests, auto-generate this person object in mongo: (app.use)
   // Pass it through commands for ease of use.
-  guess({guess, person}) {
-    const correct = await Game.guess(guess);
+  async guess({guess, person}) {
+    let correct;
+    try {
+      correct = await Game.guess(guess);
+    } catch(e) {
+      // Just ignore guesses if they're outside of the game context:
+      return '';
+    }
     if (correct) {
-      const game = Game.activeGame();
+      const game = await Game.activeGame();
+      console.log(game.activeClue.value, person);
       // Award the value:
       await person.correct(game.activeClue.value);
       // Mark the question as answered:
@@ -115,20 +122,35 @@ const bot = 'USLACKBOT';
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use('/command', (req, res, next) => {
+  // Get the person for this request.
+  // This will create a new user if none exists.
+  Person.get(req.body).then((person) => {
+    req.person = person;
+    next();
+  });
+});
+
 app.post('/command', (req, res) => {
   // Ignore messages from ourself:
   if (req.body.user_id === bot) return;
 
-  console.log('Processing...', req.body);
-
   const message = MessageReader.parse(req.body.text);
   console.log('command', message);
   if (message && message.command) {
-    command(message).then(text => {
-      res.json({
-        username,
-        text
-      });
+    command({
+      person: req.person,
+      ...message
+    }).then(text => {
+      // If they return empty, just end the response:
+      if (text === '') {
+        res.end();
+      } else {
+        res.json({
+          username,
+          text
+        });
+      }
     });
   } else {
     // Send nothing:

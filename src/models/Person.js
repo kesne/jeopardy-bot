@@ -1,11 +1,12 @@
 import {Schema, model} from 'mongoose';
 
 export const schema = new Schema({
-  // Their slack username:
+  // TODO: Their slack username:
   username: {
     type: String,
-    required: true
+    required: false
   },
+
   // Their slack ID:
   slackid: {
     type: String,
@@ -14,7 +15,7 @@ export const schema = new Schema({
   // Their actual name (for pretty printing):
   name: {
     type: String,
-    required:true
+    required: true
   },
 
   // Trebek can be insulting to sassy users:
@@ -52,22 +53,43 @@ export const schema = new Schema({
   }
 });
 
-schema.statics.won = async function(username) {
-  const user = await this.getUser(username);
-  user.won++;
-  return this.endGameForUser(username);
+schema.statics.get = async function({user_id: slackid, user_name: name}) {
+  let user = await this.findOne({
+    slackid
+  });
+  if (!user) {
+    user = await this.create({
+      name,
+      slackid
+    });
+  }
+  return user;
 };
 
-schema.statics.lost = async function(username) {
-
+schema.methods.correct = function(value) {
+  this.score += value;
+  return this.save();
 };
 
-schema.statics.getUser = async function(username) {
+schema.methods.incorrect = function(value) {
+  this.score -= value;
+  return this.save();
+}
 
+schema.methods.won = function() {
+  this.stats.won++;
+  return this.endGame();
 };
 
-schema.statics.endGameForUser = async function(username) {
+schema.methods.lost = function() {
+  this.stats.lost++;
+  return this.endGame();
+};
 
+schema.methods.endGame = function() {
+  this.stats.money += this.score;
+  this.score = 0;
+  return this.save();
 };
 
 export const Person = model('Person', schema);

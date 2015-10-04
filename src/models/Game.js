@@ -204,10 +204,10 @@ schema.statics.clueSent = async function(title, value) {
 schema.statics.guess = async function(guess) {
   const game = await this.activeGame();
   if (!game) {
-    throw new Error('No active game.');
+    throw new Error('game');
   }
   if (!game.activeQuestion) {
-    throw new Error('There is no active question.');
+    throw new Error('clue');
   }
   let answer = game.activeClue.answer;
   let similarity = DiceCoefficient(guess, answer);

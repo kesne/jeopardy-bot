@@ -63,12 +63,26 @@ export const MessageReader = {
 				}
 			}
 
-			if (tokens[0] === 'what|who|') {
+			const questions = ['what', 'whats', 'where', 'wheres', 'who', 'whos'];
+			if (questions.includes(tokens[0])) {
 				// This is a guess:
-				
+					
+				// Dump the question:
+				tokens.shift();
+
+				const questionElements = ['is', 'are', 'was', 'were', 'the', 'a', 'an'];
+				// Remove question elements for two deep:
+				for (let i = 0; i < 2; i++) {
+					if (questionElements.includes(tokens[0])) {
+						tokens.shift();
+					} else {
+						break;
+					}
+				}
+
 				return {
 					command: 'guess',
-					guess: ''// this comes from the tokens...
+					guess: tokens.join(' ')
 				}
 			}
 		}
