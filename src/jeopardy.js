@@ -38,8 +38,8 @@ export const commands = {
       // Just ignore guesses if they're outside of the game context:
       return '';
     }
+    const game = await Game.activeGame();
     if (correct) {
-      const game = await Game.activeGame();
       // Speed this up:
       await Promise.all([
         // Award the value:

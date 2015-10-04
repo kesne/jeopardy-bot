@@ -211,16 +211,20 @@ schema.statics.guess = async function(guess) {
   if (!game.activeQuestion) {
     throw new Error('clue');
   }
-  let answer = game.activeClue.answer;
-  let similarity = DiceCoefficient(guess, answer);
-  if (similarity >= ACCEPTED_SIMILARITY) {
-    return true;
-  } else if (similarity >= JARO_KICKER) {
-    let jaroSimilarity = JaroWinklerDistance(guess, answer);
-    return jaroSimilarity >= JARO_SIMILARITY;
-  } else {
-    return false;
-  }
+
+  // Get the answers:
+  let answers = game.activeClue.answer.split(/\(|\)/).filter(n => n);
+  return answers.some(answer => {
+    let similarity = DiceCoefficient(guess, answer);
+    if (similarity >= ACCEPTED_SIMILARITY) {
+      return true;
+    } else if (similarity >= JARO_KICKER) {
+      let jaroSimilarity = JaroWinklerDistance(guess, answer);
+      return jaroSimilarity >= JARO_SIMILARITY;
+    } else {
+      return false;
+    }
+  });
 };
 
 schema.statics.answer = async function() {
