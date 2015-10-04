@@ -45,7 +45,7 @@ export const commands = {
         // Award the value:
         person.correct(game.activeClue.value),
         // Mark the question as answered:
-        Game.answer();
+        Game.answer()
       ]);
       // Get the new board url:
       const url = await getImageUrl('board');
