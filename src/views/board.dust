@@ -48,19 +48,19 @@
     font-family: Helvetica;
     font-size: 22px;
     font-weight: bold;
-    line-height: 20px;
+    line-height: 22px;
     color: white;
     text-transform: uppercase;
   }
 
   #board td {
     font-family: "League Gothic";
-    font-size: 70px;
+    font-size: 80px;
     letter-spacing: 2px;
   }
 
   #board .dollar {
-    font-size: 60px;
+    font-size: 70px;
     vertical-align: middle;
     margin-top: -8px;
     display: inline-block;

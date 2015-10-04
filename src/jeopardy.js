@@ -158,7 +158,7 @@ app.get('/clue.png', (req, res) => {
 
 app.get('/board.png', (req, res) => {
   var pageres = new Pageres()
-    .src(`localhost:${port}/board`, ['1000x654'], {crop: false, filename: 'board'})
+    .src(`localhost:${port}/board`, ['1200x654'], {crop: false, filename: 'board'})
     .dest(join(__dirname, 'images'));
 
   pageres.run(function (err, items) {
