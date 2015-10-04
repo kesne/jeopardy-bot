@@ -127,7 +127,7 @@ schema.statics.activeGame = function() {
 };
 
 // End all games:
-schema.statics.end = function() {
+schema.statics.end = async function() {
   return this.remove();
 };
 

@@ -58,7 +58,7 @@ schema.statics.won = async function(username) {
   return this.endGameForUser(username);
 };
 
-schema.schema.lost = async function(username) {
+schema.statics.lost = async function(username) {
 
 };
 

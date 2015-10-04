@@ -5,10 +5,13 @@ const values = [200, 400, 600, 800, 1000];
 
 export const MessageReader = {
 
-	parseText(text) {
-		text = text.replace('\'', '').toLowerCase();
+	parse(text) {
+		text = text.replace('\'', '').trim().toLowerCase();
 
 		// Exact match cases:
+		if (text === 'help') {
+			return {command: 'help'};
+		}
 		if (text === 'new game') {
 			return {command: 'new'};
 		}
@@ -59,10 +62,6 @@ export const MessageReader = {
 				}
 			}
 		}
-	},
-
-	read(msg) {
-		this.parseText(msg.text);
 	}
 
 }

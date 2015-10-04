@@ -3,38 +3,38 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import Pageres from 'pageres';
 import fetch from 'node-fetch';
-import { MessageReader } from './MessageReader';
 import { join } from 'path';
 import { dust } from 'adaro';
-import { setClientId } from 'imgur';
+
+import responses from './responses';
 import { upload } from './upload';
+import { MessageReader } from './MessageReader';
+
 import { Game } from './models/Game';
 import { Person } from './models/Person';
 
-const helpMessage = `
-Here, this should help you out!
->*Games*
->    “new game” - Starts a new game.
->    “end game” - Ends the current game.
->*Selecting Categories*
->    “I’ll take ________ for $___”
->    “Give me ________ for $___”
->    “Choose ________ for $___”
->    “ ________ for $___”
->    “Same category (for) $___”
->*Guessing*
->    “What [is|are] _______”
->    “Who [is|are] ________”
->    “Where [is|are] ______”
->*Scores*
->    “scores” - Shows the score for the current game.
->    “leaderboard” - Shows the scores and wins from all games.
-`;
+export const commands = {
+  new() {
+    return Game.start()
+      .then(() => getImageUrl('board'))
+      .then((url) => `Let's get this game started! ${url}`)
+      .catch((e) => {
+        console.log(e);
+        return 'It looks like a game is already in progress! You need to finish or end that one first before starting a new game.'
+      });
+  },
+  end() {
+    return Game.end()
+      .then(() => `Alright, I've ended that game for you. You can always start a new game by typing "new game".`);
+  },
+  help() {
+    return responses.help;
+  }
+};
 
-// Allow setting the imgur api:
-if (process.env.IMGUR_API) {
-  setClientId(process.env.IMGUR_API);
-}
+async function command(message) {
+  return commands[message.command](message);
+};
 
 const MONGO_URL = process.env.MONGOLAB_URI || 'mongodb://localhost/jeopardy'
 mongoose.connect(MONGO_URL);
@@ -70,18 +70,31 @@ const options = {
 }
 
 app.engine('dust', dust(options));
-app.use(bodyParser.json());
 app.set('view engine', 'dust');
 app.set('views', join(__dirname, 'views'));
 
-// TODO: Body parsing
-// TODO: Stateless, so we can resume back into an in-progress game.
+const username = 'Jeopardy';
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/command', (req, res) => {
-  const command = MessageReader.read(req.body);
-  console.log('command', command);
-  res.send('ok');
-  
+  // Ignore messages from ourself:
+  if (req.body.username === username) return;
+
+  const message = MessageReader.parse(req.body.text);
+  console.log('command', message);
+  if (message && message.command) {
+    command(message).then(text => {
+      res.json({
+        username,
+        text
+      });
+    });
+  } else {
+    // Send nothing:
+    res.end();
+  }
 });
 
 app.get('/board', (req, res) => {

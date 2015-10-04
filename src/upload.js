@@ -1,4 +1,9 @@
-import { uploadFile } from 'imgur';
+import { uploadFile, setClientId } from 'imgur';
+
+// Allow setting the imgur api:
+if (process.env.IMGUR_API) {
+  setClientId(process.env.IMGUR_API);
+}
 
 const MAX_RETRIES = 3;
 
