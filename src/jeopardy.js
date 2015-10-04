@@ -33,6 +33,16 @@ export const commands = {
     try {
       correct = await Game.guess({guess, contestant});
     } catch(e) {
+      // Timeout:
+      if (e.message.includes('timeout')) {
+        const [game, url] = await Promise.all([
+          Game.activeGame(),
+          getImageUrl('board'),
+          // We timed out, so mark this question as done.
+          Game.answer()
+        ]);
+        return `Time's up, ${contestant.name}! Remember, you have 45 seconds to answer. The correct answer is \`${game.getClue().answer}\`. Select a new category. ${url}`;
+      }
       // They've already guessed
       if (e.message.includes('contestant')) {
         return `You had your chance, ${contestant.name}. Let someone else answer.`;
@@ -41,11 +51,12 @@ export const commands = {
       return '';
     }
     const game = await Game.activeGame();
+    const {value} = game.clue;
     if (correct) {
       // Speed this up:
       await Promise.all([
         // Award the value:
-        contestant.correct(game.activeClue.value),
+        contestant.correct(value),
         // Mark the question as answered:
         Game.answer()
       ]);
@@ -53,7 +64,7 @@ export const commands = {
       const url = await getImageUrl('board');
       return `That is correct, ${contestant.name}. Your score is $${contestant.score}. Select a new category. ${url}`;
     } else {
-      await contestant.incorrect(game.activeClue.value);
+      await contestant.incorrect(value);
       return `That is incorrect, ${contestant.name}. Your score is now $${contestant.score}.`;
     }
   },
@@ -178,9 +189,9 @@ app.get('/board', (req, res) => {
 });
 
 app.get('/clue', (req, res) => {
-  Game.activeGame().then(game => {
+  Game.activeGame().then(({clue}) => {
     res.render('clue', {
-      clue: game.activeClue
+      clue
     });
   });
 });

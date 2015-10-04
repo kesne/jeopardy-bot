@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import { Schema, model } from 'mongoose';
 import { DiceCoefficient, JaroWinklerDistance } from 'natural';
+import moment from 'moment';
 
 const PAGE_LENGTH = 6;
 const LAST_PAGE = 18412;
@@ -75,6 +76,11 @@ export const schema = new Schema({
     }
   }],
 
+  // TODO: Use the channel ID to allow multiple games.
+  channel_id: {
+    type: String
+  },
+
   lastCategory: {
     type: Number
   },
@@ -83,7 +89,7 @@ export const schema = new Schema({
     type: Number
   },
 
-  questonStart: {
+  questionStart: {
     type: Date
   },
 
@@ -120,10 +126,21 @@ export const schema = new Schema({
   }]
 });
 
-schema.virtual('activeClue').get(function() {
+// Gets the clue without the timeout:
+schema.methods.getClue = function() {
   return this.questions.find(q => {
     return q.id === this.activeQuestion
   });
+};
+
+// Gets the clue with the timeout:
+schema.virtual('clue').get(function() {
+  const clue = this.getClue();
+  // There's no active question if we've timed out:
+  if (moment().isAfter(moment(this.questionStart).add(45, 'seconds'))) {
+    return false;
+  }
+  return clue;
 });
 
 schema.methods.answered = function(id) {
@@ -167,7 +184,7 @@ schema.statics.getClue = async function(title, value) {
   if (!game) {
     throw new Error('No active game.');
   }
-  if (game.activeQuestion) {
+  if (game.clue) {
     throw new Error('already active');
   }
   const category = game.categories.map(cat => {
@@ -220,6 +237,9 @@ schema.statics.guess = async function({contestant, guess}) {
   if (!game.activeQuestion) {
     throw new Error('clue');
   }
+  if (!game.clue) {
+    throw new Error('timeout');
+  }
   if (game.answered(contestant.slackid)) {
     throw new Error('contestant')
   }
@@ -229,7 +249,7 @@ schema.statics.guess = async function({contestant, guess}) {
   await game.save();
 
   // Get the answers:
-  let answers = game.activeClue.answer.split(/\(|\)/).filter(n => n);
+  let answers = game.clue.answer.split(/\(|\)/).filter(n => n);
   return answers.some(answer => {
     let similarity = DiceCoefficient(guess, answer);
     if (similarity >= ACCEPTED_SIMILARITY) {

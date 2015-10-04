@@ -18,6 +18,7 @@
     "body-parser": "^1.14.1",
     "express": "^4.13.3",
     "imgur": "^0.1.6",
+    "moment": "^2.10.6",
     "mongoose": "^4.1.9",
     "native-promise-only": "^0.8.1",
     "natural": "^0.2.1",
