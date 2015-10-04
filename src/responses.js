@@ -9,7 +9,7 @@ Here, this should help you out!
 >    “Give me ________ for $___”
 >    “Choose ________ for $___”
 >    “ ________ for $___”
->    “Same category (for) $___”
+>    “Same category for $___”
 >*Guessing*
 >    “What [is|are] _______”
 >    “Who [is|are] ________”

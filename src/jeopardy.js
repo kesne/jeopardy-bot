@@ -26,6 +26,26 @@ export const commands = {
   },
   help() {
     return responses.help;
+  },
+
+  async category(message) {
+    try {
+      await Game.getClue(message.category, message.value);
+    } catch (e) {
+      if (e.message.includes('already active')) {
+        return `There's already an active clue. Wait your turn.`;
+      }
+      if (e.message.includes('value')) {
+        return `I'm sorry, I can't give you a clue for that value.`;
+      }
+      if (e.message.includes('category')) {
+        return `I'm sorry, I don't know what category that is. Try being more specific.`;
+      }
+      // Just ignore the input:
+      return ''
+    }
+    const url = await getImageUrl('clue');
+    return `Here's your clue. ${url}`;
   }
 };
 

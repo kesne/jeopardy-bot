@@ -157,7 +157,7 @@ schema.statics.getClue = async function(title, value) {
     throw new Error('No active game.');
   }
   if (game.activeQuestion) {
-    throw new Error('There is already an active question.');
+    throw new Error('already active');
   }
   const category = game.categories.map(cat => {
     return {
