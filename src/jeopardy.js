@@ -18,10 +18,7 @@ export const commands = {
     return Game.start()
       .then(() => getImageUrl('board'))
       .then((url) => `Let's get this game started! ${url}`)
-      .catch((e) => {
-        console.log(e);
-        return 'It looks like a game is already in progress! You need to finish or end that one first before starting a new game.'
-      });
+      .catch((e) => 'It looks like a game is already in progress! You need to finish or end that one first before starting a new game.');
   },
   end() {
     return Game.end()
@@ -81,6 +78,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.post('/command', (req, res) => {
   // Ignore messages from ourself:
   if (req.body.username === username) return;
+
+  console.log('Processing...', req.body);
 
   const message = MessageReader.parse(req.body.text);
   console.log('command', message);
