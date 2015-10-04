@@ -40,12 +40,15 @@ export const commands = {
     }
     if (correct) {
       const game = await Game.activeGame();
-      // Award the value:
-      await person.correct(game.activeClue.value);
+      // Speed this up:
+      await Promise.all([
+        // Award the value:
+        person.correct(game.activeClue.value),
+        // Mark the question as answered:
+        Game.answer();
+      ]);
       // Get the new board url:
       const url = await getImageUrl('board');
-      // Mark the question as answered:
-      await Game.answer();
       return `That is correct, ${person.name}. Your score is $${person.score}. Select a new category. ${url}`;
     } else {
       await person.incorrect(game.activeClue.value);
