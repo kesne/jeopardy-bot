@@ -11,7 +11,7 @@ import { upload } from './upload';
 import { MessageReader } from './MessageReader';
 
 import { Game } from './models/Game';
-import { Person } from './models/Person';
+import { Contestant } from './models/Contestant';
 
 export const commands = {
   new() {
@@ -28,13 +28,15 @@ export const commands = {
     return responses.help;
   },
 
-  // TODO: On incoming requests, auto-generate this person object in mongo: (app.use)
-  // Pass it through commands for ease of use.
-  async guess({guess, person}) {
+  async guess({guess, contestant}) {
     let correct;
     try {
-      correct = await Game.guess(guess);
+      correct = await Game.guess({guess, contestant});
     } catch(e) {
+      // They've already guessed
+      if (e.message.includes('contestant')) {
+        return `You had your chance, ${contestant.name}. Let someone else answer.`;
+      }
       // Just ignore guesses if they're outside of the game context:
       return '';
     }
@@ -43,16 +45,16 @@ export const commands = {
       // Speed this up:
       await Promise.all([
         // Award the value:
-        person.correct(game.activeClue.value),
+        contestant.correct(game.activeClue.value),
         // Mark the question as answered:
         Game.answer()
       ]);
       // Get the new board url:
       const url = await getImageUrl('board');
-      return `That is correct, ${person.name}. Your score is $${person.score}. Select a new category. ${url}`;
+      return `That is correct, ${contestant.name}. Your score is $${contestant.score}. Select a new category. ${url}`;
     } else {
-      await person.incorrect(game.activeClue.value);
-      return `That is incorrect, ${person.name}. Your score is now $${person.score}.`;
+      await contestant.incorrect(game.activeClue.value);
+      return `That is incorrect, ${contestant.name}. Your score is now $${contestant.score}.`;
     }
   },
 
@@ -127,10 +129,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/command', (req, res, next) => {
-  // Get the person for this request.
+  // Get the contestant for this request.
   // This will create a new user if none exists.
-  Person.get(req.body).then((person) => {
-    req.person = person;
+  Contestant.get(req.body).then(contestant => {
+    req.contestant = contestant;
     next();
   });
 });
@@ -142,7 +144,7 @@ app.post('/command', (req, res) => {
   const message = MessageReader.parse(req.body.text);
   if (message && message.command) {
     command({
-      person: req.person,
+      contestant: req.contestant,
       ...message
     }).then(text => {
       // If they return empty, just end the response:

@@ -92,4 +92,4 @@ schema.methods.endGame = function() {
   return this.save();
 };
 
-export const Person = model('Person', schema);
+export const Contestant = model('Contestant', schema);

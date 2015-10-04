@@ -87,6 +87,11 @@ export const schema = new Schema({
     type: Date
   },
 
+  contestantAnswers: {
+    type: Array,
+    default: []
+  },
+
   questions: [{
     id: {
       type: Number,
@@ -121,6 +126,10 @@ schema.virtual('activeClue').get(function() {
   });
 });
 
+schema.methods.answered = function(id) {
+  return this.contestantAnswers.some(i => i === id); 
+};
+
 // Grab the active game:
 schema.statics.activeGame = function() {
   return this.findOne({'questions': {$elemMatch: {answered: false}}});
@@ -128,8 +137,8 @@ schema.statics.activeGame = function() {
 
 // End all games:
 schema.statics.end = async function() {
-  const people = await this.model('Person').find();
-  await Promise.all(people.map(person => person.endGame()));
+  const contestants = await this.model('Contestant').find();
+  await Promise.all(contestants.map(contestant => contestant.endGame()));
   return this.remove();
 };
 
@@ -203,7 +212,7 @@ schema.statics.clueSent = async function(title, value) {
   return game.save();
 };
 
-schema.statics.guess = async function(guess) {
+schema.statics.guess = async function({contestant, guess}) {
   const game = await this.activeGame();
   if (!game) {
     throw new Error('game');
@@ -211,6 +220,13 @@ schema.statics.guess = async function(guess) {
   if (!game.activeQuestion) {
     throw new Error('clue');
   }
+  if (game.answered(contestant.slackid)) {
+    throw new Error('contestant')
+  }
+
+  // This contestant has now guessed:
+  game.contestantAnswers.push(contestant.slackid);
+  await game.save();
 
   // Get the answers:
   let answers = game.activeClue.answer.split(/\(|\)/).filter(n => n);
@@ -235,6 +251,7 @@ schema.statics.answer = async function() {
       return true;
     }
   });
+  game.contestantAnswers = [];
   game.activeQuestion = undefined;
   game.questionStart = undefined;
   game.lastCategory = undefined;
