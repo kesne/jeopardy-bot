@@ -49,7 +49,7 @@ export const commands = {
       return `That is correct, ${person.name}. Your score is $${person.score}. Select a new category. ${url}`;
     } else {
       await person.incorrect(game.activeClue.value);
-      return `That is incorrect, ${person.name}. Your score is now $${person.score}. ${url}`;
+      return `That is incorrect, ${person.name}. Your score is now $${person.score}.`;
     }
   },
 
