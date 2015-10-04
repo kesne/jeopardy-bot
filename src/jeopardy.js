@@ -40,15 +40,16 @@ export const commands = {
     }
     if (correct) {
       const game = await Game.activeGame();
-      console.log(game.activeClue.value, person);
       // Award the value:
       await person.correct(game.activeClue.value);
+      // Get the new board url:
+      const url = getImageUrl('board');
       // Mark the question as answered:
       await Game.answer();
-      return `That is correct, ${person.name}. Your score is $${person.score}.`;
+      return `That is correct, ${person.name}. Your score is $${person.score}. Select a new category. ${url}`;
     } else {
       await person.incorrect(game.activeClue.value);
-      return `That is incorrect, ${person.name}. Your score is now $${person.score}.`;
+      return `That is incorrect, ${person.name}. Your score is now $${person.score}. ${url}`;
     }
   },
 
