@@ -116,7 +116,7 @@ app.engine('dust', dust(options));
 app.set('view engine', 'dust');
 app.set('views', join(__dirname, 'views'));
 
-const username = 'Jeopardy';
+const username = 'JeopardyBot';
 const bot = 'USLACKBOT';
 
 app.use(bodyParser.json());
@@ -136,7 +136,6 @@ app.post('/command', (req, res) => {
   if (req.body.user_id === bot) return;
 
   const message = MessageReader.parse(req.body.text);
-  console.log('command', message);
   if (message && message.command) {
     command({
       person: req.person,
@@ -151,6 +150,9 @@ app.post('/command', (req, res) => {
           text
         });
       }
+    }).catch(() => {
+      // Make sure we always send some response:
+      res.end();
     });
   } else {
     // Send nothing:
@@ -173,38 +175,6 @@ app.get('/clue', (req, res) => {
     res.render('clue', {
       clue: game.activeClue
     });
-  });
-});
-
-app.get('/getclue/:title/:value', (req, res) => {
-  Game.getClue(req.params.title, req.params.value).then(clue => {
-    res.send('Got clue');
-  });
-});
-
-app.get('/guess/:whatis', (req, res) => {
-  Game.guess(req.params.whatis).then(valid => {
-    res.send(valid);
-  });
-});
-
-app.get('/answer', (req, res) => {
-  Game.answer().then(() => {
-    res.send('done');
-  });
-});
-
-app.get('/startgame', (req, res) => {
-  Game.start().then(() => {
-    res.send('ok');
-  }).catch((e) => {
-    res.send('no');
-  });
-});
-
-app.get('/endgame', (req, res) => {
-  Game.end().then(() => {
-    res.send('ok');
   });
 });
 
