@@ -248,7 +248,7 @@ app.get('/image/:channel_id/:name', (req, res) => {
     new Imagemin()
       .src(join(__dirname, 'images', item.filename))
       .dest(join(__dirname, 'images'))
-      .use(Imagemin.optipng({optimizationLevel: 2}))
+      .use(Imagemin.optipng({optimizationLevel: 1}))
       .run(function (err, [file]) {
         console.timeEnd('min');
         res.send('ok');
