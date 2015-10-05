@@ -5,6 +5,7 @@ import Pageres from 'pageres';
 import fetch from 'node-fetch';
 import Imagemin from 'imagemin';
 import { join } from 'path';
+import { unlink } from 'fs';
 import { dust } from 'adaro';
 
 import responses from './responses';
@@ -14,9 +15,41 @@ import { MessageReader } from './MessageReader';
 import { Game } from './models/Game';
 import { Contestant } from './models/Contestant';
 
+import * as constants from './models/constants';
+
 export const commands = {
   poke() {
     return `I'm here, I'm here...`;
+  },
+
+  async scores({body}) {
+    const contestants = await Contestant.find({
+      scores: {
+        $elemMatch: {
+          channel_id: body.channel_id,
+          value: {
+            $gt: 0
+          }
+        }
+      }
+    });
+    if (contestants.length === 0) {
+      return 'There are no scores yet!';
+    }
+    const leaders = contestants.sort((a, b) => {
+      const aScore = a.channelScore(body.channel_id);
+      const bScore = b.channelScore(body.channel_id);
+      if (aScore > bScore) {
+        return 1;
+      }
+      if(bScore > aScore) {
+        return -1;
+      }
+      return 0;
+    }).map((contestant, i) => {
+      return `${i + 1}. ${contestant.name}: ${contestant.channelScore(body.channel_id)}`;
+    });
+    return `Here are the current scores for this game:\n\n${leaders.join('\n')}`;
   },
 
   async new({game, body}) {
@@ -136,9 +169,11 @@ async function command(message) {
   return commands[message.command](message);
 };
 
+// TODO: Move this?
 const MONGO_URL = process.env.MONGOLAB_URI || 'mongodb://localhost/jeopardy'
 mongoose.connect(MONGO_URL);
 
+// TODO: Move this?
 const port = process.env.PORT || 8000;
 
 const app = express();
@@ -146,8 +181,15 @@ const app = express();
 async function getImageUrl({file, channel_id}) {
   await fetch(`http://localhost:${port}/image/${channel_id}/${file}`);
 
-  // TODO: Delete locally after an upload:
-  let url = await upload(join(__dirname, 'images', `${channel_id}.${file}.png`));
+  const fileName = join(__dirname, 'images', `${channel_id}.${file}.png`);
+
+  let url = await upload(fileName);
+
+  // After we've uploaded the image, we don't need it locally anymore.
+  // Schedule it for next tick to prevent it from blocking the response.
+  process.nextTick(() => {
+    unlink(fileName, () => {});
+  });
   return url;
 };
 
@@ -175,6 +217,7 @@ app.engine('dust', dust(options));
 app.set('view engine', 'dust');
 app.set('views', join(__dirname, 'views'));
 
+// TODO: Move these:
 const username = 'JeopardyBot';
 const bot = 'USLACKBOT';
 
@@ -237,7 +280,7 @@ app.get('/:channel_id/board', (req, res) => {
     res.render('board', {
       categories,
       questions,
-      values: [200, 400, 600, 800, 1000]
+      values: constants.VALUES
     });
   });
 });

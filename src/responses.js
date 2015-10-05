@@ -1,3 +1,5 @@
+// TODO: Move responses here...
+
 export default {
   help: `
 Here, this should help you out!

@@ -3,21 +3,14 @@ import moment from 'moment';
 import { Schema, model } from 'mongoose';
 import { DiceCoefficient, JaroWinklerDistance } from 'natural';
 
-// TODO: Move this (plus values, etc) into game constants
-const PAGE_LENGTH = 6;
-
-const LAST_PAGE = 18412;
-
-const ACCEPTED_SIMILARITY = 0.7;
-const JARO_SIMILARITY = 0.9;
-const JARO_KICKER = 0.5;
+import * as constants from './constants';
 
 async function jServiceCategories() {
-  const randomPage = Math.ceil(Math.random() * LAST_PAGE);
-  let res = await fetch(`http://jservice.io/api/categories?count=${PAGE_LENGTH}&offset=${randomPage}`);
+  const randomPage = Math.ceil(Math.random() * constants.LAST_PAGE);
+  let res = await fetch(`http://jservice.io/api/categories?count=${constants.CATEGORY_COUNT}&offset=${randomPage}`);
   let categories = await res.json();
   // Invalid category set for some reason. Try again.
-  if (categories.length !== PAGE_LENGTH) {
+  if (categories.length !== constants.CATEGORY_COUNT) {
     return jServiceCategories();
   }
   return categories;
@@ -46,7 +39,7 @@ async function jServiceCategory(id) {
 
   // Bad category set, let's reclaim it!
   if (found < 5) {
-    [200, 400, 600, 800, 1000].forEach(value => {
+    constants.VALUES.forEach(value => {
       if (!clues[value]) {
         clues[value] = reclaimed.pop();
         // Assign it the value we gave it:
@@ -78,7 +71,6 @@ export const schema = new Schema({
     }
   }],
 
-  // TODO: Use the channel ID to allow multiple games.
   channel_id: {
     type: String,
     required: true
@@ -148,7 +140,7 @@ schema.statics.forChannel = function({channel_id}) {
   return this.findOne({
     channel_id,
     questions: {
-      '$elemMatch': { answered: false }
+      $elemMatch: { answered: false }
     }
   });
 };
@@ -157,7 +149,7 @@ schema.statics.forChannel = function({channel_id}) {
 schema.statics.end = async function({channel_id}) {
   const contestants = await this.model('Contestant').find({
     scores: {
-      '$elemMatch': { channel_id }
+      $elemMatch: { channel_id }
     }
   });
   await Promise.all(contestants.map(contestant => contestant.endGame({channel_id})));
@@ -192,7 +184,7 @@ schema.methods.getClue = function() {
 // Get a new clue for a given value and title
 schema.methods.newClue = async function({category, value}) {
   value = parseInt(value, 10);
-  if (![200, 400, 600, 800, 1000].includes(value)) {
+  if (!constants.VALUES.includes(value)) {
     throw new RangeError('value');
   }
   if (this.clue) {
@@ -257,11 +249,11 @@ schema.methods.guess = async function({contestant, guess}) {
   answers.push(answers.join(' '));
   return answers.some(answer => {
     let similarity = DiceCoefficient(guess, answer);
-    if (similarity >= ACCEPTED_SIMILARITY) {
+    if (similarity >= constants.ACCEPTED_SIMILARITY) {
       return true;
-    } else if (similarity >= JARO_KICKER) {
+    } else if (similarity >= constants.JARO_KICKER) {
       let jaroSimilarity = JaroWinklerDistance(guess, answer);
-      return jaroSimilarity >= JARO_SIMILARITY;
+      return jaroSimilarity >= constants.JARO_SIMILARITY;
     } else {
       return false;
     }
