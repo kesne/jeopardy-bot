@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
+import moment from 'moment';
 import { Schema, model } from 'mongoose';
 import { DiceCoefficient, JaroWinklerDistance } from 'natural';
-import moment from 'moment';
 
 // TODO: Move this (plus values, etc) into game constants
 const PAGE_LENGTH = 6;
@@ -80,7 +80,8 @@ export const schema = new Schema({
 
   // TODO: Use the channel ID to allow multiple games.
   channel_id: {
-    type: String
+    type: String,
+    required: true
   },
 
   lastCategory: {
@@ -139,14 +140,14 @@ schema.virtual('clue').get(function() {
 });
 
 schema.methods.answered = function(id) {
-  return this.contestantAnswers.some(i => i === id); 
+  return this.contestantAnswers.some(i => i === id);
 };
 
 // Grab the active game for the channel:
 schema.statics.forChannel = function({channel_id}) {
   return this.findOne({
     channel_id,
-    questions:{
+    questions: {
       '$elemMatch': { answered: false }
     }
   });
@@ -154,9 +155,12 @@ schema.statics.forChannel = function({channel_id}) {
 
 // End all games:
 schema.statics.end = async function({channel_id}) {
-  // TODO: Make sure we only end this game for contestants!
-  const contestants = await this.model('Contestant').find();
-  await Promise.all(contestants.map(contestant => contestant.endGame()));
+  const contestants = await this.model('Contestant').find({
+    scores: {
+      '$elemMatch': { channel_id }
+    }
+  });
+  await Promise.all(contestants.map(contestant => contestant.endGame({channel_id})));
   return this.remove({channel_id});
 };
 
@@ -172,6 +176,7 @@ schema.statics.start = async function({channel_id}) {
   const categories = await jServiceCategories();
   const questions = await jServiceQuestions(categories.map(cat => cat.id));
   return this.create({
+    channel_id,
     categories,
     questions
   });

@@ -3,6 +3,8 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import Pageres from 'pageres';
 import fetch from 'node-fetch';
+import Imagemin from 'imagemin';
+import { createWriteStream, createReadStream } from 'fs';
 import { join } from 'path';
 import { dust } from 'adaro';
 
@@ -14,21 +16,35 @@ import { Game } from './models/Game';
 import { Contestant } from './models/Contestant';
 
 export const commands = {
-  new() {
-    return Game.start()
-      .then(() => getImageUrl('board'))
-      .then((url) => `Let's get this game started! ${url}`)
-      .catch((e) => 'It looks like a game is already in progress! You need to finish or end that one first before starting a new game.');
+  async new({game, body}) {
+    if (game) {
+      return 'It looks like a game is already in progress! You need to finish or end that one first before starting a new game.';
+    }
+    // Start the game:
+    await Game.start({
+      channel_id: body.channel_id
+    });
+    const url = await getImageUrl({
+      file: 'board',
+      channel_id: body.channel_id
+    });
+    return `Let's get this game started! ${url}`;
   },
-  end() {
-    return Game.end()
-      .then(() => `Alright, I've ended that game for you. You can always start a new game by typing "new game".`);
+  async end({game, body}) {
+    if (!game) {
+      return `There's no game in progress. You can always start a new game by typing "new game".`;
+    }
+    // Try to end the game:
+    await Game.end({
+      channel_id: body.channel_id
+    });
+    return `Alright, I've ended that game for you. You can always start a new game by typing "new game".`;
   },
   help() {
     return responses.help;
   },
 
-  async guess({game, contestant, guess}) {
+  async guess({game, contestant, body, guess}) {
 
     let correct;
     try {
@@ -37,7 +53,10 @@ export const commands = {
       // Timeout:
       if (e.message.includes('timeout')) {
         const [url] = await Promise.all([
-          getImageUrl('board'),
+          getImageUrl({
+            file: 'board',
+            channel_id: body.channel_id
+          }),
           // We timed out, so mark this question as done.
           game.answer()
         ]);
@@ -62,7 +81,10 @@ export const commands = {
         game.answer()
       ]);
       // Get the new board url:
-      const url = await getImageUrl('board');
+      const url = await getImageUrl({
+        file: 'board',
+        channel_id: body.channel_id
+      });
       return `That is correct, ${contestant.name}. Your score is $${contestant.score}. Select a new category. ${url}`;
     } else {
       await contestant.incorrect(value);
@@ -70,7 +92,7 @@ export const commands = {
     }
   },
 
-  async category({game, contestant, category, value}) {
+  async category({game, contestant, body, category, value}) {
     try {
       await game.getClue(category, value);
     } catch (e) {
@@ -86,7 +108,10 @@ export const commands = {
       // Just ignore the input:
       return ''
     }
-    const url = await getImageUrl('clue');
+    const url = await getImageUrl({
+      file: 'clue',
+      channel_id: body.channel_id
+    });
     // Mark that we're sending the clue now:
     await game.clueSent();
     return `Here's your clue. ${url}`;
@@ -104,9 +129,11 @@ const port = process.env.PORT || 8000;
 
 const app = express();
 
-async function getImageUrl(file) {
-  await fetch(`http://localhost:${port}/${file}.png`);
-  let url = await upload(join(__dirname, 'images', `${file}.png`));
+async function getImageUrl({file, channel_id}) {
+  await fetch(`http://localhost:${port}/image/${channel_id}/${file}`);
+
+  // TODO: Delete locally after an upload:
+  let url = await upload(join(__dirname, 'images', `${channel_id}.${file}.png`));
   return url;
 };
 
@@ -158,8 +185,10 @@ app.post('/command', (req, res) => {
   const message = MessageReader.parse(req.body.text);
   if (message && message.command) {
     command({
+      body: req.body,
       contestant: req.contestant,
       game: req.game,
+      // Spread the parsed response into this object:
       ...message
     }).then(text => {
       // If they return empty, just end the response:
@@ -172,7 +201,7 @@ app.post('/command', (req, res) => {
         });
       }
     }).catch((e) => {
-      console.log(e.stack);
+      console.log(e, e.stack);
       // Make sure we always send some response:
       res.end();
     });
@@ -182,43 +211,43 @@ app.post('/command', (req, res) => {
   }
 });
 
-// TODO: update these
-
-app.get('/board', (req, res) => {
-  Game.activeGame().then(game => {
+app.get('/:channel_id/board', (req, res) => {
+  Game.forChannel({
+    channel_id: req.params.channel_id
+  }).then(({categories, questions}) => {
     res.render('board', {
-      categories: game.categories,
-      questions: game.questions,
+      categories,
+      questions,
       values: [200, 400, 600, 800, 1000]
     });
   });
 });
 
-app.get('/clue', (req, res) => {
-  Game.activeGame().then(({clue}) => {
+app.get('/:channel_id/clue', (req, res) => {
+  Game.forChannel({
+    channel_id: req.params.channel_id
+  }).then(({clue}) => {
     res.render('clue', {
       clue
     });
   });
 });
 
-app.get('/clue.png', (req, res) => {
+app.get('/image/:channel_id/:name', (req, res) => {
   var pageres = new Pageres()
-    .src(`localhost:${port}/clue`, ['1000x654'], {crop: false, filename: 'clue'})
+    .src(`localhost:${port}/${req.params.channel_id}/${req.params.name}`, ['1200x654'], {crop: false, filename: `${req.params.channel_id}.${req.params.name}`})
     .dest(join(__dirname, 'images'));
 
-  pageres.run(function (err, items) {
-    res.sendFile(join(__dirname, 'images', 'clue.png'));
-  });
-});
-
-app.get('/board.png', (req, res) => {
-  var pageres = new Pageres()
-    .src(`localhost:${port}/board`, ['1200x654'], {crop: false, filename: 'board'})
-    .dest(join(__dirname, 'images'));
-
-  pageres.run(function (err, items) {
-    res.sendFile(join(__dirname, 'images', 'board.png'));
+  pageres.run(function (err, [item]) {
+    console.time('min');
+    new Imagemin()
+      .src(join(__dirname, 'images', item.filename))
+      .dest(join(__dirname, 'images'))
+      .use(Imagemin.optipng({optimizationLevel: 2}))
+      .run(function (err, [file]) {
+        console.timeEnd('min');
+        res.send('ok');
+      });
   });
 });
 
