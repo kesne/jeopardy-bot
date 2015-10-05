@@ -187,6 +187,11 @@ app.post('/command', (req, res) => {
   // Ignore messages from ourself:
   if (req.body.user_id === bot) return res.end();
 
+  let text = req.body.text;
+  if (req.body.trigger_word) {
+    let replacer = new RegExp(req.body.trigger_word, '');
+    text = text.replace(replacer, '');
+  }
   const message = MessageReader.parse(req.body.text);
   if (message && message.command) {
     command({
