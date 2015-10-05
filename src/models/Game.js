@@ -190,7 +190,7 @@ schema.methods.getClue = function() {
 };
 
 // Get a new clue for a given value and title
-schema.methods.getClue = async function({title, value}) {
+schema.methods.newClue = async function({category, value}) {
   value = parseInt(value, 10);
   if (![200, 400, 600, 800, 1000].includes(value)) {
     throw new RangeError('value');
@@ -198,10 +198,10 @@ schema.methods.getClue = async function({title, value}) {
   if (this.clue) {
     throw new Error('already active');
   }
-  const category = this.categories.map(cat => {
+  const selectedCategory = this.categories.map(cat => {
     return {
       id: cat.id,
-      rank: JaroWinklerDistance(cat.title, title)
+      rank: JaroWinklerDistance(cat.title, category)
     }
   }).sort((a, b) => {
     if (a.rank > b.rank) {
@@ -215,18 +215,18 @@ schema.methods.getClue = async function({title, value}) {
   })[0];
 
   // Invalid ask:
-  if (!category) {
+  if (!selectedCategory) {
     throw new RangeError('category');
   }
   const question = this.questions.find(q => {
-    return (q.category_id === category.id && q.value === value);
+    return (q.category_id === selectedCategory.id && q.value === value);
   });
 
   if (question.answered) {
     throw new Error('Question has already been answered.');
   }
 
-  this.lastCategory = category.id;
+  this.lastCategory = selectedCategory.id;
   this.activeQuestion = question.id;
   return this.save();
 };

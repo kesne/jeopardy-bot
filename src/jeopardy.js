@@ -4,7 +4,6 @@ import bodyParser from 'body-parser';
 import Pageres from 'pageres';
 import fetch from 'node-fetch';
 import Imagemin from 'imagemin';
-import { createWriteStream, createReadStream } from 'fs';
 import { join } from 'path';
 import { dust } from 'adaro';
 
@@ -94,7 +93,7 @@ export const commands = {
 
   async category({game, contestant, body, category, value}) {
     try {
-      await game.getClue(category, value);
+      await game.newClue({category, value});
     } catch (e) {
       if (e.message.includes('already active')) {
         return `There's already an active clue. Wait your turn.`;
