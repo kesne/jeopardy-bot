@@ -47,7 +47,7 @@ export const commands = {
       }
       return 0;
     }).map((contestant, i) => {
-      return `${i + 1}. ${contestant.name}: ${contestant.channelScore(body.channel_id)}`;
+      return `${i + 1}. ${contestant.name}: ${contestant.channelScore(body.channel_id).value}`;
     });
     return `Here are the current scores for this game:\n\n${leaders.join('\n')}`;
   },
@@ -129,13 +129,13 @@ export const commands = {
         file: 'board',
         channel_id: body.channel_id
       });
-      return `That is correct, ${contestant.name}. Your score is $${contestant.channelScore(body.channel_id)}. Select a new category. ${url}`;
+      return `That is correct, ${contestant.name}. Your score is $${contestant.channelScore(body.channel_id).value}. Select a new category. ${url}`;
     } else {
       await contestant.incorrect({
         value,
         channel_id: body.channel_id
       });
-      return `That is incorrect, ${contestant.name}. Your score is now $${contestant.channelScore(body.channel_id)}.`;
+      return `That is incorrect, ${contestant.name}. Your score is now $${contestant.channelScore(body.channel_id).value}.`;
     }
   },
 
