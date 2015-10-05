@@ -14,11 +14,15 @@ import { Game } from './models/Game';
 import { Contestant } from './models/Contestant';
 
 export const commands = {
-  new() {
-    return Game.start()
-      .then(() => getImageUrl('board'))
-      .then((url) => `Let's get this game started! ${url}`)
-      .catch((e) => 'It looks like a game is already in progress! You need to finish or end that one first before starting a new game.');
+  async new() {
+    try {
+      await Game.start()
+    } catch(e) {
+      console.log(e);
+      return 'It looks like a game is already in progress! You need to finish or end that one first before starting a new game.';
+    }
+    const url = await getImageUrl('board');
+    return `Let's get this game started! ${url}`;
   },
   end() {
     return Game.end()
