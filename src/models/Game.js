@@ -253,6 +253,8 @@ schema.methods.guess = async function({contestant, guess}) {
 
   // Get the answers:
   let answers = this.clue.answer.split(/\(|\)/).filter(n => n);
+  // Edge case: names:
+  answers.push(answers.join(' '));
   return answers.some(answer => {
     let similarity = DiceCoefficient(guess, answer);
     if (similarity >= ACCEPTED_SIMILARITY) {
