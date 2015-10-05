@@ -15,6 +15,10 @@ import { Game } from './models/Game';
 import { Contestant } from './models/Contestant';
 
 export const commands = {
+  poke() {
+    return `I'm here, I'm here...`;
+  },
+
   async new({game, body}) {
     if (game) {
       return 'It looks like a game is already in progress! You need to finish or end that one first before starting a new game.';
@@ -29,6 +33,7 @@ export const commands = {
     });
     return `Let's get this game started! ${url}`;
   },
+
   async end({game, body}) {
     if (!game) {
       return `There's no game in progress. You can always start a new game by typing "new game".`;
@@ -39,6 +44,7 @@ export const commands = {
     });
     return `Alright, I've ended that game for you. You can always start a new game by typing "new game".`;
   },
+
   help() {
     return responses.help;
   },
