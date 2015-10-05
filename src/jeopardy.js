@@ -192,7 +192,7 @@ app.post('/command', (req, res) => {
     let replacer = new RegExp(req.body.trigger_word, '');
     text = text.replace(replacer, '');
   }
-  const message = MessageReader.parse(req.body.text);
+  const message = MessageReader.parse(text);
   if (message && message.command) {
     command({
       body: req.body,
