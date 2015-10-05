@@ -129,13 +129,13 @@ export const commands = {
         file: 'board',
         channel_id: body.channel_id
       });
-      return `That is correct, ${contestant.name}. Your score is $${contestant.score}. Select a new category. ${url}`;
+      return `That is correct, ${contestant.name}. Your score is $${contestant.channelScore(body.channel_id)}. Select a new category. ${url}`;
     } else {
       await contestant.incorrect({
         value,
         channel_id: body.channel_id
       });
-      return `That is incorrect, ${contestant.name}. Your score is now $${contestant.score}.`;
+      return `That is incorrect, ${contestant.name}. Your score is now $${contestant.channelScore(body.channel_id)}.`;
     }
   },
 
