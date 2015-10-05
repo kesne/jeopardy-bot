@@ -18,20 +18,25 @@ export const schema = new Schema({
     required: true
   },
 
-  // Trebek can be insulting to sassy users:
+  // Trebek can be insulting to sassy contestants:
   sassFactory: {
     type: Number,
     default: 0
   },
 
-  // The score a user has in the active game.
+  // The scores a user has in the active games.
   // Not stored in the game because we don't really care about it there.
-  // This jeopardy should be super fluid.
   // At the end of the rounds, this is flushed into the stats `money`.
-  score: {
-    type: Number,
-    default: 0
-  },
+  scores: [{
+    channel_id: {
+      type: String,
+      required: true
+    },
+    value: {
+      type: Number,
+      default: 0
+    }
+  }],
 
   // Simple stats:
   stats: {
@@ -66,13 +71,41 @@ schema.statics.get = async function({user_id: slackid, user_name: name}) {
   return user;
 };
 
-schema.methods.correct = function(value) {
-  this.score += value;
+schema.methods.channelScore = function(channel_id) {
+  const score = this.scores.find(score => {
+    return score.channel_id === channel_id;
+  });
+  // If no score for this channel exists, create it:
+  if (!score) {
+    this.scores.push({
+      channel_id,
+      value: 0
+    });
+    // Just re-run the score lookup:
+    return this.channelScore(channel_id);
+  }
+  return score;
+};
+
+schema.methods.removeChannelScore = function(channel_id) {
+  return this.scores.some((score, index) => {
+    if (score.channel_id === channel_id) {
+      // Remove the score:
+      this.scores.splice(index, 1);
+      return true;
+    }
+  });
+};
+
+schema.methods.correct = function({value, channel_id}) {
+  const score = this.channelScore(channel_id);
+  score.value += value;
   return this.save();
 };
 
-schema.methods.incorrect = function(value) {
-  this.score -= value;
+schema.methods.incorrect = function({value, channel_id}) {
+  const score = this.channelScore(channel_id);
+  score.value -= value;
   return this.save();
 }
 
@@ -86,9 +119,10 @@ schema.methods.lost = function() {
   return this.endGame();
 };
 
-schema.methods.endGame = function() {
-  this.stats.money += this.score;
-  this.score = 0;
+schema.methods.endGame = function({channel_id}) {
+  const {value} = this.channelScore(channel_id);
+  this.stats.money += value;
+  this.removeChannelScore(channel_id);
   return this.save();
 };
 

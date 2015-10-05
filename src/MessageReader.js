@@ -6,9 +6,17 @@ const values = [200, 400, 600, 800, 1000];
 export const MessageReader = {
 
 	parse(text) {
+		// Invalid request:
+		if (!text) {
+			return '';
+		}
+
 		text = text.replace('\'', '').trim().toLowerCase();
 
 		// Exact match cases:
+		if (text === 'poke') {
+			return {command: 'poke'};
+		}
 		if (text === 'help') {
 			return {command: 'help'};
 		}
