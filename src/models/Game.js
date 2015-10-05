@@ -190,6 +190,10 @@ schema.methods.newClue = async function({category, value}) {
   if (this.clue) {
     throw new Error('already active');
   }
+  // If there's an active clue that has timed out, let's go ahead and time it out:
+  if (this.getClue()) {
+    await this.answer();
+  }
   const selectedCategory = this.categories.map(cat => {
     return {
       id: cat.id,

@@ -288,9 +288,9 @@ app.get('/:channel_id/board', (req, res) => {
 app.get('/:channel_id/clue', (req, res) => {
   Game.forChannel({
     channel_id: req.params.channel_id
-  }).then(({clue}) => {
+  }).then(game => {
     res.render('clue', {
-      clue
+      clue: game.getClue()
     });
   });
 });
