@@ -28,18 +28,18 @@ export const commands = {
     return responses.help;
   },
 
-  async guess({guess, contestant}) {
+  async guess({game, contestant, guess}) {
+
     let correct;
     try {
-      correct = await Game.guess({guess, contestant});
+      correct = await game.guess({guess, contestant});
     } catch(e) {
       // Timeout:
       if (e.message.includes('timeout')) {
-        const [game, url] = await Promise.all([
-          Game.activeGame(),
+        const [url] = await Promise.all([
           getImageUrl('board'),
           // We timed out, so mark this question as done.
-          Game.answer()
+          game.answer()
         ]);
         return `Time's up, ${contestant.name}! Remember, you have 45 seconds to answer. The correct answer is \`${game.getClue().answer}\`. Select a new category. ${url}`;
       }
@@ -50,15 +50,16 @@ export const commands = {
       // Just ignore guesses if they're outside of the game context:
       return '';
     }
-    const game = await Game.activeGame();
+
+    // Extract the value from the current clue:
     const {value} = game.clue;
+
     if (correct) {
-      // Speed this up:
       await Promise.all([
         // Award the value:
         contestant.correct(value),
         // Mark the question as answered:
-        Game.answer()
+        game.answer()
       ]);
       // Get the new board url:
       const url = await getImageUrl('board');
@@ -69,9 +70,9 @@ export const commands = {
     }
   },
 
-  async category({category, value}) {
+  async category({game, contestant, category, value}) {
     try {
-      await Game.getClue(category, value);
+      await game.getClue(category, value);
     } catch (e) {
       if (e.message.includes('already active')) {
         return `There's already an active clue. Wait your turn.`;
@@ -87,7 +88,7 @@ export const commands = {
     }
     const url = await getImageUrl('clue');
     // Mark that we're sending the clue now:
-    await Game.clueSent();
+    await game.clueSent();
     return `Here's your clue. ${url}`;
   }
 };
@@ -139,23 +140,26 @@ const bot = 'USLACKBOT';
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/command', (req, res, next) => {
-  // Get the contestant for this request.
-  // This will create a new user if none exists.
-  Contestant.get(req.body).then(contestant => {
-    req.contestant = contestant;
-    next();
-  });
+app.use('/command', async function(req, res, next) {
+  // Load the current game and the contestant into the request:
+  const [contestant, game] = await Promise.all([
+    Contestant.get(req.body),
+    Game.forChannel(req.body)
+  ]);
+  req.game = game;
+  req.contestant = contestant;
+  next();
 });
 
 app.post('/command', (req, res) => {
   // Ignore messages from ourself:
-  if (req.body.user_id === bot) return;
+  if (req.body.user_id === bot) return res.end();
 
   const message = MessageReader.parse(req.body.text);
   if (message && message.command) {
     command({
       contestant: req.contestant,
+      game: req.game,
       ...message
     }).then(text => {
       // If they return empty, just end the response:
@@ -177,6 +181,8 @@ app.post('/command', (req, res) => {
     res.end();
   }
 });
+
+// TODO: update these
 
 app.get('/board', (req, res) => {
   Game.activeGame().then(game => {

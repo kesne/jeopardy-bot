@@ -3,7 +3,9 @@ import { Schema, model } from 'mongoose';
 import { DiceCoefficient, JaroWinklerDistance } from 'natural';
 import moment from 'moment';
 
+// TODO: Move this (plus values, etc) into game constants
 const PAGE_LENGTH = 6;
+
 const LAST_PAGE = 18412;
 
 const ACCEPTED_SIMILARITY = 0.7;
@@ -15,7 +17,7 @@ async function jServiceCategories() {
   let res = await fetch(`http://jservice.io/api/categories?count=${PAGE_LENGTH}&offset=${randomPage}`);
   let categories = await res.json();
   // Invalid category set for some reason. Try again.
-  if (categories.length !== 6) {
+  if (categories.length !== PAGE_LENGTH) {
     return jServiceCategories();
   }
   return categories;
@@ -126,13 +128,6 @@ export const schema = new Schema({
   }]
 });
 
-// Gets the clue without the timeout:
-schema.methods.getClue = function() {
-  return this.questions.find(q => {
-    return q.id === this.activeQuestion
-  });
-};
-
 // Gets the clue with the timeout:
 schema.virtual('clue').get(function() {
   const clue = this.getClue();
@@ -147,25 +142,33 @@ schema.methods.answered = function(id) {
   return this.contestantAnswers.some(i => i === id); 
 };
 
-// Grab the active game:
-schema.statics.activeGame = function() {
-  return this.findOne({'questions': {$elemMatch: {answered: false}}});
+// Grab the active game for the channel:
+schema.statics.forChannel = function({channel_id}) {
+  return this.findOne({
+    channel_id,
+    questions:{
+      '$elemMatch': { answered: false }
+    }
+  });
 };
 
 // End all games:
-schema.statics.end = async function() {
+schema.statics.end = async function({channel_id}) {
+  // TODO: Make sure we only end this game for contestants!
   const contestants = await this.model('Contestant').find();
   await Promise.all(contestants.map(contestant => contestant.endGame()));
-  return this.remove();
+  return this.remove({channel_id});
 };
 
 // Start a new game:
-schema.statics.start = async function() {
-  const game = await this.activeGame();
+schema.statics.start = async function({channel_id}) {
+  const game = await this.forChannel({channel_id});
   if (game) {
-    throw new Error('An active game is already in progress.');
+    throw new Error('An game is already in progress.');
   }
-  await Game.end();
+  // Clear out the existing game:
+  await this.end({channel_id});
+  // Build a new game:
   const categories = await jServiceCategories();
   const questions = await jServiceQuestions(categories.map(cat => cat.id));
   return this.create({
@@ -174,20 +177,23 @@ schema.statics.start = async function() {
   });
 };
 
+// Gets the clue without the timeout:
+schema.methods.getClue = function() {
+  return this.questions.find(q => {
+    return q.id === this.activeQuestion
+  });
+};
+
 // Get a new clue for a given value and title
-schema.statics.getClue = async function(title, value) {
+schema.methods.getClue = async function({title, value}) {
   value = parseInt(value, 10);
   if (![200, 400, 600, 800, 1000].includes(value)) {
     throw new RangeError('value');
   }
-  const game = await this.activeGame();
-  if (!game) {
-    throw new Error('No active game.');
-  }
-  if (game.clue) {
+  if (this.clue) {
     throw new Error('already active');
   }
-  const category = game.categories.map(cat => {
+  const category = this.categories.map(cat => {
     return {
       id: cat.id,
       rank: JaroWinklerDistance(cat.title, title)
@@ -207,7 +213,7 @@ schema.statics.getClue = async function(title, value) {
   if (!category) {
     throw new RangeError('category');
   }
-  const question = game.questions.find(q => {
+  const question = this.questions.find(q => {
     return (q.category_id === category.id && q.value === value);
   });
 
@@ -215,41 +221,33 @@ schema.statics.getClue = async function(title, value) {
     throw new Error('Question has already been answered.');
   }
 
-  game.lastCategory = category.id;
-  game.activeQuestion = question.id;
-  return game.save();
+  this.lastCategory = category.id;
+  this.activeQuestion = question.id;
+  return this.save();
 };
 
-schema.statics.clueSent = async function(title, value) {
-  const game = await this.activeGame();
-  if (!game) {
-    throw new Error('No active game.');
-  }
-  game.questionStart = Date.now();
-  return game.save();
+schema.methods.clueSent = function() {
+  this.questionStart = Date.now();
+  return this.save();
 };
 
-schema.statics.guess = async function({contestant, guess}) {
-  const game = await this.activeGame();
-  if (!game) {
-    throw new Error('game');
-  }
-  if (!game.activeQuestion) {
+schema.methods.guess = async function({contestant, guess}) {
+  if (!this.activeQuestion) {
     throw new Error('clue');
   }
-  if (!game.clue) {
+  if (!this.clue) {
     throw new Error('timeout');
   }
-  if (game.answered(contestant.slackid)) {
+  if (this.answered(contestant.slackid)) {
     throw new Error('contestant')
   }
 
   // This contestant has now guessed:
-  game.contestantAnswers.push(contestant.slackid);
-  await game.save();
+  this.contestantAnswers.push(contestant.slackid);
+  await this.save();
 
   // Get the answers:
-  let answers = game.clue.answer.split(/\(|\)/).filter(n => n);
+  let answers = this.clue.answer.split(/\(|\)/).filter(n => n);
   return answers.some(answer => {
     let similarity = DiceCoefficient(guess, answer);
     if (similarity >= ACCEPTED_SIMILARITY) {
@@ -263,19 +261,18 @@ schema.statics.guess = async function({contestant, guess}) {
   });
 };
 
-schema.statics.answer = async function() {
-  const game = await this.activeGame();
-  game.questions.some(q => {
-    if (game.activeQuestion === q.id) {
+schema.methods.answer = function() {
+  this.questions.some(q => {
+    if (this.activeQuestion === q.id) {
       q.answered = true;
       return true;
     }
   });
-  game.contestantAnswers = [];
-  game.activeQuestion = undefined;
-  game.questionStart = undefined;
-  game.lastCategory = undefined;
-  return game.save();
+  this.contestantAnswers = [];
+  this.activeQuestion = undefined;
+  this.questionStart = undefined;
+  this.lastCategory = undefined;
+  return this.save();
 };
 
 export const Game = model('Game', schema);
