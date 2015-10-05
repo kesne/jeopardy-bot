@@ -51,6 +51,9 @@ export const commands = {
 
   async guess({game, contestant, body, guess}) {
 
+    // Cache the clue reference:
+    const clue = game.getClue();
+
     let correct;
     try {
       correct = await game.guess({guess, contestant});
@@ -65,7 +68,7 @@ export const commands = {
           // We timed out, so mark this question as done.
           game.answer()
         ]);
-        return `Time's up, ${contestant.name}! Remember, you have 45 seconds to answer. The correct answer is \`${game.getClue().answer}\`. Select a new category. ${url}`;
+        return `Time's up, ${contestant.name}! Remember, you have 45 seconds to answer. The correct answer is \`${clue.answer}\`. Select a new category. ${url}`;
       }
       // They've already guessed
       if (e.message.includes('contestant')) {
@@ -76,12 +79,15 @@ export const commands = {
     }
 
     // Extract the value from the current clue:
-    const {value} = game.clue;
+    const {value} = clue;
 
     if (correct) {
       await Promise.all([
         // Award the value:
-        contestant.correct(value),
+        contestant.correct({
+          value,
+          channel_id: body.channel_id
+        }),
         // Mark the question as answered:
         game.answer()
       ]);
@@ -92,7 +98,10 @@ export const commands = {
       });
       return `That is correct, ${contestant.name}. Your score is $${contestant.score}. Select a new category. ${url}`;
     } else {
-      await contestant.incorrect(value);
+      await contestant.incorrect({
+        value,
+        channel_id: body.channel_id
+      });
       return `That is incorrect, ${contestant.name}. Your score is now $${contestant.score}.`;
     }
   },
