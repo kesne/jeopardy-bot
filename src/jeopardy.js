@@ -23,25 +23,17 @@ export const commands = {
   },
 
   async leaderboard({body}) {
-    const contestants = await Contestant.find().limit(5);
+    const contestants = await Contestant.find().sort({'stats.money': -1}).limit(5);
     if (contestants.length === 0) {
       return 'There are no winners yet. Go out there and play some games!';
     }
-    const leaders = contestants.sort((a, b) => {
-      if (a.stats.money > b.stats.money) {
-        return 1;
-      }
-      if(b.stats.money > a.stats.money) {
-        return -1;
-      }
-      return 0;
-    }).map((contestant, i) => {
+    const leaders = contestants.map((contestant, i) => {
       return (
 `${i + 1}. ${contestant.name}:
 > _$${contestant.stats.money}_ *|* _${contestant.stats.won} wins_ *|* _${contestant.stats.lost} losses_`
       );
     });
-    return `Let's take a look at the leaderboard:\n\n${leaders.join('\n')}`;
+    return `Let's take a look at the top 5 players:\n\n${leaders.join('\n')}`;
   },
 
   async scores({body}) {
