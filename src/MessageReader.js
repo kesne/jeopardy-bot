@@ -1,7 +1,5 @@
 import { WordTokenizer } from 'natural';
-import { commands } from './commands';
-
-const values = [200, 400, 600, 800, 1000];
+import * as config from './config';
 
 export const MessageReader = {
 
@@ -30,10 +28,10 @@ export const MessageReader = {
 			return {command: 'help'};
 		}
 		if (text === 'new game') {
-			return {command: 'new'};
+			return {command: 'newgame'};
 		}
 		if (text === 'end game') {
-			return {command: 'end'};
+			return {command: 'endgame'};
 		}
 		if (text === 'leaderboard') {
 			return {command: 'leaderboard'};
@@ -49,7 +47,7 @@ export const MessageReader = {
 			// Check for selecting a category:
 			const tks = tokens.slice(-2);
 			const value = parseInt(tks[1], 10);
-			if (tks[0] === 'for' && values.includes(value)) {
+			if (tks[0] === 'for' && config.VALUES.includes(value)) {
 
 				let catTokens;
 
