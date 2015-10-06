@@ -155,6 +155,7 @@ export const commands = {
       if (e.message.includes('category')) {
         return `I'm sorry, I don't know what category that is. Try being more specific.`;
       }
+      console.log('Unexpected category selection error.', e);
       // Just ignore the input:
       return ''
     }
