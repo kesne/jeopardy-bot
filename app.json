@@ -1,0 +1,21 @@
+{
+  "name": "Jeopardy Bot",
+  "description": "A slack bot that lets you play jeopardy games.",
+  "repository": "https://github.com/kesne/jeopardy-bot",
+  "logo": "https://node-js-sample.herokuapp.com/node.png",
+  "keywords": ["node", "jeopardy", "bot", "trebek"],
+  "success_url": "/welcome",
+  "env": {
+    "SECRET_TOKEN": {
+      "description": "A secret key for verifying the integrity of signed cookies.",
+      "generator": "secret"
+    },
+    "WEB_CONCURRENCY": {
+      "description": "The number of processes to run.",
+      "value": "5"
+    }
+  },
+  "addons": [
+    "mongolab:shared-single-small"
+  ]
+}

@@ -1,12 +1,14 @@
 {
   "name": "jeopardybot",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A bot for jeopardy",
   "main": "lib/jeopardy.js",
   "private": true,
   "scripts": {
+    "postinstall": "npm run build",
     "build": "babel src --out-dir lib --copy-files",
-    "start": "babel-node src/jeopardy",
+    "start": "node lib/jeopardy",
+    "watch": "babel-node src/jeopardy",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Jordan Gensler <jordangens@gmail.com>",
