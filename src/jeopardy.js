@@ -175,7 +175,7 @@ mongoose.connect(config.MONGO);
 const app = express();
 
 async function getImageUrl({file, channel_id}) {
-  await fetch(`http://localhost:${port}/image/${channel_id}/${file}`);
+  await fetch(`http://localhost:${config.PORT}/image/${channel_id}/${file}`);
 
   const fileName = join(__dirname, 'images', `${channel_id}.${file}.png`);
 
@@ -290,7 +290,7 @@ app.get('/:channel_id/clue', (req, res) => {
 
 app.get('/image/:channel_id/:name', (req, res) => {
   var pageres = new Pageres()
-    .src(`localhost:${port}/${req.params.channel_id}/${req.params.name}`, ['1200x654'], {crop: false, filename: `${req.params.channel_id}.${req.params.name}`})
+    .src(`localhost:${config.PORT}/${req.params.channel_id}/${req.params.name}`, ['1200x654'], {crop: false, filename: `${req.params.channel_id}.${req.params.name}`})
     .dest(join(__dirname, 'images'));
 
   pageres.run(function (err, [item]) {
