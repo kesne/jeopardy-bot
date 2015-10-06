@@ -200,10 +200,10 @@ schema.methods.newClue = async function({category, value}) {
   if (category === '--same--' && this.lastCategory) {
     selectedCategory = this.lastCategory;
   } else {
-    selectedCategory = this.categories.map(cat => {
+    let cc = this.categories.map(cat => {
       return {
         id: cat.id,
-        rank: JaroWinklerDistance(cat.title, category)
+        rank: DiceCoefficient(cat.title, category)
       }
     }).sort((a, b) => {
       if (a.rank > b.rank) {
@@ -214,7 +214,10 @@ schema.methods.newClue = async function({category, value}) {
       return 0;
     }).filter(x => {
       return x.rank > 0.5;
-    })[0];
+    });
+    if (cc) {
+      selectedCategory = cc.id;
+    }
   }
 
   // Invalid ask:
@@ -222,14 +225,14 @@ schema.methods.newClue = async function({category, value}) {
     throw new RangeError('category');
   }
   const question = this.questions.find(q => {
-    return (q.category_id === selectedCategory.id && q.value === value);
+    return (q.category_id === selectedCategory && q.value === value);
   });
 
   if (question.answered) {
     throw new Error('Question has already been answered.');
   }
 
-  this.lastCategory = selectedCategory.id;
+  this.lastCategory = selectedCategory;
   this.activeQuestion = question.id;
   return this.save();
 };
