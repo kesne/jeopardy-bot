@@ -284,7 +284,6 @@ schema.methods.answer = function() {
   this.contestantAnswers = [];
   this.activeQuestion = undefined;
   this.questionStart = undefined;
-  this.lastCategory = undefined;
   return this.save();
 };
 
