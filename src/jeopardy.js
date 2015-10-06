@@ -69,7 +69,7 @@ export const commands = {
       }
       return 0;
     }).map((contestant, i) => {
-      return `${i + 1}. ${contestant.name}: ${contestant.channelScore(body.channel_id).value}`;
+      return `${i + 1}. ${contestant.name}: $${contestant.channelScore(body.channel_id).value}`;
     });
     return `Here are the current scores for this game:\n\n${leaders.join('\n')}`;
   },
