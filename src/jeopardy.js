@@ -228,7 +228,6 @@ app.post('/command', (req, res) => {
     // Wait a maximum of 10 seconds:
     wait: 10 * 1000
   }, async function(err) {
-    console.log('got lock');
     if (err) {
       console.log('Error locking file', err);
       return res.end();
