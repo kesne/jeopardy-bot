@@ -25,7 +25,7 @@ export const USERNAME = process.env.JBOT_USERNAME || 'JeopardyBot';
 export const BOT_ID = 'USLACKBOT';
 
 // The URL for the mongo database:
-export const MONGO = process.env.MONGOLAB_URI || 'mongodb://localhost/jeopardy'
+export const MONGO = process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://localhost/jeopardy'
 
 // The port for the application:
 export const PORT = process.env.PORT || 8000;
