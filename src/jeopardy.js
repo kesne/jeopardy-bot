@@ -4,6 +4,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import Pageres from 'pageres';
 import fetch from 'node-fetch';
+import lockFile from 'lockfile';
 import Imagemin from 'imagemin';
 import { join } from 'path';
 import { unlink } from 'fs';
@@ -217,49 +218,40 @@ app.set('views', join(__dirname, 'views'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const channels = {};
-const getChannel = (channel_id) => {
-  if (!channels[channel_id]) {
-    channels[channel_id] = Promise.resolve();
-  }
-  return channels[channel_id];
-};
-const setChannel = (channel_id, promise) => {
-  channels[channel_id] = promise;
-  return promise;
-};
-const freeChannel = (channel_id) => {
-  delete channels[channel_id];
-}
+app.post('/command', (req, res) => {
+  // Ignore messages from ourself:
+  if (req.body.user_id === config.BOT_ID) res.end();
 
-app.post('/command', async function(req, res) {
   const channel_id = req.body.channel_id;
-  // Grab the promise
-  let activeChannel = getChannel(channel_id);
 
-  // Wait for the last request to clear:
-  await activeChannel;
+  lockFile.lock(`jeopardy-${channel_id}.lock`, {
+    // Wait a maximum of 10 seconds:
+    wait: 10 * 1000
+  }, async function(err) {
+    console.log('got lock');
+    if (err) {
+      console.log('Error locking file', err);
+      return res.end();
+    }
+    // Hold the channel (block other requests from processing):
+    let response;
+    try {
+      response = await handleRequest(req);
+    } catch(e) {
+      console.log(e);
+    }
 
-  // Hold the channel (block other requests from processing):
-  let response;
-  try {
-    response = await setChannel(channel_id, handleRequest(req));
-  } catch(e) {
-    freeChannel(channel_id);
-    console.log(e);
-  }
+    if (response) {
+      res.json(response);
+    } else {
+      res.end();
+    }
 
-  if (response) {
-    res.json(response);
-  } else {
-    res.end();
-  }
+    lockFile.unlock(`jeopardy-${channel_id}.lock`, er => {});
+  });
 });
 
 async function handleRequest(req) {
-  // Ignore messages from ourself:
-  if (req.body.user_id === config.BOT_ID) return;
-
   let text = req.body.text;
   if (req.body.trigger_word) {
     let replacer = new RegExp(req.body.trigger_word, '');
