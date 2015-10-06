@@ -268,7 +268,7 @@ async function handleRequest(req) {
     // Spread the parsed request text into this object:
     ...req.message
   });
-  
+
   if (text) {
     return {
       username: config.USERNAME,
@@ -305,16 +305,22 @@ app.get('/image/:channel_id/:name', (req, res) => {
     .src(`localhost:${config.PORT}/${req.params.channel_id}/${req.params.name}`, ['1200x654'], {crop: false, filename: `${req.params.channel_id}.${req.params.name}`})
     .dest(join(__dirname, 'images'));
 
+  console.time('Image Capture');
   pageres.run(function (err, [item]) {
-    console.time('Image Minification');
-    new Imagemin()
-      .src(join(__dirname, 'images', item.filename))
-      .dest(join(__dirname, 'images'))
-      .use(Imagemin.optipng({optimizationLevel: 1}))
-      .run(function (err, [file]) {
-        console.timeEnd('Image Minification');
-        res.send('ok');
-      });
+    console.timeEnd('Image Capture');
+    if (config.IMAGE_MIN) {
+      console.time('Image Minification');
+      new Imagemin()
+        .src(join(__dirname, 'images', item.filename))
+        .dest(join(__dirname, 'images'))
+        .use(Imagemin.optipng({optimizationLevel: 1}))
+        .run(function (err, [file]) {
+          console.timeEnd('Image Minification');
+          res.send('ok');
+        });
+    } else {
+      res.send('ok');
+    }
   });
 });
 

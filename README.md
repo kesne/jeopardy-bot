@@ -13,3 +13,4 @@ All of the configuration options (with one exception) are prefixed with `JBOT_` 
 - JBOT_API
 - JBOT_USERNAME
 - MONGOLAB_URI
+- JBOT_IMAGE_MIN
