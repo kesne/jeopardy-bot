@@ -11,7 +11,7 @@ export const MessageReader = {
 			return '';
 		}
 
-		text = text.replace('\'', '').trim().toLowerCase();
+		text = text.trim().toLowerCase();
 
 		// Exact match cases:
 		if (text === 'poke') {
@@ -46,19 +46,19 @@ export const MessageReader = {
 
 				// SPECIAL CASE: same category:
 				if (tokens[0] === 'same' && tokens[1] === 'category' && tokens.length === 4) {
-					catTokens = ['--SAME--'];
+					catTokens = ['--same--'];
 				} else {
 					// This is a category selection:
 					catTokens = tokens.slice(0, tokens.length - 2);
 
 					// Special cases for leading phrases we allow:
-					if (catTokens[0] === 'ill' && catTokens[1] === 'take') {
+					if (catTokens[0] === 'i' && catTokens[1] === 'll' && catTokens[2] === 'take') {
+						catTokens = catTokens.slice(3);
+					} else if (catTokens[0] === 'ill' && catTokens[1] == 'take') {
 						catTokens = catTokens.slice(2);
-					}
-					if (catTokens[0] === 'give' && catTokens[1] === 'me') {
+					} else if (catTokens[0] === 'give' && catTokens[1] === 'me') {
 						catTokens = catTokens.slice(2);
-					}
-					if (catTokens[0] === 'choose') {
+					} else if (catTokens[0] === 'choose') {
 						catTokens = catTokens.slice(1);
 					}
 				}
@@ -74,7 +74,7 @@ export const MessageReader = {
 			const questions = ['what', 'whats', 'where', 'wheres', 'who', 'whos'];
 			if (questions.includes(tokens[0])) {
 				// This is a guess:
-					
+
 				// Dump the question:
 				tokens.shift();
 

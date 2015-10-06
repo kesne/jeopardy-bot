@@ -194,21 +194,28 @@ schema.methods.newClue = async function({category, value}) {
   if (this.getClue()) {
     await this.answer();
   }
-  const selectedCategory = this.categories.map(cat => {
-    return {
-      id: cat.id,
-      rank: JaroWinklerDistance(cat.title, category)
-    }
-  }).sort((a, b) => {
-    if (a.rank > b.rank) {
-      return -1;
-    } else if (b.rank > a.rank) {
-      return 1;
-    }
-    return 0;
-  }).filter(x => {
-    return x.rank > 0.5;
-  })[0];
+
+  // Handle asking for the same category:
+  let selectedCategory;
+  if (category === '--same--' && this.lastCategory) {
+    selectedCategory = this.lastCategory;
+  } else {
+    selectedCategory = this.categories.map(cat => {
+      return {
+        id: cat.id,
+        rank: JaroWinklerDistance(cat.title, category)
+      }
+    }).sort((a, b) => {
+      if (a.rank > b.rank) {
+        return -1;
+      } else if (b.rank > a.rank) {
+        return 1;
+      }
+      return 0;
+    }).filter(x => {
+      return x.rank > 0.5;
+    })[0];
+  }
 
   // Invalid ask:
   if (!selectedCategory) {
