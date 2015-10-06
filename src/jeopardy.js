@@ -39,12 +39,7 @@ export const commands = {
   async scores({body}) {
     const contestants = await Contestant.find({
       scores: {
-        $elemMatch: {
-          channel_id: body.channel_id,
-          value: {
-            $gt: 0
-          }
-        }
+        channel_id: body.channel_id
       }
     });
     if (contestants.length === 0) {
