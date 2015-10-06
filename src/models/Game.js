@@ -214,7 +214,7 @@ schema.methods.newClue = async function({category, value}) {
       return 0;
     }).filter(x => {
       return x.rank > 0.5;
-    });
+    })[0];
     if (cc) {
       selectedCategory = cc.id;
     }
