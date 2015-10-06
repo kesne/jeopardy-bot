@@ -223,6 +223,7 @@ app.post('/command', (req, res) => {
   if (req.body.user_id === config.BOT_ID) return res.end();
 
   const message = MessageReader.read(req.body);
+  console.log(message);
   if (!message || !message.command) return res.end();
   req.message = message;
 
