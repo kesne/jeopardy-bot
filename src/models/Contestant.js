@@ -100,7 +100,6 @@ schema.methods.removeChannelScore = function(channel_id) {
 schema.methods.correct = function({value, channel_id}) {
   const score = this.channelScore(channel_id);
   score.value += value;
-  console.log(this.scores);
   return this.save();
 };
 

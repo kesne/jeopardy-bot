@@ -217,21 +217,48 @@ app.set('views', join(__dirname, 'views'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/command', async function(req, res, next) {
-  // Load the current game and the contestant into the request:
-  const [contestant, game] = await Promise.all([
-    Contestant.get(req.body),
-    Game.forChannel(req.body)
-  ]);
-  req.game = game;
-  req.contestant = contestant;
-  next();
+const channels = {};
+const getChannel = (channel_id) => {
+  if (!channels[channel_id]) {
+    channels[channel_id] = Promise.resolve();
+  }
+  return channels[channel_id];
+};
+const setChannel = (channel_id, promise) => {
+  channels[channel_id] = promise;
+  return promise;
+};
+const freeChannel = (channel_id) => {
+  delete channels[channel_id];
+}
+
+app.post('/command', async function(req, res) {
+  const channel_id = req.body.channel_id;
+  // Grab the promise
+  let activeChannel = getChannel(channel_id);
+
+  // Wait for the last request to clear:
+  await activeChannel;
+
+  // Hold the channel (block other requests from processing):
+  let response;
+  try {
+    response = await setChannel(channel_id, handleRequest(req));
+  } catch(e) {
+    freeChannel(channel_id);
+    console.log(e);
+  }
+
+  if (response) {
+    res.json(response);
+  } else {
+    res.end();
+  }
 });
 
-// TODO: Put this logic into an async function.
-app.post('/command', (req, res) => {
+async function handleRequest(req) {
   // Ignore messages from ourself:
-  if (req.body.user_id === config.BOT_ID) return res.end();
+  if (req.body.user_id === config.BOT_ID) return;
 
   let text = req.body.text;
   if (req.body.trigger_word) {
@@ -240,32 +267,32 @@ app.post('/command', (req, res) => {
   }
   const message = MessageReader.parse(text);
   if (message && message.command) {
-    command({
-      body: req.body,
-      contestant: req.contestant,
-      game: req.game,
-      // Spread the parsed response into this object:
-      ...message
-    }).then(text => {
-      // If they return empty, just end the response:
-      if (text === '') {
-        res.end();
-      } else {
-        res.json({
+    try {
+      // Load the current game and the contestant into the request:
+      const [contestant, game] = await Promise.all([
+        Contestant.get(req.body),
+        Game.forChannel(req.body)
+      ]);
+
+      const text = await command({
+        body: req.body,
+        contestant,
+        game,
+        // Spread the parsed response into this object:
+        ...message
+      });
+      if (text) {
+        return {
           username: config.USERNAME,
           text
-        });
+        };
       }
-    }).catch((e) => {
+    } catch(e) {
       console.log(e, e.stack);
-      // Make sure we always send some response:
-      res.end();
-    });
-  } else {
-    // Send nothing:
-    res.end();
+    }
   }
-});
+};
+
 
 app.get('/:channel_id/board', (req, res) => {
   Game.forChannel({
