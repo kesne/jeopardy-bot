@@ -5,6 +5,15 @@ const values = [200, 400, 600, 800, 1000];
 
 export const MessageReader = {
 
+	read({text, trigger_word}) {
+		// Parse out the trigger word:
+	  if (trigger_word) {
+	    let replacer = new RegExp(trigger_word, '');
+	    text = text.replace(replacer, '');
+	  }
+		return MessageReader.parse(text);
+	},
+
 	parse(text) {
 		// Invalid request:
 		if (!text) {

@@ -220,7 +220,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/command', (req, res) => {
   // Ignore messages from ourself:
-  if (req.body.user_id === config.BOT_ID) res.end();
+  if (req.body.user_id === config.BOT_ID) return res.end();
+
+  const message = MessageReader.read(req.body);
+  if (!message || !message.command) return res.end();
+  req.message = message;
 
   const channel_id = req.body.channel_id;
 
@@ -251,36 +255,25 @@ app.post('/command', (req, res) => {
 });
 
 async function handleRequest(req) {
-  let text = req.body.text;
-  if (req.body.trigger_word) {
-    let replacer = new RegExp(req.body.trigger_word, '');
-    text = text.replace(replacer, '');
-  }
-  const message = MessageReader.parse(text);
-  if (message && message.command) {
-    try {
-      // Load the current game and the contestant into the request:
-      const [contestant, game] = await Promise.all([
-        Contestant.get(req.body),
-        Game.forChannel(req.body)
-      ]);
+  // Load the current game and the contestant into the request:
+  const [contestant, game] = await Promise.all([
+    Contestant.get(req.body),
+    Game.forChannel(req.body)
+  ]);
 
-      const text = await command({
-        body: req.body,
-        contestant,
-        game,
-        // Spread the parsed response into this object:
-        ...message
-      });
-      if (text) {
-        return {
-          username: config.USERNAME,
-          text
-        };
-      }
-    } catch(e) {
-      console.log(e, e.stack);
-    }
+  const text = await command({
+    body: req.body,
+    contestant,
+    game,
+    // Spread the parsed request text into this object:
+    ...req.message
+  });
+  
+  if (text) {
+    return {
+      username: config.USERNAME,
+      text
+    };
   }
 };
 
