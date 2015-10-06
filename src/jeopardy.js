@@ -37,25 +37,15 @@ export const commands = {
   },
 
   async scores({body}) {
-    const contestants = await Contestant.find({
-      scores: {
-        $elemMatch: {
-          channel_id: body.channel_id
-        }
-      }
-    });
+    const contestants = await Contestant.find().where('scores').elemMatch({ channel_id: body.channel_id});
     if (contestants.length === 0) {
       return 'There are no scores yet!';
     }
     const leaders = contestants.sort((a, b) => {
-      const aScore = a.channelScore(body.channel_id);
-      const bScore = b.channelScore(body.channel_id);
-      if (aScore > bScore) {
-        return 1;
-      }
-      if(bScore > aScore) {
-        return -1;
-      }
+      const {value: aScore} = a.channelScore(body.channel_id);
+      const {value: bScore} = b.channelScore(body.channel_id);
+      if (bScore > aScore) return 1;
+      if (aScore > bScore) return -1;
       return 0;
     }).map((contestant, i) => {
       return `${i + 1}. ${contestant.name}: $${contestant.channelScore(body.channel_id).value}`;
@@ -304,13 +294,13 @@ app.get('/image/:channel_id/:name', (req, res) => {
     .dest(join(__dirname, 'images'));
 
   pageres.run(function (err, [item]) {
-    console.time('min');
+    console.time('Image Minification');
     new Imagemin()
       .src(join(__dirname, 'images', item.filename))
       .dest(join(__dirname, 'images'))
       .use(Imagemin.optipng({optimizationLevel: 1}))
       .run(function (err, [file]) {
-        console.timeEnd('min');
+        console.timeEnd('Image Minification');
         res.send('ok');
       });
   });
