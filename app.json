@@ -16,6 +16,6 @@
     }
   },
   "addons": [
-    "mongolab:shared-single-small"
+    "mongolab:sandbox"
   ]
 }
