@@ -15,7 +15,7 @@ import { MessageReader } from './MessageReader';
 import { Game } from './models/Game';
 import { Contestant } from './models/Contestant';
 
-import * as constants from './models/constants';
+import * as config from './config';
 
 export const commands = {
   poke() {
@@ -183,12 +183,7 @@ async function command(message) {
   return commands[message.command](message);
 };
 
-// TODO: Move this?
-const MONGO_URL = process.env.MONGOLAB_URI || 'mongodb://localhost/jeopardy'
-mongoose.connect(MONGO_URL);
-
-// TODO: Move this?
-const port = process.env.PORT || 8000;
+mongoose.connect(config.MONGO);
 
 const app = express();
 
@@ -231,10 +226,6 @@ app.engine('dust', dust(options));
 app.set('view engine', 'dust');
 app.set('views', join(__dirname, 'views'));
 
-// TODO: Move these:
-const username = 'JeopardyBot';
-const bot = 'USLACKBOT';
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -249,9 +240,10 @@ app.use('/command', async function(req, res, next) {
   next();
 });
 
+// TODO: Put this logic into an async function.
 app.post('/command', (req, res) => {
   // Ignore messages from ourself:
-  if (req.body.user_id === bot) return res.end();
+  if (req.body.user_id === config.BOT_ID) return res.end();
 
   let text = req.body.text;
   if (req.body.trigger_word) {
@@ -272,7 +264,7 @@ app.post('/command', (req, res) => {
         res.end();
       } else {
         res.json({
-          username,
+          username: config.USERNAME,
           text
         });
       }
@@ -294,7 +286,7 @@ app.get('/:channel_id/board', (req, res) => {
     res.render('board', {
       categories,
       questions,
-      values: constants.VALUES
+      values: config.VALUES
     });
   });
 });
@@ -327,6 +319,6 @@ app.get('/image/:channel_id/:name', (req, res) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`Jeopardy Bot listening on port ${port}`);
+app.listen(config.PORT, () => {
+  console.log(`Jeopardy Bot listening on port ${config.PORT}`);
 });

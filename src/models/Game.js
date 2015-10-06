@@ -3,14 +3,14 @@ import moment from 'moment';
 import { Schema, model } from 'mongoose';
 import { DiceCoefficient, JaroWinklerDistance } from 'natural';
 
-import * as constants from './constants';
+import * as config from '../config';
 
 async function jServiceCategories() {
-  const randomPage = Math.ceil(Math.random() * constants.LAST_PAGE);
-  let res = await fetch(`http://jservice.io/api/categories?count=${constants.CATEGORY_COUNT}&offset=${randomPage}`);
+  const randomPage = Math.ceil(Math.random() * config.LAST_PAGE);
+  let res = await fetch(`http://jservice.io/api/categories?count=${config.CATEGORY_COUNT}&offset=${randomPage}`);
   let categories = await res.json();
   // Invalid category set for some reason. Try again.
-  if (categories.length !== constants.CATEGORY_COUNT) {
+  if (categories.length !== config.CATEGORY_COUNT) {
     return jServiceCategories();
   }
   return categories;
@@ -39,7 +39,7 @@ async function jServiceCategory(id) {
 
   // Bad category set, let's reclaim it!
   if (found < 5) {
-    constants.VALUES.forEach(value => {
+    config.VALUES.forEach(value => {
       if (!clues[value]) {
         clues[value] = reclaimed.pop();
         // Assign it the value we gave it:
@@ -184,7 +184,7 @@ schema.methods.getClue = function() {
 // Get a new clue for a given value and title
 schema.methods.newClue = async function({category, value}) {
   value = parseInt(value, 10);
-  if (!constants.VALUES.includes(value)) {
+  if (!config.VALUES.includes(value)) {
     throw new RangeError('value');
   }
   if (this.clue) {
@@ -253,11 +253,11 @@ schema.methods.guess = async function({contestant, guess}) {
   answers.push(answers.join(' '));
   return answers.some(answer => {
     let similarity = DiceCoefficient(guess, answer);
-    if (similarity >= constants.ACCEPTED_SIMILARITY) {
+    if (similarity >= config.ACCEPTED_SIMILARITY) {
       return true;
-    } else if (similarity >= constants.JARO_KICKER) {
+    } else if (similarity >= config.JARO_KICKER) {
       let jaroSimilarity = JaroWinklerDistance(guess, answer);
-      return jaroSimilarity >= constants.JARO_SIMILARITY;
+      return jaroSimilarity >= config.JARO_SIMILARITY;
     } else {
       return false;
     }
