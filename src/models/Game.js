@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import moment from 'moment';
+import striptags from 'striptags';
 import {Schema, model} from 'mongoose';
 import {DiceCoefficient, JaroWinklerDistance} from 'natural';
 
@@ -273,7 +274,7 @@ schema.methods.guess = async function({contestant, guess}) {
   await this.save();
 
   // Get the answers:
-  const answers = this.clue.answer.split(/\(|\)/).filter(n => n);
+  const answers = striptags(this.clue.answer).split(/\(|\)/).filter(n => n);
   // Edge case: names:
   answers.push(answers.join(' '));
   return answers.some(answer => {
