@@ -1,0 +1,10 @@
+{
+  "extends": "xo/esnext",
+  "rules": {
+    "indent": [2, 2],
+    "camelcase": 0,
+    "space-before-function-paren": 0,
+    "no-else-return": 0,
+    "new-cap": 0
+  }
+}

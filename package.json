@@ -9,7 +9,8 @@
     "build": "babel src --out-dir lib --copy-files",
     "start": "node lib/jeopardy",
     "watch": "babel-node src/jeopardy",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint src"
   },
   "author": "Jordan Gensler <jordangens@gmail.com>",
   "license": "MIT",
@@ -31,5 +32,9 @@
   },
   "engines": {
     "node": "4.x"
+  },
+  "devDependencies": {
+    "eslint": "^1.6.0",
+    "eslint-config-xo": "^0.6.0"
   }
 }
