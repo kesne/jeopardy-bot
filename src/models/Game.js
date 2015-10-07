@@ -50,7 +50,9 @@ async function jServiceCategory(id) {
   }
 
   // Return the clues:
-  return clues.filter(c => c);
+  return clues.filter(c => c).forEach(question => {
+    question.answer = striptags(question.answer);
+  });
 }
 
 async function jServiceQuestions(ids) {
@@ -274,7 +276,7 @@ schema.methods.guess = async function({contestant, guess}) {
   await this.save();
 
   // Get the answers:
-  const answers = striptags(this.clue.answer).split(/\(|\)/).filter(n => n);
+  const answers = this.clue.answer.split(/\(|\)/).filter(n => n);
   // Edge case: names:
   answers.push(answers.join(' '));
   return answers.some(answer => {
