@@ -78,16 +78,21 @@ export async function guess({game, contestant, body, guess}) {
   } catch(e) {
     // Timeout:
     if (e.message.includes('timeout')) {
-      // TODO: Handle game ends:
-      const [url] = await Promise.all([
-        getImageUrl({
+      // We timed out, so mark this question as done.
+      await game.answer();
+
+      let res = `Time's up, ${contestant.name}! Remember, you have 45 seconds to answer. The correct answer is \`${clue.answer}\`. `;
+
+      if (game.isComplete()) {
+        res += await endGameMessage({game, body});
+        return res;
+      } else {
+        const url = getImageUrl({
           file: 'board',
           channel_id: body.channel_id
-        }),
-        // We timed out, so mark this question as done.
-        game.answer()
-      ]);
-      return `Time's up, ${contestant.name}! Remember, you have 45 seconds to answer. The correct answer is \`${clue.answer}\`. Select a new category. ${url}`;
+        });
+        return res + `Select a new category. ${url}`;
+      }
     }
     // They've already guessed
     if (e.message.includes('contestant')) {
@@ -110,14 +115,11 @@ export async function guess({game, contestant, body, guess}) {
       // Mark the question as answered:
       game.answer()
     ]);
+
     let res = `That is correct, ${contestant.name}. Your score is $${contestant.channelScore(body.channel_id).value}. `;
 
     if (game.isComplete()) {
-
-      res += `And that's it for this round of Jeopardy. Let's take a look at the final scores...\n`;
-      res += `${await scores({body})}`;
-
-      game.end();
+      res += await endGameMessage({game, body});
       return res;
     } else {
       // Get the new board url:
@@ -160,4 +162,12 @@ export async function category({game, contestant, body, category, value}) {
   // Mark that we're sending the clue now:
   await game.clueSent();
   return `Here's your clue. ${url}`;
+};
+
+async function endGameMessage({body, game}) {
+  let str = `And that's it for this round of Jeopardy. Let's take a look at the final scores...\n`;
+  str += `${await scores({body})}`;
+
+  await game.end();
+  return str;
 };
