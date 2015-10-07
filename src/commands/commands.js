@@ -90,7 +90,7 @@ export async function guess({game, contestant, body, guess}) {
       if (game.isComplete()) {
         return `${res} ${ await endGameMessage({game, body}) }`;
       } else {
-        const url = getImageUrl({
+        const url = await getImageUrl({
           file: 'board',
           channel_id: body.channel_id
         });
