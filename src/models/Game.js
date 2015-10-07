@@ -131,6 +131,10 @@ schema.virtual('clue').get(function() {
   return clue;
 });
 
+schema.methods.isComplete = function() {
+  return !this.questions.some(question => !question.answered);
+};
+
 schema.methods.answered = function(id) {
   return this.contestantAnswers.some(i => i === id);
 };

@@ -14,7 +14,7 @@ const MAX_RETRIES = 3;
 export async function getImageUrl({file, channel_id}) {
   await fetch(`http://localhost:${config.PORT}/image/${channel_id}/${file}`);
 
-  const fileName = join(__dirname, 'images', `${channel_id}.${file}.png`);
+  const fileName = join(__dirname, '..', 'images', `${channel_id}.${file}.png`);
 
   let url = await upload(fileName);
 

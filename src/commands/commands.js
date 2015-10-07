@@ -78,6 +78,7 @@ export async function guess({game, contestant, body, guess}) {
   } catch(e) {
     // Timeout:
     if (e.message.includes('timeout')) {
+      // TODO: Handle game ends:
       const [url] = await Promise.all([
         getImageUrl({
           file: 'board',
@@ -109,12 +110,23 @@ export async function guess({game, contestant, body, guess}) {
       // Mark the question as answered:
       game.answer()
     ]);
-    // Get the new board url:
-    const url = await getImageUrl({
-      file: 'board',
-      channel_id: body.channel_id
-    });
-    return `That is correct, ${contestant.name}. Your score is $${contestant.channelScore(body.channel_id).value}. Select a new category. ${url}`;
+    let res = `That is correct, ${contestant.name}. Your score is $${contestant.channelScore(body.channel_id).value}. `;
+
+    if (game.isComplete()) {
+
+      res += `And that's it for this round of Jeopardy. Let's take a look at the final scores...\n`;
+      res += `${await scores({body})}`;
+
+      game.end();
+      return res;
+    } else {
+      // Get the new board url:
+      const url = await getImageUrl({
+        file: 'board',
+        channel_id: body.channel_id
+      });
+      return res + `Select a new category. ${url}`;
+    }
   } else {
     await contestant.incorrect({
       value,

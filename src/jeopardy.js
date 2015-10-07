@@ -132,7 +132,7 @@ app.get('/:channel_id/clue', (req, res) => {
 app.get('/image/:channel_id/:name', (req, res) => {
   var pageres = new Pageres()
     .src(`localhost:${config.PORT}/${req.params.channel_id}/${req.params.name}`, ['1200x654'], {crop: false, filename: `${req.params.channel_id}.${req.params.name}`})
-    .dest(join(__dirname, 'images'));
+    .dest(join(__dirname, '..', 'images'));
 
   console.time('Image Capture');
   pageres.run(function (err, [item]) {
@@ -140,8 +140,8 @@ app.get('/image/:channel_id/:name', (req, res) => {
     if (config.IMAGE_MIN) {
       console.time('Image Minification');
       new Imagemin()
-        .src(join(__dirname, 'images', item.filename))
-        .dest(join(__dirname, 'images'))
+        .src(join(__dirname, '..', 'images', item.filename))
+        .dest(join(__dirname, '..', 'images'))
         .use(Imagemin.optipng({optimizationLevel: 1}))
         .run(function (err, [file]) {
           console.timeEnd('Image Minification');
