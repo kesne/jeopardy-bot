@@ -1,17 +1,12 @@
 import {Schema, model} from 'mongoose';
 
 export const schema = new Schema({
-  // TODO: Their slack username:
-  username: {
-    type: String,
-    required: false
-  },
-
   // Their slack ID:
   slackid: {
     type: String,
-    required: true,
+    required: true
   },
+
   // Their actual name (for pretty printing):
   name: {
     type: String,
@@ -107,7 +102,7 @@ schema.methods.incorrect = function({value, channel_id}) {
   const score = this.channelScore(channel_id);
   score.value -= value;
   return this.save();
-}
+};
 
 schema.methods.won = function() {
   this.stats.won++;

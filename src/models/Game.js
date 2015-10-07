@@ -1,27 +1,27 @@
 import fetch from 'node-fetch';
 import moment from 'moment';
-import { Schema, model } from 'mongoose';
-import { DiceCoefficient, JaroWinklerDistance } from 'natural';
+import {Schema, model} from 'mongoose';
+import {DiceCoefficient, JaroWinklerDistance} from 'natural';
 
 import * as config from '../config';
 
 async function jServiceCategories() {
   const randomPage = Math.ceil(Math.random() * config.LAST_PAGE);
-  let res = await fetch(`http://jservice.io/api/categories?count=${config.CATEGORY_COUNT}&offset=${randomPage}`);
-  let categories = await res.json();
+  const res = await fetch(`http://jservice.io/api/categories?count=${config.CATEGORY_COUNT}&offset=${randomPage}`);
+  const categories = await res.json();
   // Invalid category set for some reason. Try again.
   if (categories.length !== config.CATEGORY_COUNT) {
     return jServiceCategories();
   }
   return categories;
-};
+}
 
 async function jServiceCategory(id) {
-  let res = await fetch(`http://jservice.io/api/category?id=${id}`);
-  let category = await res.json();
+  const res = await fetch(`http://jservice.io/api/category?id=${id}`);
+  const category = await res.json();
 
-  let clues = [];
-  let reclaimed = [];
+  const clues = [];
+  const reclaimed = [];
   let found = 0;
   category.clues.some(clue => {
     if (clue.value) {
@@ -53,11 +53,11 @@ async function jServiceCategory(id) {
 }
 
 async function jServiceQuestions(ids) {
-  let questions = await Promise.all(
+  const questions = await Promise.all(
     ids.map(id => jServiceCategory(id))
   );
   return [].concat(...questions);
-};
+}
 
 export const schema = new Schema({
   categories: [{
@@ -161,7 +161,9 @@ schema.statics.forChannel = function({channel_id}) {
   return this.findOne({
     channel_id,
     questions: {
-      $elemMatch: { answered: false }
+      $elemMatch: {
+        answered: false
+      }
     }
   });
 };
@@ -189,9 +191,7 @@ schema.statics.start = async function({channel_id}) {
 
 // Gets the clue without the timeout:
 schema.methods.getClue = function() {
-  return this.questions.find(q => {
-    return q.id === this.activeQuestion
-  });
+  return this.questions.find(q => q.id === this.activeQuestion);
 };
 
 // Get a new clue for a given value and title
@@ -213,11 +213,11 @@ schema.methods.newClue = async function({category, value}) {
   if (category === '--same--' && this.lastCategory) {
     selectedCategory = this.lastCategory;
   } else {
-    let cc = this.categories.map(cat => {
+    const cc = this.categories.map(cat => {
       return {
         id: cat.id,
         rank: DiceCoefficient(cat.title, category)
-      }
+      };
     }).sort((a, b) => {
       if (a.rank > b.rank) {
         return -1;
@@ -228,6 +228,8 @@ schema.methods.newClue = async function({category, value}) {
     }).filter(x => {
       return x.rank > 0.5;
     })[0];
+
+    // If we can extract a category from the input, let's use it:
     if (cc) {
       selectedCategory = cc.id;
     }
@@ -263,7 +265,7 @@ schema.methods.guess = async function({contestant, guess}) {
     throw new Error('timeout');
   }
   if (this.answered(contestant.slackid)) {
-    throw new Error('contestant')
+    throw new Error('contestant');
   }
 
   // This contestant has now guessed:
@@ -271,15 +273,15 @@ schema.methods.guess = async function({contestant, guess}) {
   await this.save();
 
   // Get the answers:
-  let answers = this.clue.answer.split(/\(|\)/).filter(n => n);
+  const answers = this.clue.answer.split(/\(|\)/).filter(n => n);
   // Edge case: names:
   answers.push(answers.join(' '));
   return answers.some(answer => {
-    let similarity = DiceCoefficient(guess, answer);
+    const similarity = DiceCoefficient(guess, answer);
     if (similarity >= config.ACCEPTED_SIMILARITY) {
       return true;
     } else if (similarity >= config.JARO_KICKER) {
-      let jaroSimilarity = JaroWinklerDistance(guess, answer);
+      const jaroSimilarity = JaroWinklerDistance(guess, answer);
       return jaroSimilarity >= config.JARO_SIMILARITY;
     } else {
       return false;

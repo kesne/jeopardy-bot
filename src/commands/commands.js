@@ -1,6 +1,7 @@
-import { Contestant } from '../models/Contestant';
-import { Game } from '../models/Game';
-import { getImageUrl } from '../upload';
+import {Contestant} from '../models/Contestant';
+import {Game} from '../models/Game';
+import {getImageUrl} from '../upload';
+import responses from './responses';
 
 export const poke = () => {
   return `I'm here, I'm here...`;
@@ -10,7 +11,7 @@ export const help = () => {
   return responses.help;
 };
 
-export async function leaderboard({body}) {
+export async function leaderboard() {
   const contestants = await Contestant.find().sort({'stats.money': -1}).limit(5);
   if (contestants.length === 0) {
     return 'There are no winners yet. Go out there and play some games!';
@@ -22,24 +23,30 @@ export async function leaderboard({body}) {
     );
   });
   return `Let's take a look at the top 5 players:\n\n${leaders.join('\n')}`;
-};
+}
 
 export async function scores({body}) {
-  const contestants = await Contestant.find().where('scores').elemMatch({ channel_id: body.channel_id});
+  const contestants = await Contestant.find().where('scores').elemMatch({
+    channel_id: body.channel_id
+  });
   if (contestants.length === 0) {
     return 'There are no scores yet!';
   }
   const leaders = contestants.sort((a, b) => {
     const {value: aScore} = a.channelScore(body.channel_id);
     const {value: bScore} = b.channelScore(body.channel_id);
-    if (bScore > aScore) return 1;
-    if (aScore > bScore) return -1;
+    if (bScore > aScore) {
+      return 1;
+    }
+    if (aScore > bScore) {
+      return -1;
+    }
     return 0;
   }).map((contestant, i) => {
     return `${i + 1}. ${contestant.name}: $${contestant.channelScore(body.channel_id).value}`;
   });
   return `Here are the current scores for this game:\n\n${leaders.join('\n')}`;
-};
+}
 
 export async function newgame({game, body}) {
   if (game) {
@@ -54,7 +61,7 @@ export async function newgame({game, body}) {
     channel_id: body.channel_id
   });
   return `Let's get this game started! ${url}`;
-};
+}
 
 export async function endgame({game}) {
   if (!game) {
@@ -63,33 +70,31 @@ export async function endgame({game}) {
   // Try to end the game:
   await game.end();
   return `Alright, I've ended that game for you. You can always start a new game by typing "new game".`;
-};
+}
 
 export async function guess({game, contestant, body, guess}) {
-
   // Cache the clue reference:
   const clue = game.getClue();
 
   let correct;
   try {
     correct = await game.guess({guess, contestant});
-  } catch(e) {
+  } catch (e) {
     // Timeout:
     if (e.message.includes('timeout')) {
       // We timed out, so mark this question as done.
       await game.answer();
 
-      let res = `Time's up, ${contestant.name}! Remember, you have 45 seconds to answer. The correct answer is \`${clue.answer}\`. `;
+      const res = `Time's up, ${contestant.name}! Remember, you have 45 seconds to answer. The correct answer is \`${clue.answer}\`.`;
 
       if (game.isComplete()) {
-        res += await endGameMessage({game, body});
-        return res;
+        return `${res} ${ await endGameMessage({game, body}) }`;
       } else {
         const url = getImageUrl({
           file: 'board',
           channel_id: body.channel_id
         });
-        return res + `Select a new category. ${url}`;
+        return `${res} Select a new category. ${url}`;
       }
     }
     // They've already guessed
@@ -114,18 +119,17 @@ export async function guess({game, contestant, body, guess}) {
       game.answer()
     ]);
 
-    let res = `That is correct, ${contestant.name}. Your score is $${contestant.channelScore(body.channel_id).value}. `;
+    const res = `That is correct, ${contestant.name}. Your score is $${contestant.channelScore(body.channel_id).value}.`;
 
     if (game.isComplete()) {
-      res += await endGameMessage({game, body});
-      return res;
+      return `${res} ${ await endGameMessage({game, body}) }`;
     } else {
       // Get the new board url:
       const url = await getImageUrl({
         file: 'board',
         channel_id: body.channel_id
       });
-      return res + `Select a new category. ${url}`;
+      return `${res} Select a new category. ${url}`;
     }
   } else {
     await contestant.incorrect({
@@ -134,9 +138,9 @@ export async function guess({game, contestant, body, guess}) {
     });
     return `That is incorrect, ${contestant.name}. Your score is now $${contestant.channelScore(body.channel_id).value}.`;
   }
-};
+}
 
-export async function category({game, contestant, body, category, value}) {
+export async function category({game, body, category, value}) {
   try {
     await game.newClue({category, value});
   } catch (e) {
@@ -151,7 +155,7 @@ export async function category({game, contestant, body, category, value}) {
     }
     console.log('Unexpected category selection error.', e);
     // Just ignore the input:
-    return ''
+    return '';
   }
   const url = await getImageUrl({
     file: 'clue',
@@ -160,13 +164,13 @@ export async function category({game, contestant, body, category, value}) {
   // Mark that we're sending the clue now:
   await game.clueSent();
   return `Here's your clue. ${url}`;
-};
+}
 
 async function endGameMessage({body, game}) {
   let str = `\nAnd that's it for this round of Jeopardy. Let's take a look at the final scores...\n`;
-  str += `${await scores({body})}`;
+  str += `${ await scores({body}) }`;
   str += `\n\nThanks for playing! You can always start another game by typing "new game".`;
 
   await game.end();
   return str;
-};
+}
