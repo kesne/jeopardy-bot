@@ -18,6 +18,6 @@ Here, this should help you out!
     “Where [is|are] ______”
 *Scores*
     “scores” - Shows the score for the current game.
-    “leaderboard” - Shows the scores and wins from all games.`,
+    “leaderboard” - Shows the scores and wins from all games.`
 
-}
+};

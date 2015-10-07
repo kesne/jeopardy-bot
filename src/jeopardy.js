@@ -5,14 +5,13 @@ import bodyParser from 'body-parser';
 import Pageres from 'pageres';
 import lockFile from 'lockfile';
 import Imagemin from 'imagemin';
-import { join } from 'path';
-import { dust } from 'adaro';
+import {join} from 'path';
+import {dust} from 'adaro';
 
-import { upload } from './upload';
-import { MessageReader } from './MessageReader';
+import {MessageReader} from './MessageReader';
 import execCommand from './commands/exec';
-import { Game } from './models/Game';
-import { Contestant } from './models/Contestant';
+import {Game} from './models/Game';
+import {Contestant} from './models/Contestant';
 import * as config from './config';
 
 mongoose.connect(config.MONGO);
@@ -21,12 +20,12 @@ const app = express();
 
 const options = {
   helpers: [
-    (dust) => {
+    dust => {
       dust.helpers.Card = (chunk, context, bodies, params) => {
         const questions = context.get('questions');
         const value = context.resolve(params.value);
         const id = context.resolve(params.id);
-        var question = questions.find((q) => {
+        const question = questions.find(q => {
           return q.value === value && q.category_id === id;
         });
         if (question.answered) {
@@ -34,25 +33,31 @@ const options = {
         } else {
           chunk.write(`<span class="dollar">$</span>${value}`);
         }
-      }
+      };
     }
   ]
-}
+};
 
 app.engine('dust', dust(options));
 app.set('view engine', 'dust');
 app.set('views', join(__dirname, 'views'));
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({extended: true}));
 
 app.post('/command', (req, res) => {
   // Ignore messages from ourself:
-  if (req.body.user_id === config.BOT_ID) return res.end();
+  if (req.body.user_id === config.BOT_ID) {
+    return res.end();
+  }
 
+  // Try to parse the message:
   const message = MessageReader.read(req.body);
-  console.log(message);
-  if (!message || !message.command) return res.end();
+
+  // If we can't get a valid message out, just dump the request:
+  if (!message || !message.command) {
+    return res.end();
+  }
   req.message = message;
 
   const channel_id = req.body.channel_id;
@@ -69,7 +74,7 @@ app.post('/command', (req, res) => {
     let response;
     try {
       response = await handleRequest(req);
-    } catch(e) {
+    } catch (e) {
       console.log(e);
     }
 
@@ -79,7 +84,7 @@ app.post('/command', (req, res) => {
       res.end();
     }
 
-    lockFile.unlock(`jeopardy-${channel_id}.lock`, er => {});
+    lockFile.unlock(`jeopardy-${channel_id}.lock`, () => {});
   });
 });
 
@@ -104,8 +109,7 @@ async function handleRequest(req) {
       text
     };
   }
-};
-
+}
 
 app.get('/:channel_id/board', (req, res) => {
   Game.forChannel({
@@ -130,12 +134,12 @@ app.get('/:channel_id/clue', (req, res) => {
 });
 
 app.get('/image/:channel_id/:name', (req, res) => {
-  var pageres = new Pageres()
+  const pageres = new Pageres()
     .src(`localhost:${config.PORT}/${req.params.channel_id}/${req.params.name}`, ['1200x654'], {crop: false, filename: `${req.params.channel_id}.${req.params.name}`})
     .dest(join(__dirname, '..', 'images'));
 
   console.time('Image Capture');
-  pageres.run(function (err, [item]) {
+  pageres.run((err, [item]) => {
     console.timeEnd('Image Capture');
     if (config.IMAGE_MIN) {
       console.time('Image Minification');
@@ -143,7 +147,7 @@ app.get('/image/:channel_id/:name', (req, res) => {
         .src(join(__dirname, '..', 'images', item.filename))
         .dest(join(__dirname, '..', 'images'))
         .use(Imagemin.optipng({optimizationLevel: 1}))
-        .run(function (err, [file]) {
+        .run(() => {
           console.timeEnd('Image Minification');
           res.send('ok');
         });

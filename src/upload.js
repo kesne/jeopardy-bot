@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
-import { join } from 'path';
-import { unlink } from 'fs';
-import { uploadFile, setClientId } from 'imgur';
+import {join} from 'path';
+import {unlink} from 'fs';
+import {uploadFile, setClientId} from 'imgur';
 import * as config from './config';
 
 // Allow setting the imgur api:
@@ -16,7 +16,7 @@ export async function getImageUrl({file, channel_id}) {
 
   const fileName = join(__dirname, '..', 'images', `${channel_id}.${file}.png`);
 
-  let url = await upload(fileName);
+  const url = await upload(fileName);
 
   // After we've uploaded the image, we don't need it locally anymore.
   // Schedule it for next tick to prevent it from blocking the response.
@@ -24,17 +24,17 @@ export async function getImageUrl({file, channel_id}) {
     unlink(fileName, () => {});
   });
   return url;
-};
+}
 
-async function upload(file, attempt=1) {
+async function upload(file, attempt = 1) {
   // Allow 3 retires to upload images to imgur:
   if (attempt > MAX_RETRIES) {
     throw new Error('Error uploading image. Max number');
   }
   try {
-    let {data} = await uploadFile(file);
+    const {data} = await uploadFile(file);
     return data.link;
-  } catch(e) {
+  } catch (e) {
     return upload(file, attempt + 1);
   }
-};
+}
