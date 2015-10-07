@@ -163,8 +163,9 @@ export async function category({game, contestant, body, category, value}) {
 };
 
 async function endGameMessage({body, game}) {
-  let str = `And that's it for this round of Jeopardy. Let's take a look at the final scores...\n`;
+  let str = `\nAnd that's it for this round of Jeopardy. Let's take a look at the final scores...\n`;
   str += `${await scores({body})}`;
+  str += `\n\nThanks for playing! You can always start another game by typing "new game".`;
 
   await game.end();
   return str;
