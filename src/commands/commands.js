@@ -56,14 +56,12 @@ export async function newgame({game, body}) {
   return `Let's get this game started! ${url}`;
 };
 
-export async function endgame({game, body}) {
+export async function endgame({game}) {
   if (!game) {
     return `There's no game in progress. You can always start a new game by typing "new game".`;
   }
   // Try to end the game:
-  await Game.end({
-    channel_id: body.channel_id
-  });
+  await game.end();
   return `Alright, I've ended that game for you. You can always start a new game by typing "new game".`;
 };
 

@@ -139,6 +139,23 @@ schema.methods.answered = function(id) {
   return this.contestantAnswers.some(i => i === id);
 };
 
+// End all games:
+schema.methods.end = async function() {
+  const contestants = await this.model('Contestant').find({
+    scores: {
+      $elemMatch: {
+        channel_id: this.channel_id
+      }
+    }
+  });
+  await Promise.all(
+    contestants.map(contestant => contestant.endGame({
+      channel_id: this.channel_id
+    }))
+  );
+  return this.remove();
+};
+
 // Grab the active game for the channel:
 schema.statics.forChannel = function({channel_id}) {
   return this.findOne({
@@ -149,17 +166,6 @@ schema.statics.forChannel = function({channel_id}) {
   });
 };
 
-// End all games:
-schema.statics.end = async function({channel_id}) {
-  const contestants = await this.model('Contestant').find({
-    scores: {
-      $elemMatch: { channel_id }
-    }
-  });
-  await Promise.all(contestants.map(contestant => contestant.endGame({channel_id})));
-  return this.remove({channel_id});
-};
-
 // Start a new game:
 schema.statics.start = async function({channel_id}) {
   const game = await this.forChannel({channel_id});
@@ -167,7 +173,7 @@ schema.statics.start = async function({channel_id}) {
     throw new Error('An game is already in progress.');
   }
   // Clear out the existing game:
-  await this.end({channel_id});
+  await game.end();
   // Build a new game:
   const categories = await jServiceCategories();
   const questions = await jServiceQuestions(categories.map(cat => cat.id));
