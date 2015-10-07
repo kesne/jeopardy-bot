@@ -168,12 +168,15 @@ schema.statics.forChannel = function({channel_id}) {
 
 // Start a new game:
 schema.statics.start = async function({channel_id}) {
-  const game = await this.forChannel({channel_id});
-  if (game) {
+  const game = await this.find({channel_id});
+
+  // Clear out existing (ended) games:
+  if (game && !game.isComplete()) {
     throw new Error('An game is already in progress.');
+  } else if (game) {
+    await game.end();
   }
-  // Clear out the existing game:
-  await game.end();
+
   // Build a new game:
   const categories = await jServiceCategories();
   const questions = await jServiceQuestions(categories.map(cat => cat.id));
