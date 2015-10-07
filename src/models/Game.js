@@ -168,7 +168,7 @@ schema.statics.forChannel = function({channel_id}) {
 
 // Start a new game:
 schema.statics.start = async function({channel_id}) {
-  const game = await this.find({channel_id});
+  const game = await this.findOne({channel_id});
 
   // Clear out existing (ended) games:
   if (game && !game.isComplete()) {
