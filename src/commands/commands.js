@@ -49,7 +49,7 @@ export async function scores({body}) {
 }
 
 export async function newgame({game, body}) {
-  if (game) {
+  if (game && !game.isComplete()) {
     return 'It looks like a game is already in progress! You need to finish or end that one first before starting a new game.';
   }
   // Start the game:

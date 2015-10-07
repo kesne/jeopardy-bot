@@ -75,7 +75,7 @@ app.post('/command', (req, res) => {
     try {
       response = await handleRequest(req);
     } catch (e) {
-      console.log(e);
+      console.log(e.stack);
     }
 
     if (response) {
@@ -84,7 +84,11 @@ app.post('/command', (req, res) => {
       res.end();
     }
 
-    lockFile.unlock(`jeopardy-${channel_id}.lock`, () => {});
+    lockFile.unlock(`jeopardy-${channel_id}.lock`, err => {
+      if (err) {
+        console.log('Error unlocking file', err);
+      }
+    });
   });
 });
 
@@ -120,6 +124,8 @@ app.get('/:channel_id/board', (req, res) => {
       questions,
       values: config.VALUES
     });
+  }).catch(() => {
+    res.send('Internal Server Error');
   });
 });
 
@@ -130,6 +136,8 @@ app.get('/:channel_id/clue', (req, res) => {
     res.render('clue', {
       clue: game.getClue()
     });
+  }).catch(() => {
+    res.send('Internal Server Error');
   });
 });
 

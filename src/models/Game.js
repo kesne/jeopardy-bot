@@ -135,7 +135,7 @@ schema.virtual('clue').get(function() {
 });
 
 schema.methods.isComplete = function() {
-  return !this.questions.some(question => !question.answered);
+  return !this.questions.some(question => !(question && question.answered));
 };
 
 schema.methods.answered = function(id) {
@@ -161,23 +161,16 @@ schema.methods.end = async function() {
 
 // Grab the active game for the channel:
 schema.statics.forChannel = function({channel_id}) {
-  return this.findOne({
-    channel_id,
-    questions: {
-      $elemMatch: {
-        answered: false
-      }
-    }
-  });
+  return this.findOne({channel_id});
 };
 
 // Start a new game:
 schema.statics.start = async function({channel_id}) {
-  const game = await this.findOne({channel_id});
+  const game = await this.forChannel({channel_id});
 
   // Clear out existing (ended) games:
   if (game && !game.isComplete()) {
-    throw new Error('An game is already in progress.');
+    throw new Error('A game is already in progress.');
   } else if (game) {
     await game.end();
   }
