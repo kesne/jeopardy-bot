@@ -1,7 +1,10 @@
+import numeral from 'numeral';
 import {Contestant} from '../models/Contestant';
 import {Game} from '../models/Game';
 import {getImageUrl} from '../upload';
 import responses from './responses';
+
+const formatter = '$0,0';
 
 export const poke = () => {
   return `I'm here, I'm here...`;
@@ -19,13 +22,13 @@ export async function leaderboard() {
   const leaders = contestants.map((contestant, i) => {
     return (
 `${i + 1}. ${contestant.name}:
-> _$${contestant.stats.money}_ *|* _${contestant.stats.won} wins_ *|* _${contestant.stats.lost} losses_`
+> _${numeral(contestant.stats.money).format(formatter)}_ *|* _${contestant.stats.won} wins_ *|* _${contestant.stats.lost} losses_`
     );
   });
   return `Let's take a look at the top 5 players:\n\n${leaders.join('\n')}`;
 }
 
-export async function scores({body}) {
+export async function scores({body, showHeader = true}) {
   const contestants = await Contestant.find().where('scores').elemMatch({
     channel_id: body.channel_id
   });
@@ -43,9 +46,13 @@ export async function scores({body}) {
     }
     return 0;
   }).map((contestant, i) => {
-    return `${i + 1}. ${contestant.name}: $${contestant.channelScore(body.channel_id).value}`;
+    return `${i + 1}. ${contestant.name}: ${numeral(contestant.channelScore(body.channel_id).value).format(formatter)}`;
   });
-  return `Here are the current scores for this game:\n\n${leaders.join('\n')}`;
+  let res = '';
+  if (showHeader) {
+    res += 'Here are the current scores for this game:';
+  }
+  return `${res}\n\n${leaders.join('\n')}`;
 }
 
 export async function newgame({game, body}) {
@@ -119,7 +126,7 @@ export async function guess({game, contestant, body, guess}) {
       game.answer()
     ]);
 
-    const res = `That is correct, ${contestant.name}. Your score is $${contestant.channelScore(body.channel_id).value}.`;
+    const res = `That is correct, ${contestant.name}. Your score is ${numeral(contestant.channelScore(body.channel_id).value).format(formatter)}.`;
 
     if (game.isComplete()) {
       return `${res} ${ await endGameMessage({game, body}) }`;
@@ -136,7 +143,7 @@ export async function guess({game, contestant, body, guess}) {
       value,
       channel_id: body.channel_id
     });
-    return `That is incorrect, ${contestant.name}. Your score is now $${contestant.channelScore(body.channel_id).value}.`;
+    return `That is incorrect, ${contestant.name}. Your score is now ${numeral(contestant.channelScore(body.channel_id).value).format(formatter)}.`;
   }
 }
 
@@ -167,8 +174,8 @@ export async function category({game, body, category, value}) {
 }
 
 async function endGameMessage({body, game}) {
-  let str = `\nAnd that's it for this round of Jeopardy. Let's take a look at the final scores...\n`;
-  str += `${ await scores({body}) }`;
+  let str = `\nAnd that's it for this round of Jeopardy. Let's take a look at the final scores...`;
+  str += `${ await scores({body, showHeader: false}) }`;
   str += `\n\nThanks for playing! You can always start another game by typing "new game".`;
 
   await game.end();
