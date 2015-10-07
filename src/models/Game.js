@@ -50,8 +50,9 @@ async function jServiceCategory(id) {
   }
 
   // Return the clues:
-  return clues.filter(c => c).forEach(question => {
+  return clues.filter(c => c).map(question => {
     question.answer = striptags(question.answer);
+    return question;
   });
 }
 
