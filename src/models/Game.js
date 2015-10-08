@@ -21,39 +21,29 @@ async function jServiceCategory(id) {
   const res = await fetch(`http://jservice.io/api/category?id=${id}`);
   const category = await res.json();
 
-  const clues = [];
-  const reclaimed = [];
-  let found = 0;
-  category.clues.some(clue => {
-    if (clue.value) {
-      if (!clues[clue.value]) {
-        clues[clue.value] = clue;
-        found++;
-      }
-    } else {
-      // This question wasn't included because it doesn't have a value,
-      // but we could assign one in to "reclaim" this question:
-      reclaimed.push(clue);
-    }
-    return found === 5;
+  // The final clues we will return:
+  let clues = [];
+
+  // Take the first five clues:
+  category.clues.slice(0, 5).forEach((clue, i) => {
+    // Force the value:
+    clue.value = (i + 1) * 200;
+    clues.push(clue);
   });
 
-  // Bad category set, let's reclaim it!
-  if (found < 5) {
-    config.VALUES.forEach(value => {
-      if (!clues[value]) {
-        clues[value] = reclaimed.pop();
-        // Assign it the value we gave it:
-        clues[value].value = value;
-      }
-    });
-  }
-
-  // Return the clues:
-  return clues.filter(c => c).map(question => {
+  // Remove undefined values and HTML markup in answers:
+  clues = clues.map(question => {
     question.answer = striptags(question.answer);
     return question;
   });
+
+  // Check for bad categories:
+  if (clues.length < 5) {
+    throw new Error('Bad clue set.');
+  }
+
+  // Return the clues:
+  return clues;
 }
 
 async function jServiceQuestions(ids) {
@@ -298,12 +288,11 @@ schema.methods.guess = async function({contestant, guess}) {
 
   // Get the answers:
   const answers = this.clue.answer.split(/\(|\)/).filter(n => n);
-  // Edge case: names:
   answers.push(answers.join(' '));
   return answers.some(answer => {
     const guessDate = moment(guess);
-    if (guessDate.isValid()){
-       return guessDate.isSame(moment(answer));
+    if (guessDate.isValid()) {
+      return guessDate.isSame(moment(answer));
     } else {
       const similarity = DiceCoefficient(guess, answer);
       if (similarity >= config.ACCEPTED_SIMILARITY) {

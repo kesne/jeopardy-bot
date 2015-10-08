@@ -33,7 +33,7 @@
         right: 0;
         bottom: 0;
         margin-right: 30px;
-        margin-bottom: 24px;
+        margin-bottom: 20px;
         z-index: 900;
       }
     </style>

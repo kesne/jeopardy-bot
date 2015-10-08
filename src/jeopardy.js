@@ -18,6 +18,7 @@ mongoose.connect(config.MONGO);
 
 const app = express();
 
+// TODO: Move this.
 const options = {
   helpers: [
     dust => {
@@ -75,6 +76,7 @@ app.post('/command', (req, res) => {
     try {
       response = await handleRequest(req);
     } catch (e) {
+      console.log(e);
       console.log(e.stack);
     }
 
