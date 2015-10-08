@@ -75,7 +75,7 @@ async function loadEpisode(url) {
   };
 }
 
-async function loadRandomEpisode() {
+export async function randomEpisode() {
   const season = Math.ceil(Math.random() * seasons);
   const res = await fetch(`http://www.j-archive.com/showseason.php?season=${season}`);
   const text = await res.text();
@@ -91,12 +91,3 @@ async function loadRandomEpisode() {
     roundOne
   };
 }
-
-loadRandomEpisode().then(season => {
-  console.log(season.roundOne, season.episode);
-}).catch(e => {
-  console.log(e.stack);
-});
-
-// Seasons info:
-// http://www.j-archive.com/showseason.php?season=32
