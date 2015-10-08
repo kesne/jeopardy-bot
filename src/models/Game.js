@@ -71,7 +71,7 @@ export const schema = new Schema({
 schema.virtual('clue').get(function() {
   const clue = this.getClue();
   // There's no active question if we've timed out:
-  if (moment().isAfter(moment(this.questionStart).add(45, 'seconds'))) {
+  if (moment().isAfter(moment(this.questionStart).add(config.CLUE_TIMEOUT, 'seconds'))) {
     return false;
   }
   return clue;

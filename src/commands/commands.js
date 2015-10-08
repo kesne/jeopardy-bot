@@ -3,6 +3,7 @@ import {Contestant} from '../models/Contestant';
 import {Game} from '../models/Game';
 import {getImageUrl} from '../upload';
 import responses from './responses';
+import * as config from '../config';
 
 const formatter = '$0,0';
 
@@ -92,7 +93,7 @@ export async function guess({game, contestant, body, guess}) {
       // We timed out, so mark this question as done.
       await game.answer();
 
-      const res = `Time's up, ${contestant.name}! Remember, you have 45 seconds to answer. The correct answer is \`${clue.answer}\`.`;
+      const res = `Time's up, ${contestant.name}! Remember, you have ${config.CLUE_TIMEOUT} seconds to answer. The correct answer is \`${clue.answer}\`.`;
 
       if (game.isComplete()) {
         return `${res} ${ await endGameMessage({game, body}) }`;

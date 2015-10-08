@@ -6,7 +6,7 @@ export const MODE = process.env.JBOT_MODE || 'response';
 
 export let IMAGE_MIN = true;
 if (process.env.JBOT_IMAGE_MIN) {
-  IMAGE_MIN = process.env.JBOT_IMAGE_MIN !== 'false';
+  IMAGE_MIN = Number(process.env.JBOT_IMAGE_MIN);
 }
 
 // A list of rooms that the bot will work in:
@@ -25,7 +25,7 @@ export const USERNAME = process.env.JBOT_USERNAME || 'JeopardyBot';
 export const BOT_ID = 'USLACKBOT';
 
 // The URL for the mongo database:
-export const MONGO = process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://localhost/jeopardy';
+export const MONGO = process.env.MONGO_URL || process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://localhost/jeopardy';
 
 // The port for the application:
 export const PORT = process.env.PORT || 8000;
@@ -47,10 +47,10 @@ export const VALUES = [
 export const LAST_PAGE = 18412;
 
 // The number of seconds to wait before a clue is timed out.
-export const CLUE_TIMEOUT = 45;
+export const CLUE_TIMEOUT = Number(process.env.JBOT_TIMEOUT) || 45;
 
 // The number of seconds to give control of the board to the correct guesser.
-export const BOARD_CONTROL_TIMEOUT = 10;
+export const BOARD_CONTROL_TIMEOUT = Number(process.env.JBOT_BOARD_CONTROL) || 10;
 
 // How many things we want:
 export const CATEGORY_COUNT = 6;
