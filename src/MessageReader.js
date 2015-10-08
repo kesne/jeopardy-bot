@@ -45,34 +45,36 @@ export const MessageReader = {
 		// Need at least three tokens:
     if (tokens.length >= 3) {
 			// Check for selecting a category:
-      const tks = tokens.slice(-2);
-      const value = parseInt(tks[1], 10);
-      if (tks[0] === 'for' && config.VALUES.includes(value)) {
-        let catTokens;
+      const [forString, rawValue] = tokens.slice(-2);
+      const value = parseInt(rawValue, 10);
+      if (forString === 'for' && config.VALUES.includes(value)) {
+        let categoryString = '';
 
 				// SPECIAL CASE: same category:
         if (tokens[0] === 'same' && tokens[1] === 'category' && tokens.length === 4) {
-          catTokens = ['--same--'];
+          categoryString = '--same--';
         } else {
 					// This is a category selection:
-          catTokens = tokens.slice(0, tokens.length - 2);
+          const catTokens = tokens.slice(0, tokens.length - 2);
 
 					// Special cases for leading phrases we allow:
           if (catTokens[0] === 'i' && catTokens[1] === 'll' && catTokens[2] === 'take') {
-            catTokens = catTokens.slice(3);
+            categoryString = text.substring(text.indexOf('take') + 4, text.lastIndexOf('for'));
           } else if (catTokens[0] === 'ill' && catTokens[1] === 'take') {
-            catTokens = catTokens.slice(2);
+            categoryString = text.substring(text.indexOf('take') + 4, text.lastIndexOf('for'));
           } else if (catTokens[0] === 'give' && catTokens[1] === 'me') {
-            catTokens = catTokens.slice(2);
+            categoryString = text.substring(text.indexOf('me') + 4, text.lastIndexOf('for'));
           } else if (catTokens[0] === 'choose') {
-            catTokens = catTokens.slice(1);
+            categoryString = text.substring(text.indexOf('choose') + 4, text.lastIndexOf('for'));
+          } else {
+            categoryString = text.substring(0, text.lastIndexOf('for'));
           }
         }
 
 				// Return the command:
         return {
           command: 'category',
-          category: catTokens.join(' '),
+          category: categoryString,
           value
         };
       }
