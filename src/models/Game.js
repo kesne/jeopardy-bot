@@ -276,7 +276,7 @@ schema.methods.guess = async function({contestant, guess}) {
   return answers.some(answer => {
     const guessDate = moment.parse(guess);
     if (guessDate.isValid()){
-       return guessDate.isSame(anwser);
+       return guessDate.isSame(answer);
     } else {
       const similarity = DiceCoefficient(guess, answer);
       if (similarity >= config.ACCEPTED_SIMILARITY) {
