@@ -104,19 +104,15 @@ schema.methods.incorrect = function({value, channel_id}) {
   return this.save();
 };
 
-schema.methods.won = function() {
-  this.stats.won++;
-  return this.endGame();
-};
-
-schema.methods.lost = function() {
-  this.stats.lost++;
-  return this.endGame();
-};
-
-schema.methods.endGame = function({channel_id}) {
+schema.methods.endGame = function({channel_id, won, lost}) {
   const {value} = this.channelScore(channel_id);
   this.stats.money += value;
+  if (won) {
+    this.stats.won++;
+  }
+  if (lost) {
+    this.stats.lost++;
+  }
   this.removeChannelScore(channel_id);
   return this.save();
 };

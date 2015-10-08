@@ -115,6 +115,11 @@ async function handleRequest(req) {
   }
 }
 
+// Heroku landing page:
+app.get('/welcome', (req, res) => {
+  res.render('welcome');
+});
+
 app.get('/:channel_id/board', (req, res) => {
   Game.forChannel({
     channel_id: req.params.channel_id

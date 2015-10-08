@@ -153,9 +153,36 @@ schema.methods.end = async function() {
     }
   });
   await Promise.all(
-    contestants.map(contestant => contestant.endGame({
-      channel_id: this.channel_id
-    }))
+    contestants.sort((a, b) => {
+      const {value: aScore} = a.channelScore(this.channel_id);
+      const {value: bScore} = b.channelScore(this.channel_id);
+      if (bScore > aScore) {
+        return 1;
+      }
+      if (aScore > bScore) {
+        return -1;
+      }
+      return 0;
+    }).map((contestant, i) => {
+      let won = false;
+      let lost = false;
+      // If the game is complete, the player may have won or lost:
+      if (this.isComplete()) {
+        if (i === 0) {
+          // If we're first, then we have the highest score:
+          won = true;
+        } else {
+          // Otherwise, we lost this game:
+          lost = true;
+        }
+      }
+      // Mark the contestant game as ended:
+      return contestant.endGame({
+        channel_id: this.channel_id,
+        won,
+        lost
+      });
+    })
   );
   return this.remove();
 };
