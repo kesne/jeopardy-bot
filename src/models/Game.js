@@ -301,14 +301,19 @@ schema.methods.guess = async function({contestant, guess}) {
   // Edge case: names:
   answers.push(answers.join(' '));
   return answers.some(answer => {
-    const similarity = DiceCoefficient(guess, answer);
-    if (similarity >= config.ACCEPTED_SIMILARITY) {
-      return true;
-    } else if (similarity >= config.JARO_KICKER) {
-      const jaroSimilarity = JaroWinklerDistance(guess, answer);
-      return jaroSimilarity >= config.JARO_SIMILARITY;
+    const guessDate = moment(guess);
+    if (guessDate.isValid()){
+       return guessDate.isSame(moment(answer));
     } else {
-      return false;
+      const similarity = DiceCoefficient(guess, answer);
+      if (similarity >= config.ACCEPTED_SIMILARITY) {
+        return true;
+      } else if (similarity >= config.JARO_KICKER) {
+        const jaroSimilarity = JaroWinklerDistance(guess, answer);
+        return jaroSimilarity >= config.JARO_SIMILARITY;
+      } else {
+        return false;
+      }
     }
   });
 };
