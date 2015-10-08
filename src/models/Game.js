@@ -274,9 +274,9 @@ schema.methods.guess = async function({contestant, guess}) {
   // Edge case: names:
   answers.push(answers.join(' '));
   return answers.some(answer => {
-    const guessDate = moment.parse(guess);
+    const guessDate = moment(guess);
     if (guessDate.isValid()){
-       return guessDate.isSame(answer);
+       return guessDate.isSame(moment(answer));
     } else {
       const similarity = DiceCoefficient(guess, answer);
       if (similarity >= config.ACCEPTED_SIMILARITY) {
