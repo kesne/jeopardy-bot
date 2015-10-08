@@ -1,57 +1,9 @@
-import fetch from 'node-fetch';
 import moment from 'moment';
-import striptags from 'striptags';
 import {Schema, model} from 'mongoose';
 import {DiceCoefficient, JaroWinklerDistance} from 'natural';
 
+import {randomEpisode} from '../japi';
 import * as config from '../config';
-
-async function jServiceCategories() {
-  const randomPage = Math.ceil(Math.random() * config.LAST_PAGE);
-  const res = await fetch(`http://jservice.io/api/categories?count=${config.CATEGORY_COUNT}&offset=${randomPage}`);
-  const categories = await res.json();
-  // Invalid category set for some reason. Try again.
-  if (categories.length !== config.CATEGORY_COUNT) {
-    return jServiceCategories();
-  }
-  return categories;
-}
-
-async function jServiceCategory(id) {
-  const res = await fetch(`http://jservice.io/api/category?id=${id}`);
-  const category = await res.json();
-
-  // The final clues we will return:
-  let clues = [];
-
-  // Take the first five clues:
-  category.clues.slice(0, 5).forEach((clue, i) => {
-    // Force the value:
-    clue.value = (i + 1) * 200;
-    clues.push(clue);
-  });
-
-  // Remove undefined values and HTML markup in answers:
-  clues = clues.map(question => {
-    question.answer = striptags(question.answer);
-    return question;
-  });
-
-  // Check for bad categories:
-  if (clues.length < 5) {
-    throw new Error('Bad clue set.');
-  }
-
-  // Return the clues:
-  return clues;
-}
-
-async function jServiceQuestions(ids) {
-  const questions = await Promise.all(
-    ids.map(id => jServiceCategory(id))
-  );
-  return [].concat(...questions);
-}
 
 export const schema = new Schema({
   categories: [{
@@ -193,9 +145,11 @@ schema.statics.start = async function({channel_id}) {
     await game.end();
   }
 
-  // Build a new game:
-  const categories = await jServiceCategories();
-  const questions = await jServiceQuestions(categories.map(cat => cat.id));
+  // Grab a random episode from the API:
+  const episode = await randomEpisode();
+  // Extract the questions and categories:
+  const {clues: questions, categories} = episode.roundOne;
+
   return this.create({
     channel_id,
     categories,
