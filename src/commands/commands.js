@@ -95,6 +95,8 @@ export async function wager({game, contestant, body, value}) {
   if (value > contestant.channelScore(body.channel_id).value && value > game.getClue().value) {
     return 'That wager is too high.';
   }
+
+  // Stash the daily double wager:
   game.dailyDouble.wager = value;
 
   // Parallelize for better performance:
@@ -138,12 +140,22 @@ export async function guess({game, contestant, body, guess}) {
     if (e.message.includes('contestant')) {
       return `You had your chance, ${contestant.name}. Let someone else answer.`;
     }
+    // Daily doubles need wagers:
+    if (e.message.inclues('wager')) {
+      return 'You need to make a wager before you guess.';
+    }
+
     // Just ignore guesses if they're outside of the game context:
     return '';
   }
 
   // Extract the value from the current clue:
-  const {value} = clue;
+  let {value} = clue;
+
+  // Daily doubles have a different value:
+  if (game.isDailyDouble) {
+    value = game.dailyDouble.wager;
+  }
 
   if (correct) {
     await Promise.all([

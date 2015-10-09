@@ -269,6 +269,9 @@ schema.methods.guess = async function({contestant, guess}) {
   if (this.isDailyDouble && this.dailyDouble.contestant !== contestant) {
     throw new Error('dailydouble');
   }
+  if (this.isDailyDouble && !this.dailyDouble.wager) {
+    throw new Error('wager');
+  }
 
   // This contestant has now guessed:
   this.contestantAnswers.push(contestant.slackid);
