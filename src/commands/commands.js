@@ -5,6 +5,7 @@ import {getImageUrl} from '../upload';
 import responses from './responses';
 import * as config from '../config';
 
+// TODO: Make top-level formatter to simplify some code down below.
 const formatter = '$0,0';
 
 export const poke = () => {
@@ -80,6 +81,34 @@ export async function endgame({game}) {
   return `Alright, I've ended that game for you. You can always start a new game by typing "new game".`;
 }
 
+// For daily doubles:
+export async function wager({game, contestant, body, value}) {
+  // Sanity check (this function is easy to trigger accidently):
+  if (!game || !game.isDailyDouble || game.dailyDouble.contestant !== contestant || game.dailyDouble.wager) {
+    return '';
+  }
+  // Validate the value of the wager:
+  if (value < 5) {
+    return 'That wager is too low.';
+  }
+  // Wager must be less than or equal to the value of the clue, or all of your money.
+  if (value > contestant.channelScore(body.channel_id).value && value > game.getClue().value) {
+    return 'That wager is too high.';
+  }
+  game.dailyDouble.wager = value;
+
+  // Parallelize for better performance:
+  const [url] = await Promise.all([
+    getImageUrl({
+      file: 'clue',
+      channel_id: body.channel_id
+    }),
+    game.save()
+  ]);
+
+  return `For ${numeral(contestant.stats.money).format(formatter)}, here's your clue. ${url}`;
+}
+
 export async function guess({game, contestant, body, guess}) {
   // Cache the clue reference:
   const clue = game.getClue();
@@ -148,9 +177,9 @@ export async function guess({game, contestant, body, guess}) {
   }
 }
 
-export async function category({game, body, category, value}) {
+export async function category({game, contestant, body, category, value}) {
   try {
-    await game.newClue({category, value});
+    await game.newClue({category, value, contestant});
   } catch (e) {
     if (e.message.includes('already active')) {
       return `There's already an active clue. Wait your turn.`;
@@ -162,16 +191,27 @@ export async function category({game, body, category, value}) {
       return `I'm sorry, I don't know what category that is. Try being more specific.`;
     }
     console.log('Unexpected category selection error.', e);
-    // Just ignore the input:
+    // Just ignore it:
     return '';
   }
-  const url = await getImageUrl({
-    file: 'clue',
-    channel_id: body.channel_id
-  });
-  // Mark that we're sending the clue now:
-  await game.clueSent();
-  return `Here's your clue. ${url}`;
+
+  // You found a daily double!
+  if (game.isDailyDouble) {
+    const dailyDoubleUrl = await getImageUrl({
+      file: 'dailydouble',
+      channel_id: body.channel_id
+    });
+
+    return `Answer: Daily Double ${dailyDoubleUrl} \nWhat would you like to wager, ${contestant.name}?`;
+  } else {
+    const url = await getImageUrl({
+      file: 'clue',
+      channel_id: body.channel_id
+    });
+    // Mark that we're sending the clue now:
+    await game.clueSent();
+    return `Here's your clue. ${url}`;
+  }
 }
 
 async function endGameMessage({body, game}) {

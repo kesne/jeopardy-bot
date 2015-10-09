@@ -40,6 +40,15 @@ export const MessageReader = {
       return {command: 'scores'};
     }
 
+    // Wagers:
+    const numberValue = Number(text.replace(/\$|,/g, ''));
+    if (!Number.isNan(numberValue)) {
+      return {
+        command: 'wager',
+        value: numberValue
+      };
+    }
+
     const tokenizer = new WordTokenizer();
     const tokens = tokenizer.tokenize(text);
 		// Need at least three tokens:

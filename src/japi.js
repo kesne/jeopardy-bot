@@ -65,6 +65,8 @@ async function loadEpisode(url) {
     });
   });
 
+  console.log(clues);
+
   // Return it:
   return {
     episode,

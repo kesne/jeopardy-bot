@@ -16,6 +16,8 @@ Here, this should help you out!
     “What [is|are] _______”
     “Who [is|are] ________”
     “Where [is|are] ______”
+*Wagering*
+    "$___"
 *Scores*
     “scores” - Shows the score for the current game.
     “leaderboard” - Shows the scores and wins from all games.`

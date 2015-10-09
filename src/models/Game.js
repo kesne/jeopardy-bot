@@ -17,6 +17,21 @@ export const schema = new Schema({
     }
   }],
 
+  // Information for the daily double:
+  dailyDouble: {
+    // The user that the daily double is currently assigned to:
+    contestant: {
+      type: Schema.Types.ObjectId,
+      ref: 'Contestant'
+    },
+    // The wager of the daily double:
+    wager: {
+      type: Number,
+      // Wager must be at least 5:
+      min: 5
+    }
+  },
+
   channel_id: {
     type: String,
     required: true
@@ -60,6 +75,10 @@ export const schema = new Schema({
       type: Boolean,
       default: false
     },
+    dailyDouble: {
+      type: Boolean,
+      default: false
+    },
     category_id: {
       type: Number,
       required: true
@@ -75,6 +94,11 @@ schema.virtual('clue').get(function() {
     return false;
   }
   return clue;
+});
+
+schema.virtual('isDailyDouble').get(function() {
+  const clue = this.getClue();
+  return clue.dailyDouble;
 });
 
 schema.methods.isComplete = function() {
@@ -162,8 +186,8 @@ schema.methods.getClue = function() {
   return this.questions.find(q => q.id === this.activeQuestion);
 };
 
-// Get a new clue for a given value and title
-schema.methods.newClue = async function({category, value}) {
+// Get a new clue for a given value and title.
+schema.methods.newClue = async function({category, value, contestant}) {
   value = parseInt(value, 10);
   if (!config.VALUES.includes(value)) {
     throw new RangeError('value');
@@ -207,12 +231,18 @@ schema.methods.newClue = async function({category, value}) {
   if (!selectedCategory) {
     throw new RangeError('category');
   }
+
   const question = this.questions.find(q => {
     return (q.category_id === selectedCategory && q.value === value);
   });
 
   if (question.answered) {
     throw new Error('Question has already been answered.');
+  }
+
+  // If the question is a daily double, add in the contestant:
+  if (question.dailyDouble) {
+    this.dailyDouble.contestant = contestant;
   }
 
   this.lastCategory = selectedCategory;
@@ -234,6 +264,10 @@ schema.methods.guess = async function({contestant, guess}) {
   }
   if (this.answered(contestant.slackid)) {
     throw new Error('contestant');
+  }
+  // Daily doubles can only be answered by the user that selected them
+  if (this.isDailyDouble && this.dailyDouble.contestant !== contestant) {
+    throw new Error('dailydouble');
   }
 
   // This contestant has now guessed:
@@ -271,6 +305,7 @@ schema.methods.answer = function() {
   this.contestantAnswers = [];
   this.activeQuestion = undefined;
   this.questionStart = undefined;
+  this.dailyDouble = {};
   return this.save();
 };
 

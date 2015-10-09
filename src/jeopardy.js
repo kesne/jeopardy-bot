@@ -148,6 +148,10 @@ app.get('/:channel_id/clue', (req, res) => {
   });
 });
 
+app.get('/:channel_id/dailydouble', (req, res) => {
+  res.render('dailydouble');
+});
+
 app.get('/image/:channel_id/:name', (req, res) => {
   const pageres = new Pageres()
     .src(`localhost:${config.PORT}/${req.params.channel_id}/${req.params.name}`, ['1200x654'], {crop: false, filename: `${req.params.channel_id}.${req.params.name}`})
