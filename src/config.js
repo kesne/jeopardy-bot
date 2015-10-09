@@ -4,7 +4,7 @@
 // The mode the bot is in:
 export const MODE = process.env.JBOT_MODE || 'response';
 
-export let IMAGE_MIN = true;
+export let IMAGE_MIN = 0;
 if (process.env.JBOT_IMAGE_MIN) {
   IMAGE_MIN = Number(process.env.JBOT_IMAGE_MIN);
 }
