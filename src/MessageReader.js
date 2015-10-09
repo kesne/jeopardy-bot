@@ -42,7 +42,7 @@ export const MessageReader = {
 
     // Wagers:
     const numberValue = Number(text.replace(/\$|,/g, ''));
-    if (!Number.isNan(numberValue) && numberValue > 0) {
+    if (!Number.isNaN(numberValue) && numberValue > 0) {
       return {
         command: 'wager',
         value: numberValue
