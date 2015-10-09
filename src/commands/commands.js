@@ -141,7 +141,7 @@ export async function guess({game, contestant, body, guess}) {
       return `You had your chance, ${contestant.name}. Let someone else answer.`;
     }
     // Daily doubles need wagers:
-    if (e.message.inclues('wager')) {
+    if (e.message.includes('wager')) {
       return 'You need to make a wager before you guess.';
     }
 
