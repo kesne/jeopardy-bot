@@ -84,7 +84,7 @@ export async function endgame({game}) {
 // For daily doubles:
 export async function wager({game, contestant, body, value}) {
   // Sanity check (this function is easy to trigger accidently):
-  if (!game || !game.isDailyDouble || game.dailyDouble.contestant !== contestant || game.dailyDouble.wager) {
+  if (!game || !game.isDailyDouble || game.dailyDouble.contestant !== contestant.slackid || game.dailyDouble.wager) {
     return '';
   }
   // Validate the value of the wager:
@@ -108,7 +108,7 @@ export async function wager({game, contestant, body, value}) {
     game.save()
   ]);
 
-  return `For ${numeral(contestant.stats.money).format(formatter)}, here's your clue. ${url}`;
+  return `For ${numeral(value).format(formatter)}, here's your clue. ${url}`;
 }
 
 export async function guess({game, contestant, body, guess}) {
@@ -191,7 +191,11 @@ export async function guess({game, contestant, body, guess}) {
 
 export async function category({game, contestant, body, category, value}) {
   try {
-    await game.newClue({category, value, contestant});
+    await game.newClue({
+      contestant: contestant.slackid,
+      category,
+      value
+    });
   } catch (e) {
     if (e.message.includes('already active')) {
       return `There's already an active clue. Wait your turn.`;

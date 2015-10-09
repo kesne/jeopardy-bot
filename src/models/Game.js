@@ -21,8 +21,7 @@ export const schema = new Schema({
   dailyDouble: {
     // The user that the daily double is currently assigned to:
     contestant: {
-      type: Schema.Types.ObjectId,
-      ref: 'Contestant'
+      type: String
     },
     // The wager of the daily double:
     wager: {
