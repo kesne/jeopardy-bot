@@ -117,7 +117,10 @@ export async function guess({game, contestant, body, guess}) {
 
   let correct;
   try {
-    correct = await game.guess({guess, contestant});
+    correct = await game.guess({
+      guess,
+      contestant: contestant.slackid
+    });
   } catch (e) {
     // Timeout:
     if (e.message.includes('timeout')) {
