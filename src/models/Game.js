@@ -2,7 +2,7 @@ import moment from 'moment';
 import {Schema, model} from 'mongoose';
 import {DiceCoefficient, JaroWinklerDistance} from 'natural';
 
-import {randomEpisode} from '../japi';
+import {generateGame} from '../japi';
 import * as config from '../config';
 
 export const schema = new Schema({
@@ -169,7 +169,7 @@ schema.statics.start = async function({channel_id}) {
   }
 
   // Grab a random episode from the API:
-  const episode = await randomEpisode();
+  const episode = await generateGame();
   // Extract the questions and categories:
   const {clues: questions, categories} = episode.roundOne;
 

@@ -2,32 +2,53 @@ import numeral from 'numeral';
 import {Contestant} from '../models/Contestant';
 import {Game} from '../models/Game';
 import {getImageUrl} from '../upload';
-import responses from './responses';
 import * as config from '../config';
 
-// TODO: Make top-level formatter to simplify some code down below.
 const formatter = '$0,0';
-
-export const poke = () => {
-  return `I'm here, I'm here...`;
+const formatCurrency = value => {
+  return numeral(value).format(formatter);
 };
 
-export const help = () => {
-  return responses.help;
-};
+export function poke() {
+  this.send(`I'm here, I'm here...`);
+}
+
+export function help() {
+  this.send(`
+Here, this should help you out!
+>>>*Games*
+    “new game” - Starts a new game.
+    “end game” - Ends the current game.
+*Selecting Categories*
+    “I’ll take ________ for $___”
+    “Give me ________ for $___”
+    “Choose ________ for $___”
+    “ ________ for $___”
+    “Same category for $___”
+*Guessing*
+    “What [is|are] _______”
+    “Who [is|are] ________”
+    “Where [is|are] ______”
+*Wagering*
+    "$___"
+*Scores*
+    “scores” - Shows the score for the current game.
+    “leaderboard” - Shows the scores and wins from all games.`);
+}
 
 export async function leaderboard() {
   const contestants = await Contestant.find().sort({'stats.money': -1}).limit(5);
   if (contestants.length === 0) {
-    return 'There are no winners yet. Go out there and play some games!';
+    this.send('There are no winners yet. Go out there and play some games!');
+    return;
   }
   const leaders = contestants.map((contestant, i) => {
     return (
 `${i + 1}. ${contestant.name}:
-> _${numeral(contestant.stats.money).format(formatter)}_ *|* _${contestant.stats.won} wins_ *|* _${contestant.stats.lost} losses_`
+> _${formatCurrency(contestant.stats.money)}_ *|* _${contestant.stats.won} wins_ *|* _${contestant.stats.lost} losses_`
     );
   });
-  return `Let's take a look at the top 5 players:\n\n${leaders.join('\n')}`;
+  this.send(`Let's take a look at the top 5 players:\n\n${leaders.join('\n')}`);
 }
 
 export async function scores({body, showHeader = true}) {
@@ -35,7 +56,8 @@ export async function scores({body, showHeader = true}) {
     channel_id: body.channel_id
   });
   if (contestants.length === 0) {
-    return 'There are no scores yet!';
+    this.send('There are no scores yet!');
+    return;
   }
   const leaders = contestants.sort((a, b) => {
     const {value: aScore} = a.channelScore(body.channel_id);
@@ -48,18 +70,20 @@ export async function scores({body, showHeader = true}) {
     }
     return 0;
   }).map((contestant, i) => {
-    return `${i + 1}. ${contestant.name}: ${numeral(contestant.channelScore(body.channel_id).value).format(formatter)}`;
+    return `${i + 1}. ${contestant.name}: ${formatCurrency(contestant.channelScore(body.channel_id).value)}`;
   });
-  let res = '';
+
   if (showHeader) {
-    res += 'Here are the current scores for this game:';
+    this.send('Here are the current scores for this game:');
   }
-  return `${res}\n\n${leaders.join('\n')}`;
+
+  this.send(`\n\n${leaders.join('\n')}`);
 }
 
 export async function newgame({game, body}) {
   if (game && !game.isComplete()) {
-    return 'It looks like a game is already in progress! You need to finish or end that one first before starting a new game.';
+    this.send('It looks like a game is already in progress! You need to finish or end that one first before starting a new game.');
+    return;
   }
   // Start the game:
   await Game.start({
@@ -69,31 +93,34 @@ export async function newgame({game, body}) {
     file: 'board',
     channel_id: body.channel_id
   });
-  return `Let's get this game started! ${url}`;
+  this.send(`Let's get this game started!`, url);
 }
 
 export async function endgame({game}) {
   if (!game) {
-    return `There's no game in progress. You can always start a new game by typing "new game".`;
+    this.send(`There's no game in progress. You can always start a new game by typing "new game".`);
+    return;
   }
   // Try to end the game:
   await game.end();
-  return `Alright, I've ended that game for you. You can always start a new game by typing "new game".`;
+  this.send(`Alright, I've ended that game for you. You can always start a new game by typing "new game".`);
 }
 
 // For daily doubles:
 export async function wager({game, contestant, body, value}) {
   // Sanity check (this function is easy to trigger accidently):
   if (!game || !game.isDailyDouble || game.dailyDouble.contestant !== contestant.slackid || game.dailyDouble.wager) {
-    return '';
+    return;
   }
   // Validate the value of the wager:
   if (value < 5) {
-    return 'That wager is too low.';
+    this.send('That wager is too low.');
+    return;
   }
   // Wager must be less than or equal to the value of the clue, or all of your money.
   if (value > contestant.channelScore(body.channel_id).value && value > game.getClue().value) {
-    return 'That wager is too high.';
+    this.send('That wager is too high.');
+    return;
   }
 
   // Stash the daily double wager:
@@ -108,7 +135,7 @@ export async function wager({game, contestant, body, value}) {
     game.save()
   ]);
 
-  return `For ${numeral(value).format(formatter)}, here's your clue. ${url}`;
+  this.send(`For ${formatCurrency(value)}, here's your clue.`, url);
 }
 
 export async function guess({game, contestant, body, guess}) {
@@ -171,7 +198,7 @@ export async function guess({game, contestant, body, guess}) {
       game.answer()
     ]);
 
-    const res = `That is correct, ${contestant.name}. Your score is ${numeral(contestant.channelScore(body.channel_id).value).format(formatter)}.`;
+    const res = `That is correct, ${contestant.name}. Your score is ${formatCurrency(contestant.channelScore(body.channel_id).value)}.`;
 
     if (game.isComplete()) {
       return `${res} ${ await endGameMessage({game, body}) }`;
@@ -188,7 +215,7 @@ export async function guess({game, contestant, body, guess}) {
       value,
       channel_id: body.channel_id
     });
-    return `That is incorrect, ${contestant.name}. Your score is now ${numeral(contestant.channelScore(body.channel_id).value).format(formatter)}.`;
+    return `That is incorrect, ${contestant.name}. Your score is now ${formatCurrency(contestant.channelScore(body.channel_id).value)}.`;
   }
 }
 

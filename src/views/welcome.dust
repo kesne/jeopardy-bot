@@ -115,7 +115,7 @@
                   This improves the responses that the bot sends, and makes the overall experience a little bit nicer.
                 </p>
                 <p>
-                  For this feature to be enabled, the bot mode must be set to "mixed".
+                  For this feature to be enabled, the bot mode must be set to "hybrid".
                   You can do this by setting the environment variable "JBOT_MODE".
                 </p>
               </div>
