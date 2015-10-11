@@ -14,7 +14,7 @@ function sendToSlack(message, url) {
 export async function exec(info) {
   let response = '';
   await commands[info.command].call({
-    send(message, url) {
+    send(message, url = '') {
       if (config.MODE === 'response') {
         response += `${message} ${url}`;
       } else {

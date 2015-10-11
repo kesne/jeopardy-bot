@@ -42,12 +42,13 @@ export async function leaderboard() {
     this.send('There are no winners yet. Go out there and play some games!');
     return;
   }
-  const leaders = contestants.map((contestant, i) => {
-    return (
+
+  // Format the leaders:
+  const leaders = contestants.map((contestant, i) => (
 `${i + 1}. ${contestant.name}:
 > _${formatCurrency(contestant.stats.money)}_ *|* _${contestant.stats.won} wins_ *|* _${contestant.stats.lost} losses_`
-    );
-  });
+  ));
+
   this.send(`Let's take a look at the top 5 players:\n\n${leaders.join('\n')}`);
 }
 
@@ -69,9 +70,9 @@ export async function scores({body, showHeader = true}) {
       return -1;
     }
     return 0;
-  }).map((contestant, i) => {
-    return `${i + 1}. ${contestant.name}: ${formatCurrency(contestant.channelScore(body.channel_id).value)}`;
-  });
+  }).map((contestant, i) => (
+    `${i + 1}. ${contestant.name}: ${formatCurrency(contestant.channelScore(body.channel_id).value)}`
+  ));
 
   if (showHeader) {
     this.send('Here are the current scores for this game:');
@@ -154,29 +155,25 @@ export async function guess({game, contestant, body, guess}) {
       // We timed out, so mark this question as done.
       await game.answer();
 
-      const res = `Time's up, ${contestant.name}! Remember, you have ${config.CLUE_TIMEOUT} seconds to answer. The correct answer is \`${clue.answer}\`.`;
+      this.send(`Time's up, ${contestant.name}! Remember, you have ${config.CLUE_TIMEOUT} seconds to answer. The correct answer is \`${clue.answer}\`.`);
 
       if (game.isComplete()) {
-        return `${res} ${ await endGameMessage({game, body}) }`;
+        this.send(`${ await endGameMessage({game, body}) }`);
       } else {
         const url = await getImageUrl({
           file: 'board',
           channel_id: body.channel_id
         });
-        return `${res} Select a new category. ${url}`;
+        this.send(`Select a new category.`, url);
       }
-    }
-    // They've already guessed
-    if (e.message.includes('contestant')) {
-      return `You had your chance, ${contestant.name}. Let someone else answer.`;
-    }
-    // Daily doubles need wagers:
-    if (e.message.includes('wager')) {
-      return 'You need to make a wager before you guess.';
+    } else if (e.message.includes('contestant')) {
+      this.send(`You had your chance, ${contestant.name}. Let someone else answer.`);
+    } else if (e.message.includes('wager')) {
+      this.send('You need to make a wager before you guess.');
     }
 
     // Just ignore guesses if they're outside of the game context:
-    return '';
+    return;
   }
 
   // Extract the value from the current clue:
@@ -198,24 +195,24 @@ export async function guess({game, contestant, body, guess}) {
       game.answer()
     ]);
 
-    const res = `That is correct, ${contestant.name}. Your score is ${formatCurrency(contestant.channelScore(body.channel_id).value)}.`;
+    this.send(`That is correct, ${contestant.name}. Your score is ${formatCurrency(contestant.channelScore(body.channel_id).value)}.`);
 
     if (game.isComplete()) {
-      return `${res} ${ await endGameMessage({game, body}) }`;
+      this.send(`${ await endGameMessage({game, body}) }`);
     } else {
       // Get the new board url:
       const url = await getImageUrl({
         file: 'board',
         channel_id: body.channel_id
       });
-      return `${res} Select a new category. ${url}`;
+      this.send(`Select a new category.`, url);
     }
   } else {
     await contestant.incorrect({
       value,
       channel_id: body.channel_id
     });
-    return `That is incorrect, ${contestant.name}. Your score is now ${formatCurrency(contestant.channelScore(body.channel_id).value)}.`;
+    this.send(`That is incorrect, ${contestant.name}. Your score is now ${formatCurrency(contestant.channelScore(body.channel_id).value)}.`);
   }
 }
 
@@ -228,17 +225,16 @@ export async function category({game, contestant, body, category, value}) {
     });
   } catch (e) {
     if (e.message.includes('already active')) {
-      return `There's already an active clue. Wait your turn.`;
+      this.send(`There's already an active clue. Wait your turn.`);
+    } else if (e.message.includes('value')) {
+      this.send(`I'm sorry, I can't give you a clue for that value.`);
+    } else if (e.message.includes('category')) {
+      this.send(`I'm sorry, I don't know what category that is. Try being more specific.`);
+    } else {
+      console.log('Unexpected category selection error.', e);
     }
-    if (e.message.includes('value')) {
-      return `I'm sorry, I can't give you a clue for that value.`;
-    }
-    if (e.message.includes('category')) {
-      return `I'm sorry, I don't know what category that is. Try being more specific.`;
-    }
-    console.log('Unexpected category selection error.', e);
     // Just ignore it:
-    return '';
+    return;
   }
 
   // You found a daily double!
@@ -248,7 +244,7 @@ export async function category({game, contestant, body, category, value}) {
       channel_id: body.channel_id
     });
 
-    return `Answer: Daily Double ${dailyDoubleUrl} \nWhat would you like to wager, ${contestant.name}?`;
+    this.send(`Answer: Daily Double ${dailyDoubleUrl} \nWhat would you like to wager, ${contestant.name}?`);
   } else {
     const url = await getImageUrl({
       file: 'clue',
@@ -256,7 +252,7 @@ export async function category({game, contestant, body, category, value}) {
     });
     // Mark that we're sending the clue now:
     await game.clueSent();
-    return `Here's your clue. ${url}`;
+    this.send(`Here's your clue.`, url);
   }
 }
 
