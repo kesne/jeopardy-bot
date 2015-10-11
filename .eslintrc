@@ -7,6 +7,7 @@
     "no-else-return": 0,
     "new-cap": 0,
     "no-trailing-spaces": 0,
-    "prefer-reflect": 0
+    "prefer-reflect": 0,
+    "babel/generator-star-spacing": 0
   }
 }

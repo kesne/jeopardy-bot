@@ -3,12 +3,20 @@ import * as commands from './commands';
 import * as config from '../config';
 
 function sendToSlack(message, url) {
-  return console.log('Sending: ', message);
+  const body = {
+    token: config.API_KEY
+  };
+
+  if (url) {
+    body.attachments = [{
+      url,
+      color: ''
+    }];
+  }
+
   // TODO:
   return fetch('https://sack.com/api/chat.postMessage', {
-    body: {
-      token: config.API_KEY
-    }
+    body
   });
 }
 

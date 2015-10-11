@@ -251,7 +251,6 @@ export async function category({game, contestant, body, category, value}) {
     await this.send('Answer: Daily Double', dailyDoubleUrl);
     this.send(`What would you like to wager, ${contestant.name}?`);
   } else {
-
     // Give the user a little more feedback when we can:
     this.sendOptional(`OK, \`${game.getCategory().title}\` for ${formatCurrency(value)}...`);
 
