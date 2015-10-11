@@ -3,6 +3,7 @@ import * as commands from './commands';
 import * as config from '../config';
 
 function sendToSlack(message, url) {
+  return console.log('Sending: ', message);
   // TODO:
   return fetch('https://sack.com/api/chat.postMessage', {
     body: {

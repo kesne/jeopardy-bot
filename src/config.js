@@ -4,7 +4,7 @@
 // The mode the bot is in:
 export let MODE = process.env.JBOT_MODE || 'response';
 // Validate the mode configuration:
-if (MODE !== 'response' || MODE !== 'hybrid') {
+if (MODE !== 'response' && MODE !== 'hybrid') {
   console.warn(`An invalid mode was provided. Found mode "${MODE}".`);
   // Default it back to response:
   MODE = 'response';

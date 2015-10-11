@@ -150,7 +150,7 @@ export async function guess({game, contestant, body, guess}) {
   try {
     correct = await game.guess({
       guess,
-      contestant: contestant.slackid
+      contestant
     });
   } catch (e) {
     // Timeout:
