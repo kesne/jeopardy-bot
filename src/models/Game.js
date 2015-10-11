@@ -185,6 +185,11 @@ schema.methods.getClue = function() {
   return this.questions.find(q => q.id === this.activeQuestion);
 };
 
+schema.methods.getCategory = function() {
+  const clue = this.getClue();
+  return this.categories.find(cat => cat.id === clue.category_id);
+};
+
 // Get a new clue for a given value and title.
 schema.methods.newClue = async function({category, value, contestant}) {
   value = parseInt(value, 10);

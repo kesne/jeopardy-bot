@@ -10,9 +10,6 @@ if (MODE !== 'response' || MODE !== 'hybrid') {
   MODE = 'response';
 }
 
-// Shortcut to say if the mode is an API-driven one:
-export const MODE_API = MODE !== 'reponse';
-
 export let IMAGE_MIN = 0;
 if (process.env.JBOT_IMAGE_MIN) {
   IMAGE_MIN = Number(process.env.JBOT_IMAGE_MIN);

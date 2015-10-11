@@ -14,11 +14,17 @@ function sendToSlack(message, url) {
 export async function exec(info) {
   let response = '';
   await commands[info.command].call({
-    send(message, url = '') {
+    async send(message, url = '') {
       if (config.MODE === 'response') {
-        response += `${message} ${url}`;
+        response += `${message} ${url}\n`;
       } else {
-        sendToSlack(message, url);
+        await sendToSlack(message, url);
+      }
+    },
+    // You can use this to send optional bits of information that will be sent by the bot:
+    sendOptional(...args) {
+      if (config.MODE !== 'response') {
+        return this.send(...args);
       }
     }
   }, info);

@@ -75,7 +75,7 @@ export async function scores({body, showHeader = true}) {
   ));
 
   if (showHeader) {
-    this.send('Here are the current scores for this game:');
+    await this.send('Here are the current scores for this game:');
   }
 
   this.send(`\n\n${leaders.join('\n')}`);
@@ -86,6 +86,9 @@ export async function newgame({game, body}) {
     this.send('It looks like a game is already in progress! You need to finish or end that one first before starting a new game.');
     return;
   }
+
+  this.sendOptional('Starting a new game for you...');
+
   // Start the game:
   await Game.start({
     channel_id: body.channel_id
@@ -94,7 +97,7 @@ export async function newgame({game, body}) {
     file: 'board',
     channel_id: body.channel_id
   });
-  this.send(`Let's get this game started!`, url);
+  this.send(`Let's get this game started! Go ahead and select a category and value.`, url);
 }
 
 export async function endgame({game}) {
@@ -155,7 +158,7 @@ export async function guess({game, contestant, body, guess}) {
       // We timed out, so mark this question as done.
       await game.answer();
 
-      this.send(`Time's up, ${contestant.name}! Remember, you have ${config.CLUE_TIMEOUT} seconds to answer. The correct answer is \`${clue.answer}\`.`);
+      await this.send(`Time's up, ${contestant.name}! Remember, you have ${config.CLUE_TIMEOUT} seconds to answer. The correct answer is \`${clue.answer}\`.`);
 
       if (game.isComplete()) {
         this.send(`${ await endGameMessage({game, body}) }`);
@@ -164,7 +167,7 @@ export async function guess({game, contestant, body, guess}) {
           file: 'board',
           channel_id: body.channel_id
         });
-        this.send(`Select a new category.`, url);
+        this.send(`Select a new clue.`, url);
       }
     } else if (e.message.includes('contestant')) {
       this.send(`You had your chance, ${contestant.name}. Let someone else answer.`);
@@ -195,7 +198,7 @@ export async function guess({game, contestant, body, guess}) {
       game.answer()
     ]);
 
-    this.send(`That is correct, ${contestant.name}. Your score is ${formatCurrency(contestant.channelScore(body.channel_id).value)}.`);
+    await this.send(`That is correct, ${contestant.name}. Your score is ${formatCurrency(contestant.channelScore(body.channel_id).value)}.`);
 
     if (game.isComplete()) {
       this.send(`${ await endGameMessage({game, body}) }`);
@@ -244,8 +247,14 @@ export async function category({game, contestant, body, category, value}) {
       channel_id: body.channel_id
     });
 
-    this.send(`Answer: Daily Double ${dailyDoubleUrl} \nWhat would you like to wager, ${contestant.name}?`);
+    // Make sure that the daily double image displays before we do anything else:
+    await this.send('Answer: Daily Double', dailyDoubleUrl);
+    this.send(`What would you like to wager, ${contestant.name}?`);
   } else {
+
+    // Give the user a little more feedback when we can:
+    this.sendOptional(`OK, \`${game.getCategory().title}\` for ${formatCurrency(value)}...`);
+
     const url = await getImageUrl({
       file: 'clue',
       channel_id: body.channel_id
