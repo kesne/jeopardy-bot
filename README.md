@@ -13,5 +13,5 @@ All of the configuration options (with one exception) are prefixed with `JBOT_` 
 - JBOT_VERIFY_TOKENS
 - JBOT_API
 - JBOT_USERNAME
-- MONGOLAB_URI
 - JBOT_IMAGE_MIN
+- MONGO_URI | MONGOHQ_URI | MONGOLAB_URI
