@@ -4,20 +4,27 @@ import * as config from '../config';
 
 function sendToSlack(message, url) {
   const body = {
-    token: config.API_KEY
+    token: config.API_KEY,
+    username: config.USERNAME,
+    text: message,
+    as_user: true
   };
 
   if (url) {
     body.attachments = [{
-      url,
-      color: ''
+      fallback: 'Jeopardy Bot',
+      image_url: url,
+      color: '#F4AC79'
     }];
   }
 
-  // TODO:
-  return fetch('https://sack.com/api/chat.postMessage', {
-    method: 'post',
-    body
+  return fetch('https://slack.com/api/chat.postMessage', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
   });
 }
 
