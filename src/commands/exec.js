@@ -16,6 +16,7 @@ function sendToSlack(message, url) {
 
   // TODO:
   return fetch('https://sack.com/api/chat.postMessage', {
+    method: 'post',
     body
   });
 }
