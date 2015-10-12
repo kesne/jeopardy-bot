@@ -23,10 +23,10 @@ ROOM_WHITELIST = ROOM_WHITELIST.split(',');
 export let VERIFY_TOKENS = process.env.JBOT_VERIFY_TOKENS || '';
 VERIFY_TOKENS = VERIFY_TOKENS.split(',');
 
-export const API_KEY = process.env.JBOT_API || '';
+export const API_TOKEN = process.env.JBOT_API_TOKEN || '';
 
 // The username of the bot:
-export const USERNAME = process.env.JBOT_USERNAME || 'JeopardyBot';
+export const USERNAME = process.env.JBOT_USERNAME || 'jeopardybot';
 // The ID of the bot that we can use to ignore messages from ourself:
 export const BOT_ID = 'USLACKBOT';
 

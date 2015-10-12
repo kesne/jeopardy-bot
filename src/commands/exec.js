@@ -2,29 +2,33 @@ import fetch from 'node-fetch';
 import * as commands from './commands';
 import * as config from '../config';
 
-function sendToSlack(message, url) {
-  const body = {
-    token: config.API_KEY,
-    username: config.USERNAME,
-    text: message,
-    as_user: true
-  };
+var FormData = require('form-data');
+
+function sendToSlack(channel, message, url) {
+  const form = new FormData();
+  form.append('token', config.API_TOKEN);
+  form.append('username', config.USERNAME);
+  form.append('text', message);
+  form.append('channel', channel);
+  form.append('as_user', JSON.stringify(true));
 
   if (url) {
-    body.attachments = [{
+    form.append('attachments', JSON.stringify([{
       fallback: 'Jeopardy Bot',
       image_url: url,
       color: '#F4AC79'
-    }];
+    }]));
   }
 
   return fetch('https://slack.com/api/chat.postMessage', {
     method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
+    body: form
+  }).then((msg) => {
+    msg.text().then(text => {
+      console.log('harro', text);
+    })
+  }, (e) => {
+    console.error(e.stack);
   });
 }
 
@@ -35,7 +39,7 @@ export async function exec(info) {
       if (config.MODE === 'response') {
         response += `${message} ${url}\n`;
       } else {
-        await sendToSlack(message, url);
+        await sendToSlack(info.body.channel_id, message, url);
       }
     },
     // You can use this to send optional bits of information that will be sent by the bot:
