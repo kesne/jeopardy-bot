@@ -1,10 +1,10 @@
 import fetch from 'node-fetch';
+import FormData from 'form-data';
 import * as commands from './commands';
 import * as config from '../config';
 
-var FormData = require('form-data');
-
 function sendToSlack(channel, message, url) {
+  // Create our new form:
   const form = new FormData();
   form.append('token', config.API_TOKEN);
   form.append('username', config.USERNAME);
@@ -23,12 +23,6 @@ function sendToSlack(channel, message, url) {
   return fetch('https://slack.com/api/chat.postMessage', {
     method: 'POST',
     body: form
-  }).then((msg) => {
-    msg.text().then(text => {
-      console.log('harro', text);
-    })
-  }, (e) => {
-    console.error(e.stack);
   });
 }
 
