@@ -48,7 +48,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.post('/command', (req, res) => {
   // Ignore messages from ourself:
-  if (req.body.user_id === config.BOT_ID) {
+  if (req.body.user_id === config.BOT_ID || req.body.user_name === config.USERNAME) {
     return res.end();
   }
 
