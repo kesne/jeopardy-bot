@@ -9,7 +9,7 @@ import {join} from 'path';
 import {dust} from 'adaro';
 
 import {MessageReader} from './MessageReader';
-import execCommand from './commands/exec';
+import {exec} from './commands/exec';
 import {Game} from './models/Game';
 import {Contestant} from './models/Contestant';
 import * as config from './config';
@@ -101,7 +101,7 @@ async function handleRequest(req) {
     Game.forChannel(req.body)
   ]);
 
-  const text = await execCommand({
+  const text = await exec({
     body: req.body,
     contestant,
     game,

@@ -91,3 +91,17 @@ export async function randomEpisode() {
     roundOne
   };
 }
+
+// Force-generate a new game:
+export async function generateGame() {
+  let game;
+  do {
+    try {
+      game = await randomEpisode();
+    } catch (e) {
+      console.log('Unable to generate game.');
+      console.error(e);
+    }
+  } while (!game);
+  return game;
+}

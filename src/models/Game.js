@@ -2,7 +2,7 @@ import moment from 'moment';
 import {Schema, model} from 'mongoose';
 import {DiceCoefficient, JaroWinklerDistance} from 'natural';
 
-import {randomEpisode} from '../japi';
+import {generateGame} from '../japi';
 import * as config from '../config';
 
 export const schema = new Schema({
@@ -169,7 +169,7 @@ schema.statics.start = async function({channel_id}) {
   }
 
   // Grab a random episode from the API:
-  const episode = await randomEpisode();
+  const episode = await generateGame();
   // Extract the questions and categories:
   const {clues: questions, categories} = episode.roundOne;
 
@@ -183,6 +183,11 @@ schema.statics.start = async function({channel_id}) {
 // Gets the clue without the timeout:
 schema.methods.getClue = function() {
   return this.questions.find(q => q.id === this.activeQuestion);
+};
+
+schema.methods.getCategory = function() {
+  const clue = this.getClue();
+  return this.categories.find(cat => cat.id === clue.category_id);
 };
 
 // Get a new clue for a given value and title.

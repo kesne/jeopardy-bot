@@ -2,7 +2,13 @@
  * BOT CONFIGURATION:
  */
 // The mode the bot is in:
-export const MODE = process.env.JBOT_MODE || 'response';
+export let MODE = process.env.JBOT_MODE || 'response';
+// Validate the mode configuration:
+if (MODE !== 'response' && MODE !== 'hybrid') {
+  console.warn(`An invalid mode was provided. Found mode "${MODE}".`);
+  // Default it back to response:
+  MODE = 'response';
+}
 
 export let IMAGE_MIN = 0;
 if (process.env.JBOT_IMAGE_MIN) {
@@ -41,6 +47,15 @@ export const VALUES = [
   600,
   800,
   1000
+];
+
+// Question values for double jeopardy:
+export const DOUBLE_JEOPARDY_VALUES = [
+  400,
+  800,
+  1200,
+  1600,
+  2000
 ];
 
 // The last page of jService that will return valid results:
