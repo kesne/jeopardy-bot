@@ -1,4 +1,5 @@
 import moment from 'moment';
+import dehumanize from 'dehumanize-date';
 import {Schema, model} from 'mongoose';
 import {DiceCoefficient, JaroWinklerDistance} from 'natural';
 
@@ -263,6 +264,11 @@ schema.methods.clueSent = function() {
   return this.save();
 };
 
+// Helper function to determine if something is just a raw number:
+const isNumber = num => {
+  return !isNaN(num);
+};
+
 schema.methods.guess = async function({contestant, guess}) {
   if (!this.activeQuestion) {
     throw new Error('clue');
@@ -289,19 +295,27 @@ schema.methods.guess = async function({contestant, guess}) {
   const answers = this.clue.answer.split(/\(|\)/).filter(n => n);
   answers.push(answers.join(' '));
   return answers.some(answer => {
-    const guessDate = moment(guess);
-    if (guessDate.isValid()) {
-      return guessDate.isSame(moment(answer));
+    // Number matching:
+    if (isNumber(answer)) {
+      // Numbers much be identical:
+      return parseInt(answer, 10) === parseInt(guess, 10);
+    }
+
+    // Date matching:
+    const answerDate = dehumanize(answer);
+    if (answerDate) {
+      return moment(answerDate).isSame(moment(guess));
+    }
+
+    // String matching:
+    const similarity = DiceCoefficient(guess, answer);
+    if (similarity >= config.ACCEPTED_SIMILARITY) {
+      return true;
+    } else if (similarity >= config.JARO_KICKER) {
+      const jaroSimilarity = JaroWinklerDistance(guess, answer);
+      return jaroSimilarity >= config.JARO_SIMILARITY;
     } else {
-      const similarity = DiceCoefficient(guess, answer);
-      if (similarity >= config.ACCEPTED_SIMILARITY) {
-        return true;
-      } else if (similarity >= config.JARO_KICKER) {
-        const jaroSimilarity = JaroWinklerDistance(guess, answer);
-        return jaroSimilarity >= config.JARO_SIMILARITY;
-      } else {
-        return false;
-      }
+      return false;
     }
   });
 };

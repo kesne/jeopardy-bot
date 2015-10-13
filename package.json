@@ -20,6 +20,7 @@
     "babel-runtime": "^5.8.25",
     "body-parser": "^1.14.1",
     "cheerio": "^0.19.0",
+    "dehumanize-date": "^2.1.0",
     "express": "^4.13.3",
     "form-data": "^0.2.0",
     "imagemin": "^3.2.0",
