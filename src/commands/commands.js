@@ -267,6 +267,10 @@ export async function category({game, contestant, body, category, value}) {
       setTimeout(async () => {
         if (game.isTimedOut()) {
           const clue = game.getClue();
+          
+          // We timed out, so mark this question as done.
+          await game.answer();
+
           if (game.isComplete()) {
             this.sendOptional(`Time's up! The correct answer is \`${clue.answer}\`. ${ await endGameMessage({game, body}) }`);
           } else {
