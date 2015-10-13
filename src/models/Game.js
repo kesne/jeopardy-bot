@@ -304,7 +304,8 @@ schema.methods.guess = async function({contestant, guess}) {
     // Date matching:
     const answerDate = dehumanize(answer);
     if (answerDate) {
-      return moment(answerDate).isSame(moment(guess));
+      const guessDate = dehumanize(guess);
+      return moment(answerDate).isSame(moment(guessDate));
     }
 
     // String matching:
