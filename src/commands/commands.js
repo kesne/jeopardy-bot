@@ -264,7 +264,7 @@ export async function category({game, contestant, body, category, value}) {
 
     // Additional feedback after we timeout (plus five seconds for some flexibility):
     if (config.MODE !== 'response') {
-      setTimeout((async function() {
+      setTimeout(async () => {
         if (game.isTimedOut()) {
           const clue = game.getClue();
           if (game.isComplete()) {
@@ -280,7 +280,7 @@ export async function category({game, contestant, body, category, value}) {
             }
           }
         }
-      }).bind(this), (config.TIMEOUT + 5) * 1000);
+      }, (config.TIMEOUT + 5) * 1000);
     }
   }
 }
