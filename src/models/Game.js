@@ -89,7 +89,7 @@ export const schema = new Schema({
 schema.virtual('clue').get(function() {
   const clue = this.getClue();
   // There's no active question if we've timed out:
-  if (moment().isAfter(moment(this.questionStart).add(config.CLUE_TIMEOUT, 'seconds'))) {
+  if (this.isTimedOut()) {
     return false;
   }
   return clue;
@@ -99,6 +99,10 @@ schema.virtual('isDailyDouble').get(function() {
   const clue = this.getClue();
   return clue.dailyDouble;
 });
+
+schema.methods.isTimedOut = function() {
+  return moment().isAfter(moment(this.questionStart).add(config.CLUE_TIMEOUT, 'seconds'));
+};
 
 schema.methods.isComplete = function() {
   return !this.questions.some(question => !(question && question.answered));

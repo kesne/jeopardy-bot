@@ -208,7 +208,7 @@ export async function guess({game, contestant, body, guess}) {
         file: 'board',
         channel_id: body.channel_id
       });
-      this.send(`Select a new category.`, url);
+      this.send(`Select a new clue.`, url);
     }
   } else {
     await contestant.incorrect({
@@ -261,6 +261,27 @@ export async function category({game, contestant, body, category, value}) {
     // Mark that we're sending the clue now:
     await game.clueSent();
     this.send(`Here's your clue.`, url);
+
+    // Additional feedback after we timeout (plus five seconds for some flexibility):
+    if (config.MODE !== 'response') {
+      setTimeout(async function() {
+        if (game.isTimedOut()) {
+          const clue = game.getClue();
+          if (game.isComplete()) {
+            this.sendOptional(`Time's up! The correct answer is \`${clue.answer}\`. ${ await endGameMessage({game, body}) }`);
+          } else {
+            const url = await getImageUrl({
+              file: 'clue',
+              channel_id: body.channel_id
+            });
+            // Second check seems silly, but image uploads take time.
+            if (game.isTimedOut()) {
+              this.sendOptional(`Time's up! The correct answer is \`${clue.answer}\`.\nSelect a new clue.`, url);
+            }
+          }
+        }
+      }, (config.TIMEOUT + 5) * 1000);
+    }
   }
 }
 
