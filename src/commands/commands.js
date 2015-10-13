@@ -271,7 +271,7 @@ export async function category({game, contestant, body, category, value}) {
             this.sendOptional(`Time's up! The correct answer is \`${clue.answer}\`. ${ await endGameMessage({game, body}) }`);
           } else {
             const url = await getImageUrl({
-              file: 'clue',
+              file: 'board',
               channel_id: body.channel_id
             });
             // Second check seems silly, but image uploads take time.
