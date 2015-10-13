@@ -280,7 +280,7 @@ export async function category({game, contestant, body, category, value}) {
             }
           }
         }
-      }, (config.TIMEOUT + 5) * 1000);
+      }, (config.CLUE_TIMEOUT + 5) * 1000);
     }
   }
 }
