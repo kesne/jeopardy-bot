@@ -87,19 +87,19 @@ export const schema = new Schema({
 });
 
 // Gets the clue with the timeout:
-schema.virtual('clue').get(function() {
+schema.methods.liveClue = function() {
   const clue = this.getClue();
   // There's no active question if we've timed out:
   if (this.isTimedOut()) {
     return false;
   }
   return clue;
-});
+};
 
-schema.virtual('isDailyDouble').get(function() {
+schema.methods.isDailyDouble = function() {
   const clue = this.getClue();
   return clue.dailyDouble;
-});
+};
 
 schema.methods.isTimedOut = function() {
   return moment().isAfter(moment(this.questionStart).add(config.CLUE_TIMEOUT, 'seconds'));
@@ -201,7 +201,7 @@ schema.methods.newClue = async function({category, value, contestant}) {
   if (!config.VALUES.includes(value)) {
     throw new RangeError('value');
   }
-  if (this.clue) {
+  if (this.liveClue()) {
     throw new Error('already active');
   }
   // If there's an active clue that has timed out, let's go ahead and time it out:
@@ -273,17 +273,17 @@ schema.methods.guess = async function({contestant, guess}) {
   if (!this.activeQuestion) {
     throw new Error('clue');
   }
-  if (!this.clue) {
+  if (!this.liveClue()) {
     throw new Error('timeout');
   }
   if (this.answered(contestant.slackid)) {
     throw new Error('contestant');
   }
   // Daily doubles can only be answered by the user that selected them
-  if (this.isDailyDouble && this.dailyDouble.contestant !== contestant) {
+  if (this.isDailyDouble() && this.dailyDouble.contestant !== contestant) {
     throw new Error('dailydouble');
   }
-  if (this.isDailyDouble && !this.dailyDouble.wager) {
+  if (this.isDailyDouble() && !this.dailyDouble.wager) {
     throw new Error('wager');
   }
 
@@ -292,7 +292,7 @@ schema.methods.guess = async function({contestant, guess}) {
   await this.save();
 
   // Get the answers:
-  const answers = this.clue.answer.split(/\(|\)/).filter(n => n);
+  const answers = this.liveClue().answer.split(/\(|\)/).filter(n => n);
   answers.push(answers.join(' '));
   return answers.some(answer => {
     // Number matching:

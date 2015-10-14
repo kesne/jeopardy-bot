@@ -113,7 +113,7 @@ export async function endgame({game}) {
 // For daily doubles:
 export async function wager({game, contestant, body, value}) {
   // Sanity check (this function is easy to trigger accidently):
-  if (!game || !game.isDailyDouble || game.dailyDouble.contestant !== contestant.slackid || game.dailyDouble.wager) {
+  if (!game || !game.isDailyDouble() || game.dailyDouble.contestant !== contestant.slackid || game.dailyDouble.wager) {
     return;
   }
   // Validate the value of the wager:
@@ -185,7 +185,7 @@ export async function guess({game, contestant, body, guess}) {
   let {value} = clue;
 
   // Daily doubles have a different value:
-  if (game.isDailyDouble) {
+  if (game.isDailyDouble()) {
     value = game.dailyDouble.wager;
   }
 
@@ -243,7 +243,7 @@ export async function category({game, contestant, body, category, value}) {
   }
 
   // You found a daily double!
-  if (game.isDailyDouble) {
+  if (game.isDailyDouble()) {
     const dailyDoubleUrl = await getImageUrl({
       file: 'dailydouble',
       channel_id: body.channel_id
