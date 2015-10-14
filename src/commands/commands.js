@@ -280,10 +280,10 @@ export async function category({game, contestant, body, category, value}) {
               file: 'board',
               channel_id: body.channel_id
             });
-            // Second check seems silly, but image uploads take time.
-            if (game.getClue() === clue) {
-              this.sendOptional(`Time's up! The correct answer is \`${clue.answer}\`.\nSelect a new clue.`, url);
-            }
+
+            // TODO: This could have already happened while the image capturing happens. we should probably get a lock in the timeout.
+            // TODO: Add locks to the api provided to commands.
+            this.sendOptional(`Time's up! The correct answer is \`${clue.answer}\`.\nSelect a new clue.`, url);
           }
         }
       }, (config.CLUE_TIMEOUT + 5) * 1000);
