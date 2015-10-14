@@ -269,15 +269,20 @@ export async function category({game, contestant, body, category, value}) {
     // Additional feedback after we timeout (plus five seconds for some flexibility):
     if (config.MODE !== 'response') {
       setTimeout(async () => {
+        console.log('timeout triggered');
         if (game.isTimedOut()) {
+          console.log('Timed out!');
           const clue = game.getClue();
 
           // We timed out, so mark this question as done.
           await game.answer();
 
+          console.log('marked as answerd');
+
           if (game.isComplete()) {
             this.sendOptional(`Time's up! The correct answer is \`${clue.answer}\`. ${ await endGameMessage({game, body}) }`);
           } else {
+            console.log('trying to upload an image');
             const url = await getImageUrl({
               file: 'board',
               channel_id: body.channel_id
