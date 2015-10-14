@@ -175,6 +175,8 @@ export async function guess({game, contestant, body, guess}) {
       this.send('You need to make a wager before you guess.');
     }
 
+    console.log('Error occured', e);
+
     // Just ignore guesses if they're outside of the game context:
     return;
   }
@@ -267,7 +269,7 @@ export async function category({game, contestant, body, category, value}) {
       setTimeout(async () => {
         if (game.isTimedOut()) {
           const clue = game.getClue();
-          
+
           // We timed out, so mark this question as done.
           await game.answer();
 
