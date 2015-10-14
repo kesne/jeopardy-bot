@@ -280,8 +280,7 @@ schema.methods.guess = async function({contestant, guess}) {
     throw new Error('contestant');
   }
   // Daily doubles can only be answered by the user that selected them
-  console.log(this.dailyDouble.contestant, contestant);
-  if (this.isDailyDouble() && this.dailyDouble.contestant !== contestant) {
+  if (this.isDailyDouble() && this.dailyDouble.contestant !== contestant.slackid) {
     throw new Error('dailydouble');
   }
   if (this.isDailyDouble() && !this.dailyDouble.wager) {
