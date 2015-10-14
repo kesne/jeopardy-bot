@@ -273,13 +273,14 @@ schema.methods.guess = async function({contestant, guess}) {
   if (!this.activeQuestion) {
     throw new Error('clue');
   }
-  if (!this.liveClue()) {
+  if (this.isTimedOut()) {
     throw new Error('timeout');
   }
   if (this.answered(contestant.slackid)) {
     throw new Error('contestant');
   }
   // Daily doubles can only be answered by the user that selected them
+  console.log(this.dailyDouble.contestant, contestant);
   if (this.isDailyDouble() && this.dailyDouble.contestant !== contestant) {
     throw new Error('dailydouble');
   }

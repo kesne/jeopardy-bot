@@ -139,6 +139,7 @@ export async function wager({game, contestant, body, value}) {
     game.save()
   ]);
 
+  // TODO: Daily Double timeouts
   this.send(`For ${formatCurrency(value)}, here's your clue.`, url);
 }
 
@@ -252,6 +253,7 @@ export async function category({game, contestant, body, category, value}) {
     // Make sure that the daily double image displays before we do anything else:
     await this.send('Answer: Daily Double', dailyDoubleUrl);
     this.send(`What would you like to wager, ${contestant.name}?`);
+    // TODO: Wager timeouts
   } else {
     // Give the user a little more feedback when we can:
     this.sendOptional(`OK, \`${game.getCategory().title}\` for ${formatCurrency(value)}...`);
