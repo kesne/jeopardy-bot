@@ -281,7 +281,7 @@ export async function category({game, contestant, body, category, value}) {
               channel_id: body.channel_id
             });
             // Second check seems silly, but image uploads take time.
-            if (game.isTimedOut()) {
+            if (game.getClue() === clue) {
               this.sendOptional(`Time's up! The correct answer is \`${clue.answer}\`.\nSelect a new clue.`, url);
             }
           }
