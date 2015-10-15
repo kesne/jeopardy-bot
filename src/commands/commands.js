@@ -219,6 +219,18 @@ export async function guess({game, contestant, body, guess}) {
       channel_id: body.channel_id
     });
     this.send(`That is incorrect, ${contestant.name}. Your score is now ${formatCurrency(contestant.channelScore(body.channel_id).value)}.`);
+    // If the clue is a daily double, the game progresses
+    if (game.isDailyDouble()) {
+      // Mark answer as complete and get the new url.
+      const [url] = await Promise.all([
+        getImageUrl({
+          file: 'board',
+          channel_id: body.channel_id
+        }),
+        game.answer()
+      ]);
+      this.send('Select a new clue.', url);
+    }
   }
 }
 
