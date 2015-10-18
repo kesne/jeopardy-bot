@@ -1,8 +1,19 @@
 /*
  * BOT CONFIGURATION:
  */
+
+export const API_TOKEN = process.env.JBOT_API_TOKEN || '';
+
 // The mode the bot is in:
-export let MODE = process.env.JBOT_MODE || 'response';
+export let MODE = process.env.JBOT_MODE;
+// Set mode defaults:
+if (!MODE) {
+  if (API_TOKEN) {
+    MODE = 'hybrid';
+  } else {
+    MODE = 'response';
+  }
+}
 // Validate the mode configuration:
 if (MODE !== 'response' && MODE !== 'hybrid') {
   console.warn(`An invalid mode was provided. Found mode "${MODE}".`);
@@ -22,8 +33,6 @@ ROOM_WHITELIST = ROOM_WHITELIST.split(',');
 // The outgoing webhook token used to verify requests:
 export let VERIFY_TOKENS = process.env.JBOT_VERIFY_TOKENS || '';
 VERIFY_TOKENS = VERIFY_TOKENS.split(',');
-
-export const API_TOKEN = process.env.JBOT_API_TOKEN || '';
 
 // The username of the bot:
 export const USERNAME = process.env.JBOT_USERNAME || 'jeopardybot';
