@@ -52,33 +52,17 @@ export async function leaderboard() {
   this.send(`Let's take a look at the top 5 players:\n\n${leaders.join('\n')}`);
 }
 
-export async function scores({body, showHeader = true}) {
-  const contestants = await Contestant.find().where('scores').elemMatch({
-    channel_id: body.channel_id
-  });
-  if (contestants.length === 0) {
+export async function scores({body}) {
+  const leaders = await scoresMessage({body});
+
+  if (!leaders) {
     this.send('There are no scores yet!');
     return;
   }
-  const leaders = contestants.sort((a, b) => {
-    const {value: aScore} = a.channelScore(body.channel_id);
-    const {value: bScore} = b.channelScore(body.channel_id);
-    if (bScore > aScore) {
-      return 1;
-    }
-    if (aScore > bScore) {
-      return -1;
-    }
-    return 0;
-  }).map((contestant, i) => (
-    `${i + 1}. ${contestant.name}: ${formatCurrency(contestant.channelScore(body.channel_id).value)}`
-  ));
 
-  if (showHeader) {
-    await this.send('Here are the current scores for this game:');
-  }
+  await this.send('Here are the current scores for this game:');
 
-  this.send(`\n\n${leaders.join('\n')}`);
+  this.send(`\n\n${leaders}`);
 }
 
 export async function newgame({game, body}) {
@@ -320,11 +304,32 @@ export async function category({game, contestant, body, category, value}) {
   }
 }
 
+async function scoresMessage({body}) {
+  const contestants = await Contestant.find().where('scores').elemMatch({
+    channel_id: body.channel_id
+  });
+  return contestants.sort((a, b) => {
+    const {value: aScore} = a.channelScore(body.channel_id);
+    const {value: bScore} = b.channelScore(body.channel_id);
+    if (bScore > aScore) {
+      return 1;
+    }
+    if (aScore > bScore) {
+      return -1;
+    }
+    return 0;
+  }).map((contestant, i) => (
+    `${i + 1}. ${contestant.name}: ${formatCurrency(contestant.channelScore(body.channel_id).value)}`
+  )).join('\n');
+}
+
 async function endGameMessage({body, game}) {
   let str = `\nAnd that's it for this round of Jeopardy. Let's take a look at the final scores...`;
-  str += `${ await scores({body, showHeader: false}) }`;
+  str += await scoresMessage({body});
   str += `\n\nThanks for playing! You can always start another game by typing "new game".`;
 
+  // End the game:
   await game.end();
+
   return str;
 }
