@@ -305,7 +305,7 @@ export async function category({game, contestant, body, category, value}) {
 
           await this.unlock();
         }
-      }, (config.CLUE_TIMEOUT + 5) * 1000);
+      }, (config.CLUE_TIMEOUT + 1) * 1000);
     }
   }
 }

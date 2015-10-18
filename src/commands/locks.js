@@ -8,6 +8,8 @@ export function lock(channel_id) {
     }, err => {
       if (err) {
         console.log('Error locking file', err);
+        // If we can't get the channel lock, let's bust it (something's probably wrong).
+        unlock(channel_id);
         return reject(err);
       }
       resolve();
