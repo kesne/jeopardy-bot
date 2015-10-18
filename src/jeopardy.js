@@ -100,6 +100,7 @@ async function handleRequest(req) {
   if (text) {
     return {
       username: config.USERNAME,
+      icon_emoji: ':jbot:',
       text
     };
   }

@@ -17,6 +17,7 @@ function sendToSlack(channel, message, url) {
     form.append('attachments', JSON.stringify([{
       fallback: 'Jeopardy Bot',
       image_url: url,
+      icon_emoji: ':jbot:',
       color: '#F4AC79'
     }]));
   }
