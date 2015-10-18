@@ -281,7 +281,11 @@ export async function category({game, contestant, body, category, value}) {
       setTimeout(async () => {
         // Grab the lock so we block incoming requests:
         await this.lock();
-        // Try to be safe:
+        // We need to refresh the document because it could be outdated:
+        game = await Game.forChannel({
+          channel_id: game.channel_id
+        });
+        // Try to be safe and unlock even when we fail:
         try {
           if (!game.isTimedOut()) {
             // Game is not timed out, so it progressed. Just unlock the channel.
