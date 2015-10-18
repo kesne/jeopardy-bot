@@ -325,7 +325,7 @@ async function scoresMessage({body}) {
 
 async function endGameMessage({body, game}) {
   let str = `\nAnd that's it for this round of Jeopardy. Let's take a look at the final scores...\n\n`;
-  str += await scoresMessage({body});
+  str += `\`\`\`${ await scoresMessage({body}) }\`\`\``;
   str += `\n\nThanks for playing! You can always start another game by typing "new game".`;
 
   // End the game:
