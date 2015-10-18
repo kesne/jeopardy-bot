@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import FormData from 'form-data';
+import {lock, unlock} from './locks';
 import * as commands from './commands';
 import * as config from '../config';
 
@@ -35,6 +36,12 @@ export async function exec(info) {
       } else {
         await sendToSlack(info.body.channel_id, message, url);
       }
+    },
+    lock() {
+      return lock(info.body.channel_id);
+    },
+    unlock() {
+      return unlock(info.body.channel_id);
     },
     // You can use this to send optional bits of information that will be sent by the bot:
     sendOptional(...args) {

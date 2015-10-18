@@ -279,24 +279,31 @@ export async function category({game, contestant, body, category, value}) {
     // Additional feedback after we timeout (plus five seconds for some flexibility):
     if (config.MODE !== 'response') {
       setTimeout(async () => {
-        if (game.isTimedOut()) {
+        // Grab the lock so we block incoming requests:
+        await this.lock();
+        if (!game.isTimedOut()) {
+          // Game is not timed out, so it progressed. Just unlock the channel.
+          await this.unlock();
+        } else {
+          // Get the current clue:
           const clue = game.getClue();
 
           // We timed out, so mark this question as done.
           await game.answer();
 
+          this.sendOptional(`Time's up! The correct answer is \`${clue.answer}\`.`);
+
           if (game.isComplete()) {
-            this.sendOptional(`Time's up! The correct answer is \`${clue.answer}\`. ${ await endGameMessage({game, body}) }`);
+            this.sendOptional(await endGameMessage({game, body}));
           } else {
             const url = await getImageUrl({
               file: 'board',
               channel_id: body.channel_id
             });
-
-            // TODO: This could have already happened while the image capturing happens. we should probably get a lock in the timeout.
-            // TODO: Add locks to the api provided to commands.
-            this.sendOptional(`Time's up! The correct answer is \`${clue.answer}\`.\nSelect a new clue.`, url);
+            this.sendOptional('Select a new clue.', url);
           }
+
+          await this.unlock();
         }
       }, (config.CLUE_TIMEOUT + 5) * 1000);
     }

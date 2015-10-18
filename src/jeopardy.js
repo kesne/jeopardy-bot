@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import express from 'express';
 import bodyParser from 'body-parser';
 import Pageres from 'pageres';
-import lockFile from 'lockfile';
+import {lock, unlock} from './commands/locks';
 import Imagemin from 'imagemin';
 import {join} from 'path';
 import {dust} from 'adaro';
@@ -46,7 +46,7 @@ app.set('views', join(__dirname, 'views'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
-app.post('/command', (req, res) => {
+app.post('/command', async (req, res) => {
   // Ignore messages from ourself:
   if (req.body.user_id === config.BOT_ID || req.body.user_name === config.USERNAME) {
     return res.end();
@@ -63,22 +63,11 @@ app.post('/command', (req, res) => {
 
   const channel_id = req.body.channel_id;
 
-  lockFile.lock(`jeopardy-${channel_id}.lock`, {
-    // Wait a maximum of 10 seconds:
-    wait: 10 * 1000
-  }, async function(err) {
-    if (err) {
-      console.log('Error locking file', err);
-      return res.end();
-    }
+  try {
+    await lock(channel_id);
+
     // Hold the channel (block other requests from processing):
-    let response;
-    try {
-      response = await handleRequest(req);
-    } catch (e) {
-      console.log(e);
-      console.log(e.stack);
-    }
+    const response = await handleRequest(req);
 
     if (response) {
       res.json(response);
@@ -86,12 +75,11 @@ app.post('/command', (req, res) => {
       res.end();
     }
 
-    lockFile.unlock(`jeopardy-${channel_id}.lock`, err => {
-      if (err) {
-        console.log('Error unlocking file', err);
-      }
-    });
-  });
+    await unlock(channel_id);
+  } catch (e) {
+    console.log(e);
+    console.log(e.stack);
+  }
 });
 
 async function handleRequest(req) {
