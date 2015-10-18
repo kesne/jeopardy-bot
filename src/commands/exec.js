@@ -29,26 +29,31 @@ function sendToSlack(channel, message, url) {
 
 export async function exec(info) {
   let response = '';
-  await commands[info.command].call({
-    async send(message, url = '') {
-      if (config.MODE === 'response') {
-        response += `${message} ${url}\n`;
-      } else {
-        await sendToSlack(info.body.channel_id, message, url);
+  try {
+    await commands[info.command].call({
+      async send(message, url = '') {
+        if (config.MODE === 'response') {
+          response += `${message} ${url}\n`;
+        } else {
+          await sendToSlack(info.body.channel_id, message, url);
+        }
+      },
+      lock() {
+        return lock(info.body.channel_id);
+      },
+      unlock() {
+        return unlock(info.body.channel_id);
+      },
+      // You can use this to send optional bits of information that will be sent by the bot:
+      sendOptional(...args) {
+        if (config.MODE !== 'response') {
+          return this.send(...args);
+        }
       }
-    },
-    lock() {
-      return lock(info.body.channel_id);
-    },
-    unlock() {
-      return unlock(info.body.channel_id);
-    },
-    // You can use this to send optional bits of information that will be sent by the bot:
-    sendOptional(...args) {
-      if (config.MODE !== 'response') {
-        return this.send(...args);
-      }
-    }
-  }, info);
+    }, info);
+  } catch (e) {
+    console.log('Command failed to execute.');
+    console.log(e);
+  }
   return response;
 }

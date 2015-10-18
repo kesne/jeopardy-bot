@@ -281,29 +281,35 @@ export async function category({game, contestant, body, category, value}) {
       setTimeout(async () => {
         // Grab the lock so we block incoming requests:
         await this.lock();
-        if (!game.isTimedOut()) {
-          // Game is not timed out, so it progressed. Just unlock the channel.
-          await this.unlock();
-        } else {
-          // Get the current clue:
-          const clue = game.getClue();
-
-          // We timed out, so mark this question as done.
-          await game.answer();
-
-          this.sendOptional(`Time's up! The correct answer is \`${clue.answer}\`.`);
-
-          if (game.isComplete()) {
-            this.sendOptional(await endGameMessage({game, body}));
+        // Try to be safe:
+        try {
+          if (!game.isTimedOut()) {
+            // Game is not timed out, so it progressed. Just unlock the channel.
+            await this.unlock();
           } else {
-            const url = await getImageUrl({
-              file: 'board',
-              channel_id: body.channel_id
-            });
-            this.sendOptional('Select a new clue.', url);
-          }
+            // Get the current clue:
+            const clue = game.getClue();
 
-          await this.unlock();
+            // We timed out, so mark this question as done.
+            await game.answer();
+
+            this.sendOptional(`Time's up! The correct answer is \`${clue.answer}\`.`);
+
+            if (game.isComplete()) {
+              this.sendOptional(await endGameMessage({game, body}));
+            } else {
+              const url = await getImageUrl({
+                file: 'board',
+                channel_id: body.channel_id
+              });
+              this.sendOptional('Select a new clue.', url);
+            }
+
+            await this.unlock();
+          }
+        } catch (e) {
+          console.log('Error occured while performing timeout.', e);
+          this.unlock();
         }
       }, (config.CLUE_TIMEOUT + 1) * 1000);
     }
