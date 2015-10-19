@@ -173,11 +173,15 @@ schema.methods.endChallenge = async function() {
       slackid
     });
     const {value} = this.questions.find(question => question.id === this.challenge.question);
-    contestant.correct({
+    await contestant.correct({
       // Award twice the value, one to make up for the loss, and one for the new points:
       value: value * 2,
       channel_id: this.channel_id
     });
+
+    return {
+      channelScore: contestant.channelScore(this.channel_id)
+    };
   } else {
     throw new Error('votes');
   }
