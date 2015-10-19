@@ -18,6 +18,35 @@ export const schema = new Schema({
     }
   }],
 
+  challenge: {
+    active: {
+      type: Boolean,
+      default: false
+    },
+    contestant: {
+      type: String
+    },
+    started: {
+      type: Date
+    },
+    guess: {
+      type: String
+    },
+    question: {
+      type: Number
+    },
+    votes: [{
+      contestant: {
+        type: String,
+        required: true
+      },
+      correct: {
+        type: Boolean,
+        required: true
+      }
+    }]
+  },
+
   // Information for the daily double:
   dailyDouble: {
     // The user that the daily double is currently assigned to:
@@ -99,6 +128,47 @@ schema.methods.liveClue = function() {
 schema.methods.isDailyDouble = function() {
   const clue = this.getClue();
   return clue.dailyDouble;
+};
+
+schema.methods.isChallengeStarted = function() {
+  return this.challenge.active && moment().isBefore(moment(this.challenge.started).add(config.CHALLENGE_TIMEOUT, 'seconds'));
+};
+
+// TODO: Should only be able to start a question if you answered INCORRECTLY and were docked points.
+// This logic currently works if you answered CORRECTLY. Need to flip.
+schema.methods.startChallenge = function() {
+  if (!this.getClue() && !this.challenge.active && this.challenge.question && this.challenge.guess) {
+    this.challenge.active = true;
+    this.challenge.started = Date.now();
+    return this.save();
+  } else {
+    throw new Error('bad values');
+  }
+};
+
+schema.methods.endChallenge = function() {
+  this.challenge.active = false;
+  const votes = this.challenge.votes;
+
+  // Clean out some values:
+  this.challenge.votes = [];
+  this.challenge.question = undefined;
+  this.challenge.guess = undefined;
+
+  if (votes.length < config.CHALLENGE_MIN) {
+    throw new Error('min');
+  }
+  const yesVotes = this.challenge.votes.map(vote => vote.correct ? 1 : 0).reduce((prev, curr) => {
+    return prev + curr;
+  });
+
+  if ((yesVotes / votes.length) > config.CHALLENGE_THRESHOLD) {
+    this.model('Contestant').findOne({
+
+    });
+  } else {
+    throw new Error('votes');
+  }
 };
 
 schema.methods.isTimedOut = function() {
@@ -197,6 +267,10 @@ schema.methods.getCategory = function() {
 
 // Get a new clue for a given value and title.
 schema.methods.newClue = async function({category, value, contestant}) {
+  if (this.isChallengeStarted()) {
+    throw new Error('challenge');
+  }
+
   if (category === '--same-lowest--' && this.lastCategory) {
     // These questions are internally value-sorted lowest-to-highest.
     const lowestValueClue = this.questions.find(question => {
@@ -281,6 +355,9 @@ const isNumber = num => {
 };
 
 schema.methods.guess = async function({contestant, guess}) {
+  if (this.isChallengeStarted()) {
+    throw new Error('challenge');
+  }
   if (!this.activeQuestion) {
     throw new Error('clue');
   }
@@ -332,17 +409,27 @@ schema.methods.guess = async function({contestant, guess}) {
   });
 };
 
-schema.methods.answer = function() {
+schema.methods.answer = function({guess, contestant}) {
   this.questions.some(q => {
     if (this.activeQuestion === q.id) {
       q.answered = true;
       return true;
     }
   });
+
+  // Set up the ruling to be started:
+  this.challenge.votes = [];
+  this.challenge.guess = guess;
+  this.challenge.active = false;
+  this.challenge.question = this.activeQuestion;
+  this.challenge.contestant = contestant.slackid;
+
+  // Clear out all of the data for this question:
   this.contestantAnswers = [];
   this.activeQuestion = undefined;
   this.questionStart = undefined;
   this.dailyDouble = {};
+
   return this.save();
 };
 

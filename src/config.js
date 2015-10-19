@@ -70,6 +70,13 @@ export const DOUBLE_JEOPARDY_VALUES = [
 // The number of seconds to wait before a clue is timed out.
 export const CLUE_TIMEOUT = Number(process.env.JBOT_CLUE_TIMEOUT) || 45;
 
+// Challenges timeout after a number of seconds:
+export const CHALLENGE_TIMEOUT = 7;
+// The minimum number of votes that a challenge must recieve to be considered valid.
+export const CHALLENGE_MIN = 2;
+// The threshold for a challenge to go through:
+export const CHALLENGE_THRESHOLD = 0.65;
+
 // The number of seconds to give control of the board to the correct guesser.
 export const BOARD_CONTROL_TIMEOUT = Number(process.env.JBOT_BOARD_CONTROL) || 10;
 
