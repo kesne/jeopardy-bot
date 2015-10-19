@@ -148,8 +148,9 @@ export async function challenge({game, contestant, body, correct, start}) {
       }),
       game.startChallenge({contestant})
     ]);
+    const contestantString = contestants.map(contestant => `@${contestant.name}`).join(', ');
     this.send(`A challenge has been called on the last question.\nI thought the correct answer was \`${answer}\`, and the guess was \`${guess}\`.`);
-    this.send(`So @${contestants.join(', @')}, do you think they were right? Respond with just "y" or "n" to vote.`);
+    this.send(`${contestantString}, do you think they were right? Respond with just "y" or "n" to vote.`);
 
     setTimeout(async () => {
       await this.lock();

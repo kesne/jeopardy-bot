@@ -133,7 +133,7 @@ schema.methods.isDailyDouble = function() {
 };
 
 schema.methods.isChallengeStarted = function() {
-  return this.challenge.active && moment().isBefore(moment(this.challenge.started).add(config.CHALLENGE_TIMEOUT, 'seconds'));
+  return this.challenge.active && this.challenge.started && moment().isBefore(moment(this.challenge.started).add(config.CHALLENGE_TIMEOUT, 'seconds'));
 };
 
 schema.methods.startChallenge = async function({contestant}) {
@@ -144,10 +144,9 @@ schema.methods.startChallenge = async function({contestant}) {
     await this.save();
     return {
       guess: lastGuess.guess,
-      answer: this.questions.find(question => question.id === this.challenge.question)
+      answer: this.questions.find(question => question.id === this.challenge.question).answer
     };
   } else {
-    console.log(this.challenge, lastGuess);
     throw new Error('bad values');
   }
 };
@@ -442,7 +441,7 @@ schema.methods.answer = function() {
 
   // Set up the ruling to be started:
   this.challenge.votes = [];
-  this.challenge.active = false;
+  this.challenge.active = '';
   this.challenge.question = this.activeQuestion;
 
   // Clear out all of the data for this question:
