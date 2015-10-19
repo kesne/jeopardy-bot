@@ -31,7 +31,7 @@ export let ROOM_WHITELIST = process.env.JBOT_ROOMS || 'jeopardy';
 ROOM_WHITELIST = ROOM_WHITELIST.split(',');
 
 // The outgoing webhook token used to verify requests:
-export let VERIFY_TOKENS = process.env.JBOT_VERIFY_TOKENS || '';
+export let VERIFY_TOKENS = process.env.JBOT_OUTGOING_WEBHOOK_TOKEN || '';
 VERIFY_TOKENS = VERIFY_TOKENS.split(',');
 
 // The username of the bot:
@@ -67,18 +67,11 @@ export const DOUBLE_JEOPARDY_VALUES = [
   2000
 ];
 
-// The last page of jService that will return valid results:
-export const LAST_PAGE = 18412;
-
 // The number of seconds to wait before a clue is timed out.
-export const CLUE_TIMEOUT = Number(process.env.JBOT_TIMEOUT) || 45;
+export const CLUE_TIMEOUT = Number(process.env.JBOT_CLUE_TIMEOUT) || 45;
 
 // The number of seconds to give control of the board to the correct guesser.
 export const BOARD_CONTROL_TIMEOUT = Number(process.env.JBOT_BOARD_CONTROL) || 10;
-
-// How many things we want:
-export const CATEGORY_COUNT = 6;
-export const VALUES_LENGTH = VALUES.length;
 
 // Constants for answer similarity:
 export const ACCEPTED_SIMILARITY = 0.7;

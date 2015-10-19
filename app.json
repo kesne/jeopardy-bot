@@ -1,18 +1,25 @@
 {
   "name": "Jeopardy Bot",
-  "description": "A slack bot that lets you play jeopardy games.",
+  "description": "A slack bot that lets you play full Jeopardy! games.",
   "repository": "https://github.com/kesne/jeopardy-bot",
-  "logo": "https://node-js-sample.herokuapp.com/node.png",
-  "keywords": ["node", "jeopardy", "bot", "trebek"],
+  "logo": "http://i.imgur.com/fyUzznF.png",
+  "keywords": ["node", "slack", "jeopardy", "bot", "trebek"],
   "success_url": "/welcome",
   "env": {
-    "SECRET_TOKEN": {
-      "description": "A secret key for verifying the integrity of signed cookies.",
-      "generator": "secret"
+    "JBOT_API_TOKEN": {
+      "description": "The Slack API key."
     },
-    "WEB_CONCURRENCY": {
-      "description": "The number of processes to run.",
-      "value": "5"
+    "JBOT_OUTGOING_WEBHOOK_TOKEN": {
+      "description": "The token of the Slack outgoing webhook. Used to verify incoming requests."
+    },
+    "JBOT_USERNAME": {
+      "description": "The username you would like the bot to post as.",
+      "value": "jeopardybot",
+      "required": true
+    },
+    "JBOT_CLUE_TIMEOUT": {
+      "description": "The number of seconds users have to answer questions.",
+      "value": "45"
     }
   },
   "addons": [

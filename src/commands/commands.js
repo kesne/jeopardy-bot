@@ -17,6 +17,7 @@ export function help() {
   this.send(`
 Here, this should help you out!
 >>>*Games*
+    “help” - Displays this helpful message.
     “new game” - Starts a new game.
     “end game” - Ends the current game.
 *Selecting Categories*
@@ -30,7 +31,7 @@ Here, this should help you out!
     “Who [is|are] ________”
     “Where [is|are] ______”
 *Wagering*
-    "$___"
+    “$___”
 *Scores*
     “scores” - Shows the score for the current game.
     “leaderboard” - Shows the scores and wins from all games.`);
