@@ -35,7 +35,7 @@ Selecting Categories
     “Give me ________ for $___”
     “Choose ________ for $___”
     “ ________ for $___”
-    “Same category for $___”
+    “Same (category) for $___”
 Guessing
     “What [is|are] _______”
     “Who [is|are] ________”
@@ -65,6 +65,7 @@ You can configure the bot via environment variables. Most of the configuration o
 ### Configuring MongoDB
 
 There are three different environment variables that you can use to set the URL for MongoDB. Jeopardy Bot will check the environment variables `MONGO_URL`, `MONGOHQ_URL`, and `MONGOLAB_URI` (in that order), before finally defaulting to `mongodb://localhost/jeopardy`.
+
 
 ---
 
