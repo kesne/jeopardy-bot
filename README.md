@@ -10,6 +10,7 @@ Deploying on Heroku is extremely simple. There are currently two supported [mode
 2. Grab the token for the outgoing webhook you just created.
 3. _(for hybrid mode):_ Obtain an API token. You can can either get one [for you slack account](https://api.slack.com/web), or by [creating a bot account](https://my.slack.com/services/new/bot).
 4. Set up the Heroku app by clicking this button. Fill out the fields with the information from the steps above.
+
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 5. Go into your outgoing webhook configuration and point it to the URL `https://[YOUR-HEROKU-APP].herokuapp.com/command`.
 
