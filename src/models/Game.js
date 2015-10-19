@@ -147,6 +147,7 @@ schema.methods.startChallenge = async function({contestant}) {
       answer: this.questions.find(question => question.id === this.challenge.question)
     };
   } else {
+    console.log(this.challenge, lastGuess);
     throw new Error('bad values');
   }
 };
