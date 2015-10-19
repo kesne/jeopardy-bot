@@ -59,8 +59,8 @@ export const MessageReader = {
       if (forString === 'for' && config.VALUES.includes(value)) {
         let categoryString = '';
 
-				// SPECIAL CASE: same category:
-        if (tokens[0] === 'same' && tokens[1] === 'category' && tokens.length === 4) {
+				// SPECIAL CASE: same category
+        if (tokens[0] === 'same' && (tokens[1] === 'category' && tokens.length === 4) || (tokens.length === 3)) {
           categoryString = '--same--';
         } else {
 					// This is a category selection:
