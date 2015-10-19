@@ -1,6 +1,6 @@
 {
   "name": "Jeopardy Bot",
-  "description": "A slack bot that lets you play full Jeopardy! games. For information on how to deploy, visit https://bit.ly/jepbot.",
+  "description": "A slack bot that lets you play full Jeopardy! games.",
   "repository": "https://github.com/kesne/jeopardy-bot",
   "logo": "http://i.imgur.com/fyUzznF.png",
   "keywords": ["node", "slack", "jeopardy", "bot", "trebek"],
