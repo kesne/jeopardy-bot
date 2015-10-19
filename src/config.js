@@ -71,7 +71,7 @@ export const DOUBLE_JEOPARDY_VALUES = [
 export const CLUE_TIMEOUT = Number(process.env.JBOT_CLUE_TIMEOUT) || 45;
 
 // Challenges timeout after a number of seconds:
-export const CHALLENGE_TIMEOUT = 7;
+export const CHALLENGE_TIMEOUT = 11;
 // The minimum number of votes that a challenge must recieve to be considered valid.
 export const CHALLENGE_MIN = 2;
 // The threshold for a challenge to go through:
