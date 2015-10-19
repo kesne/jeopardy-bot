@@ -197,6 +197,17 @@ schema.methods.getCategory = function() {
 
 // Get a new clue for a given value and title.
 schema.methods.newClue = async function({category, value, contestant}) {
+  if (category === '--same-lowest--' && this.lastCategory) {
+    // These questions are internally value-sorted lowest-to-highest.
+    const lowestValueClue = this.questions.find(question => {
+      return (question.category_id === this.lastCategory && !question.answered);
+    });
+    if (lowestValueClue) {
+      category = '--same--';
+      value = lowestValueClue.value;
+    }
+  }
+
   value = parseInt(value, 10);
   if (!config.VALUES.includes(value)) {
     throw new RangeError('value');

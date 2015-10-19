@@ -238,6 +238,8 @@ export async function category({game, contestant, body, category, value}) {
     return;
   }
 
+  const clue = game.getClue();
+
   // You found a daily double!
   if (game.isDailyDouble()) {
     const dailyDoubleUrl = await getImageUrl({
@@ -251,7 +253,7 @@ export async function category({game, contestant, body, category, value}) {
     // TODO: Wager timeouts
   } else {
     // Give the user a little more feedback when we can:
-    this.sendOptional(`OK, \`${game.getCategory().title}\` for ${formatCurrency(value)}...`);
+    this.sendOptional(`OK, \`${game.getCategory().title}\` for ${formatCurrency(clue.value)}...`);
 
     const url = await getImageUrl({
       file: 'clue',

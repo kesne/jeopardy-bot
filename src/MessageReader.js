@@ -51,6 +51,16 @@ export const MessageReader = {
 
     const tokenizer = new WordTokenizer();
     const tokens = tokenizer.tokenize(text);
+
+    // SPECIAL CASE: same for lowest value
+    if (tokens[0] === 'same' && tokens.length === 1) {
+      return {
+        command: 'category',
+        category: '--same-lowest--',
+        value: -1
+      };
+    }
+
 		// Need at least three tokens:
     if (tokens.length >= 3) {
 			// Check for selecting a category:
