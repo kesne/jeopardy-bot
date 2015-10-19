@@ -40,6 +40,15 @@ export const MessageReader = {
       return {command: 'scores'};
     }
 
+    // Challenges:
+    if (text === 'y' || text === 'n' || text === 'challenge') {
+      return {
+        command: 'challenge',
+        start: text === 'challenge',
+        correct: text === 'y'
+      };
+    }
+
     // Wagers:
     const numberValue = Number(text.replace(/\$|,/g, ''));
     if (!Number.isNaN(numberValue) && numberValue > 0) {

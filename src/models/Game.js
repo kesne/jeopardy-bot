@@ -18,6 +18,37 @@ export const schema = new Schema({
     }
   }],
 
+  challenge: {
+    active: {
+      type: String,
+      default: ''
+    },
+    started: {
+      type: Date
+    },
+    question: {
+      type: Number
+    },
+    guesses: [{
+      contestant: {
+        type: String
+      },
+      guess: {
+        type: String
+      }
+    }],
+    votes: [{
+      contestant: {
+        type: String,
+        required: true
+      },
+      correct: {
+        type: Boolean,
+        required: true
+      }
+    }]
+  },
+
   // Information for the daily double:
   dailyDouble: {
     // The user that the daily double is currently assigned to:
@@ -99,6 +130,57 @@ schema.methods.liveClue = function() {
 schema.methods.isDailyDouble = function() {
   const clue = this.getClue();
   return clue.dailyDouble;
+};
+
+schema.methods.isChallengeStarted = function() {
+  return this.challenge.active && this.challenge.started && moment().isBefore(moment(this.challenge.started).add(config.CHALLENGE_TIMEOUT, 'seconds'));
+};
+
+schema.methods.startChallenge = async function({contestant}) {
+  const lastGuess = this.challenge.guesses.find(guess => guess.contestant === contestant.slackid);
+  if (!this.liveClue() && !this.challenge.active && this.challenge.question && lastGuess) {
+    this.challenge.active = lastGuess.contestant;
+    this.challenge.started = Date.now();
+    await this.save();
+    return {
+      guess: lastGuess.guess,
+      answer: this.questions.find(question => question.id === this.challenge.question).answer
+    };
+  } else {
+    throw new Error('bad values');
+  }
+};
+
+schema.methods.endChallenge = async function() {
+  const slackid = this.challenge.active;
+  const votes = this.challenge.votes;
+
+  // Clean out some values:
+  this.challenge.active = undefined;
+  this.challenge.votes = [];
+  this.challenge.guesses = [];
+  this.challenge.question = undefined;
+
+  if (votes.length < config.CHALLENGE_MIN) {
+    throw new Error('min');
+  }
+  const yesVotes = this.challenge.votes.map(vote => vote.correct ? 1 : 0).reduce((prev, curr) => {
+    return prev + curr;
+  });
+
+  if ((yesVotes / votes.length) >= config.CHALLENGE_THRESHOLD) {
+    const contestant = await this.model('Contestant').findOne({
+      slackid
+    });
+    const {value} = this.questions.find(question => question.id === this.challenge.question);
+    contestant.correct({
+      // Award twice the value, one to make up for the loss, and one for the new points:
+      value: value * 2,
+      channel_id: this.channel_id
+    });
+  } else {
+    throw new Error('votes');
+  }
 };
 
 schema.methods.isTimedOut = function() {
@@ -197,6 +279,10 @@ schema.methods.getCategory = function() {
 
 // Get a new clue for a given value and title.
 schema.methods.newClue = async function({category, value, contestant}) {
+  if (this.isChallengeStarted()) {
+    throw new Error('challenge');
+  }
+
   if (category === '--same-lowest--' && this.lastCategory) {
     // These questions are internally value-sorted lowest-to-highest.
     const lowestValueClue = this.questions.find(question => {
@@ -265,6 +351,8 @@ schema.methods.newClue = async function({category, value, contestant}) {
     this.dailyDouble.contestant = contestant;
   }
 
+  // Reset the guesses:
+  this.challenge.guesses = [];
   this.lastCategory = selectedCategory;
   this.activeQuestion = question.id;
   return this.save();
@@ -281,6 +369,9 @@ const isNumber = num => {
 };
 
 schema.methods.guess = async function({contestant, guess}) {
+  if (this.isChallengeStarted()) {
+    throw new Error('challenge');
+  }
   if (!this.activeQuestion) {
     throw new Error('clue');
   }
@@ -300,12 +391,11 @@ schema.methods.guess = async function({contestant, guess}) {
 
   // This contestant has now guessed:
   this.contestantAnswers.push(contestant.slackid);
-  await this.save();
 
   // Get the answers:
   const answers = this.liveClue().answer.split(/\(|\)/).filter(n => n);
   answers.push(answers.join(' '));
-  return answers.some(answer => {
+  const correctAnswer = answers.some(answer => {
     // Number matching:
     if (isNumber(answer)) {
       // Numbers much be identical:
@@ -330,6 +420,15 @@ schema.methods.guess = async function({contestant, guess}) {
       return false;
     }
   });
+  if (!correctAnswer) {
+    // Add the guess to allow for a challenge:
+    this.challenge.guesses.push({
+      guess,
+      contestant: contestant.slackid
+    });
+  }
+  await this.save();
+  return correctAnswer;
 };
 
 schema.methods.answer = function() {
@@ -339,10 +438,18 @@ schema.methods.answer = function() {
       return true;
     }
   });
+
+  // Set up the ruling to be started:
+  this.challenge.votes = [];
+  this.challenge.active = '';
+  this.challenge.question = this.activeQuestion;
+
+  // Clear out all of the data for this question:
   this.contestantAnswers = [];
   this.activeQuestion = undefined;
   this.questionStart = undefined;
   this.dailyDouble = {};
+
   return this.save();
 };
 

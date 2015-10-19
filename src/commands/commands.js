@@ -128,6 +128,49 @@ export async function wager({game, contestant, body, value}) {
   this.send(`For ${formatCurrency(value)}, here's your clue.`, url);
 }
 
+// TODO: Environment variable to enable challenges.
+// TODO: Challenges are only available in hybrid mode. Make sure that's documented and set.
+export async function challenge({game, contestant, body, correct, start}) {
+  if (!start && game.isChallengeStarted()) {
+    // Register the vote if we haven't already voted:
+    const hasVoted = game.challenge.votes.some(vote => vote.contestant === contestant.slackid);
+    if (!hasVoted) {
+      game.challenge.votes.push({
+        contestant: contestant.slackid,
+        correct
+      });
+      await game.save();
+    }
+  } else if (start && !game.isChallengeStarted()) {
+    const [contestants, {guess, answer}] = await Promise.all([
+      Contestant.find().where('scores').elemMatch({
+        channel_id: body.channel_id
+      }),
+      game.startChallenge({contestant})
+    ]);
+    const contestantString = contestants.map(contestant => `@${contestant.name}`).join(', ');
+    this.send(`A challenge has been called on the last question.\nI thought the correct answer was \`${answer}\`, and the guess was \`${guess}\`.`);
+    this.send(`${contestantString}, do you think they were right? Respond with just "y" or "n" to vote.`);
+
+    setTimeout(async () => {
+      await this.lock();
+      try {
+        await game.endChallenge();
+        // TODO: Award message.
+        this.send('The challenge has gone through!');
+      } catch (e) {
+        if (e.message.includes('min')) {
+          this.send('The challenge failed. There were not enough votes. Carry on!');
+        } else if (e.message.includes('votes')) {
+          this.send('The challenge failed. Not enough people agreed. Carry on!');
+        }
+      } finally {
+        this.unlock();
+      }
+    }, (config.CHALLENGE_TIMEOUT + 1) * 1000);
+  }
+}
+
 export async function guess({game, contestant, body, guess}) {
   // Cache the clue reference:
   const clue = game.getClue();
@@ -275,10 +318,7 @@ export async function category({game, contestant, body, category, value}) {
         });
         // Try to be safe and unlock even when we fail:
         try {
-          if (!game.isTimedOut()) {
-            // Game is not timed out, so it progressed. Just unlock the channel.
-            await this.unlock();
-          } else {
+          if (game.isTimedOut()) {
             // Get the current clue:
             const clue = game.getClue();
 
@@ -296,11 +336,8 @@ export async function category({game, contestant, body, category, value}) {
               });
               this.sendOptional('Select a new clue.', url);
             }
-
-            await this.unlock();
           }
-        } catch (e) {
-          console.log('Error occured while performing timeout.', e);
+        } finally {
           this.unlock();
         }
       }, (config.CLUE_TIMEOUT + 1) * 1000);
