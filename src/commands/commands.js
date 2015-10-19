@@ -129,7 +129,7 @@ export async function wager({game, contestant, body, value}) {
 }
 
 // TODO: Environment variable to enable challenges.
-// TODO: Challenges are only available in hybrid mode.
+// TODO: Challenges are only available in hybrid mode. Make sure that's documented and set.
 export async function challenge({game, contestant, body, correct, start}) {
   if (!start && game.isChallengeStarted()) {
     // Register the vote if we haven't already voted:
@@ -142,20 +142,21 @@ export async function challenge({game, contestant, body, correct, start}) {
       await game.save();
     }
   } else if (start && !game.isChallengeStarted()) {
-    const [contestants] = await Promise.all([
+    const [contestants, {guess, answer}] = await Promise.all([
       Contestant.find().where('scores').elemMatch({
         channel_id: body.channel_id
       }),
-      game.startChallenge()
+      game.startChallenge({contestant})
     ]);
-    const challengeClue = game.questions.find(question => question.id === game.challenge.question);
-    this.send(`A challenge has been called on the last question.\nI thought the correct answer was \`${challengeClue.answer}\`, and the guess was \`${game.challenge.guess}\`.`);
+    this.send(`A challenge has been called on the last question.\nI thought the correct answer was \`${answer}\`, and the guess was \`${guess}\`.`);
     this.send(`So @${contestants.join(', @')}, do you think they were right? Respond with just "y" or "n" to vote.`);
 
     setTimeout(async () => {
       await this.lock();
       try {
-        await game.challengeEnd();
+        await game.endChallenge();
+        // TODO: Award message.
+        this.send('The challenge has gone through!');
       } catch (e) {
         if (e.message.includes('min')) {
           this.send('The challenge failed. There were not enough votes. Carry on!');
@@ -224,9 +225,7 @@ export async function guess({game, contestant, body, guess}) {
         channel_id: body.channel_id
       }),
       // Mark the question as answered:
-      game.answer({
-        guess
-      })
+      game.answer()
     ]);
 
     await this.send(`That is correct, ${contestant.name}. Your score is ${formatCurrency(contestant.channelScore(body.channel_id).value)}.`);
@@ -251,9 +250,7 @@ export async function guess({game, contestant, body, guess}) {
     if (game.isDailyDouble()) {
       this.send(`The correct answer is \`${clue.answer}\`.`);
       // Mark answer as complete.
-      await game.answer({
-        guess
-      });
+      await game.answer();
       const url = await getImageUrl({
         file: 'board',
         channel_id: body.channel_id

@@ -20,21 +20,23 @@ export const schema = new Schema({
 
   challenge: {
     active: {
-      type: Boolean,
-      default: false
-    },
-    contestant: {
-      type: String
+      type: String,
+      default: ''
     },
     started: {
       type: Date
     },
-    guess: {
-      type: String
-    },
     question: {
       type: Number
     },
+    guesses: [{
+      contestant: {
+        type: String
+      },
+      guess: {
+        type: String
+      }
+    }],
     votes: [{
       contestant: {
         type: String,
@@ -134,26 +136,30 @@ schema.methods.isChallengeStarted = function() {
   return this.challenge.active && moment().isBefore(moment(this.challenge.started).add(config.CHALLENGE_TIMEOUT, 'seconds'));
 };
 
-// TODO: Should only be able to start a question if you answered INCORRECTLY and were docked points.
-// This logic currently works if you answered CORRECTLY. Need to flip.
-schema.methods.startChallenge = function() {
-  if (!this.getClue() && !this.challenge.active && this.challenge.question && this.challenge.guess) {
-    this.challenge.active = true;
+schema.methods.startChallenge = async function({contestant}) {
+  const lastGuess = this.challenge.guesses.find(guess => guess.contestant === contestant.slackid);
+  if (!this.liveClue() && !this.challenge.active && this.challenge.question && lastGuess) {
+    this.challenge.active = lastGuess.contestant;
     this.challenge.started = Date.now();
-    return this.save();
+    await this.save();
+    return {
+      guess: lastGuess.guess,
+      answer: this.questions.find(question => question.id === this.challenge.question)
+    };
   } else {
     throw new Error('bad values');
   }
 };
 
-schema.methods.endChallenge = function() {
-  this.challenge.active = false;
+schema.methods.endChallenge = async function() {
+  const slackid = this.challenge.active;
   const votes = this.challenge.votes;
 
   // Clean out some values:
+  this.challenge.active = undefined;
   this.challenge.votes = [];
+  this.challenge.guesses = [];
   this.challenge.question = undefined;
-  this.challenge.guess = undefined;
 
   if (votes.length < config.CHALLENGE_MIN) {
     throw new Error('min');
@@ -162,9 +168,15 @@ schema.methods.endChallenge = function() {
     return prev + curr;
   });
 
-  if ((yesVotes / votes.length) > config.CHALLENGE_THRESHOLD) {
-    this.model('Contestant').findOne({
-
+  if ((yesVotes / votes.length) >= config.CHALLENGE_THRESHOLD) {
+    const contestant = await this.model('Contestant').findOne({
+      slackid
+    });
+    const {value} = this.questions.find(question => question.id === this.challenge.question);
+    contestant.correct({
+      // Award twice the value, one to make up for the loss, and one for the new points:
+      value: value * 2,
+      channel_id: this.channel_id
     });
   } else {
     throw new Error('votes');
@@ -339,6 +351,8 @@ schema.methods.newClue = async function({category, value, contestant}) {
     this.dailyDouble.contestant = contestant;
   }
 
+  // Reset the guesses:
+  this.challenge.guesses = [];
   this.lastCategory = selectedCategory;
   this.activeQuestion = question.id;
   return this.save();
@@ -377,12 +391,11 @@ schema.methods.guess = async function({contestant, guess}) {
 
   // This contestant has now guessed:
   this.contestantAnswers.push(contestant.slackid);
-  await this.save();
 
   // Get the answers:
   const answers = this.liveClue().answer.split(/\(|\)/).filter(n => n);
   answers.push(answers.join(' '));
-  return answers.some(answer => {
+  const correctAnswer = answers.some(answer => {
     // Number matching:
     if (isNumber(answer)) {
       // Numbers much be identical:
@@ -407,9 +420,18 @@ schema.methods.guess = async function({contestant, guess}) {
       return false;
     }
   });
+  if (!correctAnswer) {
+    // Add the guess to allow for a challenge:
+    this.challenge.guesses.push({
+      guess,
+      contestant: contestant.slackid
+    });
+  }
+  await this.save();
+  return correctAnswer;
 };
 
-schema.methods.answer = function({guess, contestant}) {
+schema.methods.answer = function() {
   this.questions.some(q => {
     if (this.activeQuestion === q.id) {
       q.answered = true;
@@ -419,10 +441,8 @@ schema.methods.answer = function({guess, contestant}) {
 
   // Set up the ruling to be started:
   this.challenge.votes = [];
-  this.challenge.guess = guess;
   this.challenge.active = false;
   this.challenge.question = this.activeQuestion;
-  this.challenge.contestant = contestant.slackid;
 
   // Clear out all of the data for this question:
   this.contestantAnswers = [];
