@@ -162,6 +162,9 @@ schema.methods.endChallenge = async function() {
   this.challenge.guesses = [];
   this.challenge.question = undefined;
 
+  // Force a save:
+  await this.save();
+
   if (votes.length < config.CHALLENGE_MIN) {
     throw new Error('min');
   }
