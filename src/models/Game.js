@@ -155,6 +155,7 @@ schema.methods.startChallenge = async function({contestant}) {
 schema.methods.endChallenge = async function() {
   const slackid = this.challenge.active;
   const votes = this.challenge.votes;
+  const question = this.challenge.question;
 
   // Clean out some values:
   this.challenge.active = undefined;
@@ -176,7 +177,7 @@ schema.methods.endChallenge = async function() {
     const contestant = await this.model('Contestant').findOne({
       slackid
     });
-    const {value} = this.questions.find(question => question.id === this.challenge.question);
+    const {value} = this.questions.find(q => q.id === question);
     await contestant.correct({
       // Award twice the value, one to make up for the loss, and one for the new points:
       value: value * 2,
