@@ -166,6 +166,9 @@ export async function challenge({game, contestant, body, correct, start}) {
           this.send('The challenge failed. There were not enough votes. Carry on!');
         } else if (e.message.includes('votes')) {
           this.send('The challenge failed. Not enough people agreed. Carry on!');
+        } else {
+          console.log('Unknown challenge error...', e);
+          console.log(e.stack);
         }
       } finally {
         this.unlock();
