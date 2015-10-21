@@ -165,9 +165,9 @@ schema.methods.endChallenge = async function() {
   if (votes.length < config.CHALLENGE_MIN) {
     throw new Error('min');
   }
-  const yesVotes = this.challenge.votes.map(vote => vote.correct ? 1 : 0).reduce((prev, curr) => {
+  const yesVotes = votes.map(vote => vote.correct ? 1 : 0).reduce((prev, curr) => {
     return prev + curr;
-  });
+  }, 0);
 
   if ((yesVotes / votes.length) >= config.CHALLENGE_THRESHOLD) {
     const contestant = await this.model('Contestant').findOne({
