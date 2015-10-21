@@ -154,7 +154,7 @@ app.get('/image/:channel_id/:name', (req, res) => {
       new Imagemin()
         .src(join(__dirname, '..', 'images', item.filename))
         .dest(join(__dirname, '..', 'images'))
-        .use(Imagemin.optipng({optimizationLevel: 1}))
+        .use(Imagemin.optipng({optimizationLevel: config.IMAGE_MIN}))
         .run(() => {
           console.timeEnd('Image Minification');
           res.send('ok');
