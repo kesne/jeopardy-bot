@@ -154,9 +154,12 @@ export async function challenge({game, contestant, body, correct, start}) {
 
     setTimeout(async () => {
       await this.lock();
+      // We need to refresh the document because it could be outdated:
+      game = await Game.forChannel({
+        channel_id: game.channel_id
+      });
       try {
         const {channelScore} = await game.endChallenge();
-        // TODO: Award message.
         this.send(`Congrats, ${contestant}, your challenge has succeeded. Your score is now ${formatCurrency(channelScore.value)}.`);
       } catch (e) {
         if (e.message.includes('min')) {
