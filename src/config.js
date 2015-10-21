@@ -81,6 +81,6 @@ export const CHALLENGE_THRESHOLD = 0.65;
 export const BOARD_CONTROL_TIMEOUT = Number(process.env.JBOT_BOARD_CONTROL) || 10;
 
 // Constants for answer similarity:
-export const ACCEPTED_SIMILARITY = 0.7;
+export const ACCEPTED_SIMILARITY = 0.6;
 export const JARO_SIMILARITY = 0.9;
 export const JARO_KICKER = 0.5;

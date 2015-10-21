@@ -8,7 +8,7 @@ import Imagemin from 'imagemin';
 import {join} from 'path';
 import {dust} from 'adaro';
 
-import {MessageReader} from './MessageReader';
+import {read} from './MessageReader';
 import {exec} from './commands/exec';
 import {Game} from './models/Game';
 import {Contestant} from './models/Contestant';
@@ -53,7 +53,7 @@ app.post('/command', async (req, res) => {
   }
 
   // Try to parse the message:
-  const message = MessageReader.read(req.body);
+  const message = read(req.body);
 
   // If we can't get a valid message out, just dump the request:
   if (!message || !message.command) {

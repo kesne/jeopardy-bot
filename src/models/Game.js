@@ -4,6 +4,7 @@ import {Schema, model} from 'mongoose';
 import {DiceCoefficient, JaroWinklerDistance} from 'natural';
 
 import {generateGame} from '../japi';
+import {clean} from '../MessageReader';
 import * as config from '../config';
 
 export const schema = new Schema({
@@ -400,6 +401,8 @@ schema.methods.guess = async function({contestant, guess}) {
   const answers = this.liveClue().answer.split(/\(|\)/).filter(n => n);
   answers.push(answers.join(' '));
   const correctAnswer = answers.some(answer => {
+    // Clean up the answer a little before matching:
+    answer = clean(answer);
     // Number matching:
     if (isNumber(answer)) {
       // Numbers much be identical:
