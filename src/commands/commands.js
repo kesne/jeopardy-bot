@@ -1,3 +1,4 @@
+import moment from 'moment';
 import numeral from 'numeral';
 import {Contestant} from '../models/Contestant';
 import {Game} from '../models/Game';
@@ -179,6 +180,12 @@ export async function challenge({game, contestant, body, correct, start}) {
 export async function guess({game, contestant, body, guess}) {
   // Cache the clue reference:
   const clue = game.getClue();
+
+  const guessDate = parseInt(body.timestamp, 10) * 1000;
+  if (moment(guessDate).isBefore(moment(game.questionStart))) {
+    // We guessed before the question was fully posted:
+    return;
+  }
 
   let correct;
   try {
