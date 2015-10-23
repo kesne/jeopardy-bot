@@ -1,12 +1,20 @@
 import fetch from 'node-fetch';
 import striptags from 'striptags';
 import {load} from 'cheerio';
+import {AllHtmlEntities} from 'html-entities';
+import unidecode from 'unidecode';
+
+const {decode} = new AllHtmlEntities();
+
+function simplifyText(text) {
+  unidecode(decode(text));
+}
 
 // Hard code number of seasons:
 // Season 32 is relatively incomplete.
 const seasons = 31;
 
-// Selector to get seasons URLS from
+// Selector to get seasons URLs from
 const episodeRegex = /Show #([0-9]+) -/;
 const clueRegex = /clue_J_([0-9]+)_([0-9]+)/;
 
@@ -26,7 +34,7 @@ async function loadEpisode(url) {
     id += 1;
     categories.push({
       id,
-      title: $(category).text()
+      title: simplifyText($(category).text())
     });
   });
 
@@ -50,7 +58,7 @@ async function loadEpisode(url) {
 
     // Extract the answer and strip HTML tags:
     let [, answer] = /ponse">(.*)<\/e/.exec($clue.find('td:first-child > div').attr('onmouseover'));
-    answer = striptags(answer);
+    answer = simplifyText(striptags(answer));
 
     // Extract if this question was a daily double:
     const dailyDouble = $clue.find('.clue_value_daily_double').length === 1;
