@@ -113,7 +113,7 @@ export function parse(text) {
       };
     }
 
-    const questions = ['what', 'whats', 'where', 'wheres', 'who', 'whos'];
+    const questions = ['what', 'whats', 'where', 'wheres', 'who', 'whos', 'when'];
 
     // This is a guess:
     if (questions.includes(tokens[0])) {
