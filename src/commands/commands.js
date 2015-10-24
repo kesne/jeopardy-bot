@@ -181,10 +181,13 @@ export async function guess({game, contestant, body, guess}) {
   // Cache the clue reference:
   const clue = game.getClue();
 
-  const guessDate = parseInt(body.timestamp, 10) * 1000;
-  if (moment(guessDate).isBefore(moment(game.questionStart))) {
-    // We guessed before the question was fully posted:
-    return;
+  // Daily doubles don't timeout:
+  if (!clue.dailyDouble) {
+    const guessDate = parseInt(body.timestamp, 10) * 1000;
+    if (moment(guessDate).isBefore(moment(game.questionStart))) {
+      // We guessed before the question was fully posted:
+      return;
+    }
   }
 
   let correct;
