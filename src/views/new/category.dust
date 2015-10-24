@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JEOPARDY BOARD</title>
+  <style type="text/css">
+
+  html {
+    box-sizing: border-box;
+  }
+  *, *:before, *:after {
+    box-sizing: inherit;
+  }
+
+  body {
+    background: black;
+    margin: 0;
+    padding: 0;
+  }
+
+  #board, #board th, #board td {
+    width: 100%;
+    border: 1px solid black;
+    table-layout: fixed;
+    border-spacing: 5px;
+    border-collapse: separate;
+  }
+
+  #board thead {
+    border-bottom: 15px solid black;
+  }
+  #board tbody:before {
+    content: "";
+    display: block;
+  }
+
+  #board td, #board th {
+    height: 80px;
+    background: #162387;
+    border-radius: 3px;
+    text-align: center;
+    vertical-align: middle;
+    color: #F4AC79;
+    padding: 10px;
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.6);
+  }
+
+  #board th {
+    font-family: "League Gothic";
+    letter-spacing: 1px;
+    font-size: 30px;
+    font-weight: normal;
+    line-height: 28px;
+    color: white;
+    text-transform: uppercase;
+    overflow-wrap: break-word;
+  }
+
+  #board td {
+    font-family: "League Gothic";
+    font-size: 80px;
+    letter-spacing: 2px;
+  }
+
+  #board .dollar {
+    font-size: 70px;
+    vertical-align: middle;
+    margin-top: -8px;
+    display: inline-block;
+  }
+
+  </style>
+</head>
+<body>
+  <table id="board">
+    <thead>
+      <tr>
+        <th colspan="1">
+          {title}
+        </th>
+      </tr>
+    </thead>
+  </table>
+</body>
+</html>

@@ -8,13 +8,6 @@
     }
     body {
       background: #26307f;
-      background: -moz-radial-gradient(center, ellipse cover,  #26307f 0%, #001182 100%);
-      background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,#26307f), color-stop(100%,#001182));
-      background: -webkit-radial-gradient(center, ellipse cover,  #26307f 0%,#001182 100%);
-      background: -o-radial-gradient(center, ellipse cover,  #26307f 0%,#001182 100%);
-      background: -ms-radial-gradient(center, ellipse cover,  #26307f 0%,#001182 100%);
-      background: radial-gradient(ellipse at center,  #26307f 0%,#001182 100%);
-
       height: 100%;
       padding: 0;
       margin: 0;
@@ -43,7 +36,6 @@
       display: table;
       width: 100%;
     }
-
   </style>
 </head>
 <body>
