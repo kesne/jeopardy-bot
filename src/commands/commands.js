@@ -2,8 +2,10 @@ import moment from 'moment';
 import numeral from 'numeral';
 import {Contestant} from '../models/Contestant';
 import {Game} from '../models/Game';
-import {getImageUrl} from '../upload';
+import {getImageUrl, upload} from '../upload';
 import * as config from '../config';
+
+import {board} from '../cola/generator';
 
 const formatter = '$0,0';
 const formatCurrency = value => {
@@ -16,6 +18,8 @@ export function poke() {
 
 export function help() {
   this.send(`
+*Powered By _Cola_*
+
 Here, this should help you out!
 >>>*Games*
     “help” - Displays this helpful message.
@@ -76,13 +80,13 @@ export async function newgame({game, body}) {
   this.sendOptional('Starting a new game for you...');
 
   // Start the game:
-  await Game.start({
+  game = await Game.start({
     channel_id: body.channel_id
   });
-  const url = await getImageUrl({
-    file: 'board',
-    channel_id: body.channel_id
-  });
+
+  const boardFile = await board({game});
+  const url = await upload(boardFile);
+
   this.send(`Let's get this game started! Go ahead and select a category and value.`, url);
 }
 
@@ -207,10 +211,8 @@ export async function guess({game, contestant, body, guess}) {
       if (game.isComplete()) {
         this.send(`${ await endGameMessage({game, body}) }`);
       } else {
-        const url = await getImageUrl({
-          file: 'board',
-          channel_id: body.channel_id
-        });
+        const boardFile = await board({game});
+        const url = await upload(boardFile);
         this.send(`Select a new clue.`, url);
       }
     } else if (e.message.includes('contestant')) {
@@ -250,10 +252,8 @@ export async function guess({game, contestant, body, guess}) {
       this.send(`${ await endGameMessage({game, body}) }`);
     } else {
       // Get the new board url:
-      const url = await getImageUrl({
-        file: 'board',
-        channel_id: body.channel_id
-      });
+      const boardFile = await board({game});
+      const url = await upload(boardFile);
       this.send(`Select a new clue.`, url);
     }
   } else {
@@ -267,10 +267,8 @@ export async function guess({game, contestant, body, guess}) {
       this.send(`The correct answer is \`${clue.answer}\`.`);
       // Mark answer as complete.
       await game.answer();
-      const url = await getImageUrl({
-        file: 'board',
-        channel_id: body.channel_id
-      });
+      const boardFile = await board({game});
+      const url = await upload(boardFile);
       this.send('Select a new clue.', url);
     }
   }
@@ -345,10 +343,8 @@ export async function category({game, contestant, body, category, value}) {
             if (game.isComplete()) {
               this.sendOptional(await endGameMessage({game, body}));
             } else {
-              const url = await getImageUrl({
-                file: 'board',
-                channel_id: body.channel_id
-              });
+              const boardFile = await board({game});
+              const url = await upload(boardFile);
               this.sendOptional('Select a new clue.', url);
             }
           }

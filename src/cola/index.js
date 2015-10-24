@@ -1,0 +1,3 @@
+// TODO...
+
+// Public API for cola. Basically ties together the capture/generator/uploader logic.

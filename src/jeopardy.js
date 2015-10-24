@@ -2,9 +2,7 @@ import 'babel/polyfill';
 import mongoose from 'mongoose';
 import express from 'express';
 import bodyParser from 'body-parser';
-import Pageres from 'pageres';
 import {lock, unlock} from './commands/locks';
-import Imagemin from 'imagemin';
 import {join} from 'path';
 import {dust} from 'adaro';
 
@@ -18,28 +16,7 @@ mongoose.connect(config.MONGO);
 
 const app = express();
 
-// TODO: Move this.
-const options = {
-  helpers: [
-    dust => {
-      dust.helpers.Card = (chunk, context, bodies, params) => {
-        const questions = context.get('questions');
-        const value = context.resolve(params.value);
-        const id = context.resolve(params.id);
-        const question = questions.find(q => {
-          return q.value === value && q.category_id === id;
-        });
-        if (question.answered) {
-          chunk.write('');
-        } else {
-          chunk.write(`<span class="dollar">$</span>${value}`);
-        }
-      };
-    }
-  ]
-};
-
-app.engine('dust', dust(options));
+app.engine('dust', dust());
 app.set('view engine', 'dust');
 app.set('views', join(__dirname, 'views'));
 
@@ -111,60 +88,14 @@ app.get('/welcome', (req, res) => {
   res.render('welcome');
 });
 
-app.get('/:channel_id/board', (req, res) => {
-  Game.forChannel({
-    channel_id: req.params.channel_id
-  }).then(({categories, questions}) => {
-    res.render('board', {
-      categories,
-      questions,
-      values: config.VALUES
-    });
-  }).catch(() => {
-    res.send('Internal Server Error');
+// Anything rendered by our capturing service goes through here:
+app.get('/renderable/:view', (req, res) => {
+  res.render(req.params.view, {
+    data: decodeURIComponent(req.query.data)
   });
 });
 
-app.get('/:channel_id/clue', (req, res) => {
-  Game.forChannel({
-    channel_id: req.params.channel_id
-  }).then(game => {
-    res.render('clue', {
-      clue: game.getClue()
-    });
-  }).catch(() => {
-    res.send('Internal Server Error');
-  });
-});
-
-app.get('/:channel_id/dailydouble', (req, res) => {
-  res.render('dailydouble');
-});
-
-app.get('/image/:channel_id/:name', (req, res) => {
-  const pageres = new Pageres()
-    .src(`localhost:${config.PORT}/${req.params.channel_id}/${req.params.name}`, ['1200x654'], {crop: false, filename: `${req.params.channel_id}.${req.params.name}`})
-    .dest(join(__dirname, '..', 'images'));
-
-  console.time('Image Capture');
-  pageres.run((err, [item]) => {
-    console.timeEnd('Image Capture');
-    if (config.IMAGE_MIN) {
-      console.time('Image Minification');
-      new Imagemin()
-        .src(join(__dirname, '..', 'images', item.filename))
-        .dest(join(__dirname, '..', 'images'))
-        .use(Imagemin.optipng({optimizationLevel: config.IMAGE_MIN}))
-        .run(() => {
-          console.timeEnd('Image Minification');
-          res.send('ok');
-        });
-    } else {
-      res.send('ok');
-    }
-  });
-});
-
+// Boot up the jeopardy app:
 app.listen(config.PORT, () => {
   console.log(`Jeopardy Bot listening on port ${config.PORT}`);
 });

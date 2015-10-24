@@ -26,7 +26,7 @@ export async function getImageUrl({file, channel_id}) {
   return url;
 }
 
-async function upload(file, attempt = 1) {
+export async function upload(file, attempt = 1) {
   // Allow 3 retires to upload images to imgur:
   if (attempt > MAX_RETRIES) {
     throw new Error('Error uploading image. Max number');
