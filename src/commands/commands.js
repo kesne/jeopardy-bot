@@ -2,10 +2,10 @@ import moment from 'moment';
 import numeral from 'numeral';
 import {Contestant} from '../models/Contestant';
 import {Game} from '../models/Game';
-import {getImageUrl, upload} from '../upload';
+import {upload} from '../upload';
 import * as config from '../config';
 
-import {generateBoard, generateClue} from '../cola/generator';
+import {generateBoard, generateClue, generateDailydouble} from '../cola/generator';
 
 const formatter = '$0,0';
 const formatCurrency = value => {
@@ -301,10 +301,7 @@ export async function category({game, contestant, body, category, value}) {
 
   // You found a daily double!
   if (game.isDailyDouble()) {
-    const dailyDoubleUrl = await getImageUrl({
-      file: 'dailydouble',
-      channel_id: body.channel_id
-    });
+    const dailyDoubleUrl = await generateDailydouble();
 
     // Make sure that the daily double image displays before we do anything else:
     await this.send('Answer: Daily Double', dailyDoubleUrl);
@@ -319,7 +316,7 @@ export async function category({game, contestant, body, category, value}) {
       clue
     });
     const url = await upload(clueUrl);
-    
+
     // Mark that we're sending the clue now:
     await game.clueSent();
     this.send(`Here's your clue.`, url);

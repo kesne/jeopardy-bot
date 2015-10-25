@@ -26,8 +26,10 @@ const CLUE_HEIGHT = 124;
 // Pre-calcuated positions of columns
 const COLUMN_LOCATIONS = [6, 205, 404, 603, 802, 1001];
 
-export async function dailydouble() {
-  // TODO
+const dailyDoubleUrl = 'http://i.imgur.com/EqH6Fgw.png';
+export async function generateDailydouble() {
+  const random = Math.round(Math.random() * 1000000);
+  return `${dailyDoubleUrl}?random=${random}`;
 }
 
 export async function generateClue({game, clue}) {
