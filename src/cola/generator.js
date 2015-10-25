@@ -35,7 +35,7 @@ export async function generateDailydouble() {
 export async function generateClue({game, clue}) {
   return await capture({
     view: 'clue',
-    id: game.id,
+    id: `${game.id}_${clue.id}`,
     data: clue.question,
     channel_id: game.channel_id
   });

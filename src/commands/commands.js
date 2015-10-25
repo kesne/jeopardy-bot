@@ -263,7 +263,7 @@ export async function guess({game, contestant, body, guess}) {
       value,
       channel_id: body.channel_id
     });
-    this.send(`That is incorrect, ${contestant.name}. Your score is now ${formatCurrency(contestant.channelScore(body.channel_id).value)}.`);
+    await this.send(`That is incorrect, ${contestant.name}. Your score is now ${formatCurrency(contestant.channelScore(body.channel_id).value)}.`);
     // If the clue is a daily double, the game progresses
     if (game.isDailyDouble()) {
       this.send(`The correct answer is \`${clue.answer}\`.`);
