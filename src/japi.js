@@ -107,7 +107,7 @@ export async function generateGame() {
     try {
       game = await randomEpisode();
     } catch (e) {
-      console.log('Unable to generate game.');
+      console.log('Unable to generate game.', game);
       console.error(e);
     }
   } while (!game);

@@ -2,8 +2,10 @@ import moment from 'moment';
 import numeral from 'numeral';
 import {Contestant} from '../models/Contestant';
 import {Game} from '../models/Game';
-import {getImageUrl} from '../upload';
+import {upload} from '../upload';
 import * as config from '../config';
+
+import {generateBoard, generateClue, generateDailydouble} from '../cola/generator';
 
 const formatter = '$0,0';
 const formatCurrency = value => {
@@ -16,6 +18,8 @@ export function poke() {
 
 export function help() {
   this.send(`
+*Powered By _Cola_*
+
 Here, this should help you out!
 >>>*Games*
     “help” - Displays this helpful message.
@@ -76,13 +80,13 @@ export async function newgame({game, body}) {
   this.sendOptional('Starting a new game for you...');
 
   // Start the game:
-  await Game.start({
+  game = await Game.start({
     channel_id: body.channel_id
   });
-  const url = await getImageUrl({
-    file: 'board',
-    channel_id: body.channel_id
-  });
+
+  const boardFile = await generateBoard({game});
+  const url = await upload(boardFile);
+
   this.send(`Let's get this game started! Go ahead and select a category and value.`, url);
 }
 
@@ -116,12 +120,14 @@ export async function wager({game, contestant, body, value}) {
   // Stash the daily double wager:
   game.dailyDouble.wager = value;
 
+  const clueUrl = await generateClue({
+    game,
+    clue: game.getClue()
+  });
+
   // Parallelize for better performance:
   const [url] = await Promise.all([
-    getImageUrl({
-      file: 'clue',
-      channel_id: body.channel_id
-    }),
+    upload(clueUrl),
     game.save()
   ]);
 
@@ -207,10 +213,8 @@ export async function guess({game, contestant, body, guess}) {
       if (game.isComplete()) {
         this.send(`${ await endGameMessage({game, body}) }`);
       } else {
-        const url = await getImageUrl({
-          file: 'board',
-          channel_id: body.channel_id
-        });
+        const boardFile = await generateBoard({game});
+        const url = await upload(boardFile);
         this.send(`Select a new clue.`, url);
       }
     } else if (e.message.includes('contestant')) {
@@ -250,10 +254,8 @@ export async function guess({game, contestant, body, guess}) {
       this.send(`${ await endGameMessage({game, body}) }`);
     } else {
       // Get the new board url:
-      const url = await getImageUrl({
-        file: 'board',
-        channel_id: body.channel_id
-      });
+      const boardFile = await generateBoard({game});
+      const url = await upload(boardFile);
       this.send(`Select a new clue.`, url);
     }
   } else {
@@ -261,16 +263,14 @@ export async function guess({game, contestant, body, guess}) {
       value,
       channel_id: body.channel_id
     });
-    this.send(`That is incorrect, ${contestant.name}. Your score is now ${formatCurrency(contestant.channelScore(body.channel_id).value)}.`);
+    await this.send(`That is incorrect, ${contestant.name}. Your score is now ${formatCurrency(contestant.channelScore(body.channel_id).value)}.`);
     // If the clue is a daily double, the game progresses
     if (game.isDailyDouble()) {
       this.send(`The correct answer is \`${clue.answer}\`.`);
       // Mark answer as complete.
       await game.answer();
-      const url = await getImageUrl({
-        file: 'board',
-        channel_id: body.channel_id
-      });
+      const boardFile = await generateBoard({game});
+      const url = await upload(boardFile);
       this.send('Select a new clue.', url);
     }
   }
@@ -301,10 +301,7 @@ export async function category({game, contestant, body, category, value}) {
 
   // You found a daily double!
   if (game.isDailyDouble()) {
-    const dailyDoubleUrl = await getImageUrl({
-      file: 'dailydouble',
-      channel_id: body.channel_id
-    });
+    const dailyDoubleUrl = await generateDailydouble();
 
     // Make sure that the daily double image displays before we do anything else:
     await this.send('Answer: Daily Double', dailyDoubleUrl);
@@ -314,10 +311,12 @@ export async function category({game, contestant, body, category, value}) {
     // Give the user a little more feedback when we can:
     this.sendOptional(`OK, \`${game.getCategory().title}\` for ${formatCurrency(clue.value)}...`);
 
-    const url = await getImageUrl({
-      file: 'clue',
-      channel_id: body.channel_id
+    const clueUrl = await generateClue({
+      game,
+      clue
     });
+    const url = await upload(clueUrl);
+
     // Mark that we're sending the clue now:
     await game.clueSent();
     this.send(`Here's your clue.`, url);
@@ -345,10 +344,8 @@ export async function category({game, contestant, body, category, value}) {
             if (game.isComplete()) {
               this.sendOptional(await endGameMessage({game, body}));
             } else {
-              const url = await getImageUrl({
-                file: 'board',
-                channel_id: body.channel_id
-              });
+              const boardFile = await generateBoard({game});
+              const url = await upload(boardFile);
               this.sendOptional('Select a new clue.', url);
             }
           }

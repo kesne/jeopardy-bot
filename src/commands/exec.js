@@ -54,7 +54,8 @@ export async function exec(info) {
     }, info);
   } catch (e) {
     console.log('Command failed to execute.');
-    console.log(e);
+    console.log(e.message);
+    console.log(e.stack)
   }
   return response;
 }

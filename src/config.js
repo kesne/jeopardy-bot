@@ -21,11 +21,6 @@ if (MODE !== 'response' && MODE !== 'hybrid') {
   MODE = 'response';
 }
 
-export let IMAGE_MIN = 0;
-if (process.env.JBOT_IMAGE_MIN) {
-  IMAGE_MIN = Number(process.env.JBOT_IMAGE_MIN);
-}
-
 // A list of rooms that the bot will work in:
 export let ROOM_WHITELIST = process.env.JBOT_ROOMS || 'jeopardy';
 ROOM_WHITELIST = ROOM_WHITELIST.split(',');
