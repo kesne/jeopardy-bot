@@ -30,8 +30,8 @@ export async function dailydouble() {
   // TODO
 }
 
-export async function clue({game, clue}) {
-  capture({
+export async function generateClue({game, clue}) {
+  return await capture({
     view: 'clue',
     id: game.id,
     data: clue.question,
@@ -39,7 +39,7 @@ export async function clue({game, clue}) {
   });
 }
 
-export async function board({game}) {
+export async function generateBoard({game}) {
   const categoryImageFiles = await Promise.all(
     game.categories.map(category => (
       // TODO: Keep some cache of these?
