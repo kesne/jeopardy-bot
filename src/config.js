@@ -2,6 +2,14 @@
  * BOT CONFIGURATION:
  */
 
+export const AWS_KEY = process.env.AWS_KEY || '';
+export const AWS_SECRET_KEY = process.env.AWS_SECRET_KEY || '';
+
+export let AWS = false;
+if (AWS_KEY) {
+  AWS = true;
+}
+
 export const API_TOKEN = process.env.JBOT_API_TOKEN || '';
 
 // The mode the bot is in:

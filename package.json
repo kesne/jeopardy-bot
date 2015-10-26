@@ -16,6 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "adaro": "^1.0.0",
+    "aws-sdk": "^2.2.11",
     "babel": "^5.8.23",
     "babel-runtime": "^5.8.25",
     "body-parser": "^1.14.1",
