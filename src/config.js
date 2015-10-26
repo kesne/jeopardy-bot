@@ -34,8 +34,7 @@ export let ROOM_WHITELIST = process.env.JBOT_ROOMS || 'jeopardy';
 ROOM_WHITELIST = ROOM_WHITELIST.split(',');
 
 // The outgoing webhook token used to verify requests:
-export let VERIFY_TOKENS = process.env.JBOT_OUTGOING_WEBHOOK_TOKEN || '';
-VERIFY_TOKENS = VERIFY_TOKENS.split(',');
+export let VERIFY_TOKEN = process.env.JBOT_OUTGOING_WEBHOOK_TOKEN || '';
 
 // The username of the bot:
 export const USERNAME = process.env.JBOT_USERNAME || 'jeopardybot';

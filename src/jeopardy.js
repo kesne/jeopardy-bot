@@ -25,7 +25,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.post('/command', async (req, res) => {
   // Ignore unverified messages:
-  if (config.VERIFY_TOKENS && !config.VERIFY_TOKENS.includes(req.body.token)) {
+  if (config.VERIFY_TOKEN && config.VERIFY_TOKEN !== req.body.token) {
     return res.end();
   }
   // Ignore messages from ourself:
