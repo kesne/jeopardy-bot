@@ -7,7 +7,7 @@ import unidecode from 'unidecode';
 const {decode} = new AllHtmlEntities();
 
 function simplifyText(text) {
-  return unidecode(decode(text));
+  return unidecode(decode(text)).replace(/\\/g, '');
 }
 
 // Hard code number of seasons:
