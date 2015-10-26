@@ -167,7 +167,7 @@ export async function challenge({game, contestant, body, correct, start}) {
       });
       try {
         const {channelScore} = await game.endChallenge();
-        this.send(`Congrats, ${contestant}, your challenge has succeeded. Your score is now ${formatCurrency(channelScore.value)}.`);
+        this.send(`Congrats, ${contestant.name}, your challenge has succeeded. Your score is now ${formatCurrency(channelScore.value)}.`);
       } catch (e) {
         if (e.message.includes('min')) {
           this.send('The challenge failed. There were not enough votes. Carry on!');
