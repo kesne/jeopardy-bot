@@ -34,7 +34,7 @@ export async function exec(info) {
     await commands[info.command].call({
       async send(message, url = '') {
         if (config.MODE === 'response') {
-          response += `${message} ${url}\n`;
+          response += `${message} ${url} \n`;
         } else {
           await sendToSlack(info.body.channel_id, message, url);
         }
