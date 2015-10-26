@@ -20,51 +20,79 @@ s3.createBucket({
   ACL: 'public-read'
 });
 
-function uniqueKey(filename) {
-  const key = Math.round(Math.random() * 100000);
-  return `${key}_${basename(filename)}`;
-}
-
-export function s3Upload(filename) {
-  const uniqueFilename = uniqueKey(filename);
-  return new Promise((resolve, reject) => {
+function uploadToS3({filename, filepath}) {
+  return new Promise(resolve => {
     s3.upload({
       Bucket,
-      Key: uniqueFilename,
-      Body: createReadStream(filename),
+      Key: filename,
+      Body: createReadStream(filepath),
       // Images expire in 3 days to prevent too many files:
       Expires: moment().add(3, 'days').toDate()
-    }, (...args) => {
-      console.log(args);
-      s3.getSignedUrl('getObject', {
-        Bucket,
-        Key: uniqueFilename,
-        Expires: moment.duration(3, 'days').asMilliseconds()
-      }, (err, url) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(url);
-        }
-      });
+    }, resolve);
+  });
+}
+
+function getS3Url(filename) {
+  return new Promise((resolve, reject) => {
+    s3.getSignedUrl('getObject', {
+      Bucket,
+      Key: filename,
+      Expires: moment.duration(3, 'days').asMilliseconds()
+    }, (err, url) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(url);
+      }
     });
   });
 }
 
-export async function captureAllClues(game) {
-  const localFiles = await Promise.all(
-    game.questions.map(clue =>
-      generateClue({
-        game,
-        clue
-      })
-    )
-  );
-  await Promise.all(
-    localFiles.map(s3Upload)
-  );
+export function s3Upload(filepath) {
+  const filename = basename(filepath);
+  return uploadToS3({
+    filename,
+    filepath
+  }).then(() => {
+    return getS3Url(filename);
+  });
 }
 
-export function imageForClue() {
-  
+export async function captureAllClues(game) {
+  game.questions.forEach(clue => {
+    setTimeout(async () => {
+      const filepath = await generateClue({
+        game,
+        clue
+      });
+      const filename = basename(filepath);
+      return await uploadToS3({
+        filename,
+        filepath
+      });
+    }, 0);
+  });
+}
+
+export function imageForClue({game, clue}) {
+  return new Promise(resolve => {
+    // TODO: Move the filename generator into a module:
+    const filename = `${game.channel_id}.clue.${game.id}_${clue.id}.png`;
+    s3.headObject({
+      Bucket,
+      Key: filename
+    }, async (err, data) => {
+      if (err || !data) {
+        const filepath = await generateClue({
+          game,
+          clue
+        });
+        const url = await s3Upload(filepath);
+        resolve(url);
+      } else {
+        const url = await getS3Url(filename);
+        resolve(url);
+      }
+    });
+  });
 }
