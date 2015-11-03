@@ -313,7 +313,7 @@ export async function category({game, contestant, body, category, value}) {
     // Make sure that the daily double image displays before we do anything else:
     await this.send('Answer: Daily Double', dailyDoubleUrl);
     const channelScore = contestant.channelScore(body.channel_id).value;
-    this.send(`Your score is ${formatCurrency(channelScore)}. What would you like to wager, ${contestant.name}? (max of ${formatCurrency(Math.max(channelScore, clue.value))}, min of $5)`);
+    this.send(`Your score is ${formatCurrency(channelScore)}. What would you like to wager, @${contestant.name}? (max of ${formatCurrency(Math.max(channelScore, clue.value))}, min of $5)`);
     // TODO: Wager timeouts
   } else {
     const url = await clueImage({game});
