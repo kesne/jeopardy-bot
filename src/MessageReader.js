@@ -39,6 +39,9 @@ export function parse(text) {
   if (text === 'end game') {
     return {command: 'endgame'};
   }
+  if (text === 'loserboard') {
+    return {command: 'loserboard'};
+  }
   if (text === 'leaderboard') {
     return {command: 'leaderboard'};
   }
