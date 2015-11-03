@@ -290,9 +290,7 @@ export async function category({game, contestant, body, category, value}) {
       value
     });
   } catch (e) {
-    if (e.message.includes('already active')) {
-      this.send(`There's already an active clue. Wait your turn.`);
-    } else if (e.message.includes('value')) {
+    if (e.message.includes('value')) {
       this.send(`I'm sorry, I can't give you a clue for that value.`);
     } else if (e.message.includes('category')) {
       this.send(`I'm sorry, I don't know what category that is. Try being more specific.`);
@@ -305,18 +303,19 @@ export async function category({game, contestant, body, category, value}) {
 
   const clue = game.getClue();
 
+  // Give the user a little more feedback when we can:
+  this.sendOptional(`OK, \`${game.getCategory().title}\` for ${formatCurrency(clue.value)}...`);
+
   // You found a daily double!
   if (game.isDailyDouble()) {
     const dailyDoubleUrl = await dailydoubleImage();
 
     // Make sure that the daily double image displays before we do anything else:
     await this.send('Answer: Daily Double', dailyDoubleUrl);
-    this.send(`What would you like to wager, ${contestant.name}?`);
+    const channelScore = contestant.channelScore(body.channel_id).value;
+    this.send(`Your score is ${formatCurrency(channelScore)}. What would you like to wager, ${contestant.name}? (max of ${formatCurrency(Math.max(channelScore, clue.value))}, min of $5)`);
     // TODO: Wager timeouts
   } else {
-    // Give the user a little more feedback when we can:
-    this.sendOptional(`OK, \`${game.getCategory().title}\` for ${formatCurrency(clue.value)}...`);
-
     const url = await clueImage({game});
 
     // Mark that we're sending the clue now:
