@@ -51,7 +51,7 @@ export async function loserboard() {
 > _${formatCurrency(contestant.stats.money)}_ *|* _${contestant.stats.won} wins_ *|* _${contestant.stats.lost} losses_`
   ));
 
-  this.send(`Let's take a look at the bottom 10 players:\n\n${leaders.join('\n')}`);
+  this.send(`Let's take a look at the bottom ${leaders.length} players:\n\n${leaders.join('\n')}`);
 }
 
 export async function leaderboard() {
@@ -67,7 +67,7 @@ export async function leaderboard() {
 > _${formatCurrency(contestant.stats.money)}_ *|* _${contestant.stats.won} wins_ *|* _${contestant.stats.lost} losses_`
   ));
 
-  this.send(`Let's take a look at the top 10 players:\n\n${leaders.join('\n')}`);
+  this.send(`Let's take a look at the top ${leaders.length} players:\n\n${leaders.join('\n')}`);
 }
 
 export async function scores({body}) {
