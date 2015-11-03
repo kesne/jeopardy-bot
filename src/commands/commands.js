@@ -2,8 +2,8 @@ import moment from 'moment';
 import numeral from 'numeral';
 import {Contestant} from '../models/Contestant';
 import {Game} from '../models/Game';
-import * as config from '../config';
 import {boardImage, clueImage, dailydoubleImage, captureCluesForGame} from '../cola';
+import * as config from '../config';
 
 const formatter = '$0,0';
 const formatCurrency = value => {
@@ -16,8 +16,6 @@ export function poke() {
 
 export function help() {
   this.send(`
-*Powered By _Cola_*
-
 Here, this should help you out!
 >>>*Games*
     “help” - Displays this helpful message.
@@ -40,8 +38,24 @@ Here, this should help you out!
     “leaderboard” - Shows the scores and wins from all games.`);
 }
 
+export async function loserboard() {
+  const contestants = await Contestant.find().sort({'stats.money': 1}).limit(10);
+  if (contestants.length === 0) {
+    this.send('There are no losers yet. Go out there and play some games!');
+    return;
+  }
+
+  // Format the leaders:
+  const leaders = contestants.map((contestant, i) => (
+`${i + 1}. ${contestant.name}:
+> _${formatCurrency(contestant.stats.money)}_ *|* _${contestant.stats.won} wins_ *|* _${contestant.stats.lost} losses_`
+  ));
+
+  this.send(`Let's take a look at the bottom 10 players:\n\n${leaders.join('\n')}`);
+}
+
 export async function leaderboard() {
-  const contestants = await Contestant.find().sort({'stats.money': -1}).limit(5);
+  const contestants = await Contestant.find().sort({'stats.money': -1}).limit(10);
   if (contestants.length === 0) {
     this.send('There are no winners yet. Go out there and play some games!');
     return;
@@ -53,7 +67,7 @@ export async function leaderboard() {
 > _${formatCurrency(contestant.stats.money)}_ *|* _${contestant.stats.won} wins_ *|* _${contestant.stats.lost} losses_`
   ));
 
-  this.send(`Let's take a look at the top 5 players:\n\n${leaders.join('\n')}`);
+  this.send(`Let's take a look at the top 10 players:\n\n${leaders.join('\n')}`);
 }
 
 export async function scores({body}) {
