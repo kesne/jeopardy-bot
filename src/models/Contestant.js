@@ -53,6 +53,10 @@ export const schema = new Schema({
   }
 });
 
+schema.virtual('nonMentionedName').get(function() {
+  return `${this.name.charAt(0)}.${this.name.substring(1)}`;
+});
+
 schema.statics.get = async function({user_id: slackid, user_name: name}) {
   let user = await this.findOne({
     slackid

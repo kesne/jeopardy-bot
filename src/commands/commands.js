@@ -47,7 +47,7 @@ export async function loserboard() {
 
   // Format the leaders:
   const leaders = contestants.map((contestant, i) => (
-`${i + 1}. ${contestant.name}:
+`${i + 1}. ${contestant.nonMentionedName}:
 > _${formatCurrency(contestant.stats.money)}_ *|* _${contestant.stats.won} wins_ *|* _${contestant.stats.lost} losses_`
   ));
 
@@ -63,7 +63,7 @@ export async function leaderboard() {
 
   // Format the leaders:
   const leaders = contestants.map((contestant, i) => (
-`${i + 1}. ${contestant.name}:
+`${i + 1}. ${contestant.nonMentionedName}:
 > _${formatCurrency(contestant.stats.money)}_ *|* _${contestant.stats.won} wins_ *|* _${contestant.stats.lost} losses_`
   ));
 
