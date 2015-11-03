@@ -39,7 +39,7 @@ Here, this should help you out!
 }
 
 export async function loserboard() {
-  const contestants = await Contestant.find().sort({'stats.money': 1}).limit(10);
+  const contestants = await Contestant.find({'stats.money': {$lt: 0}}).sort({'stats.money': 1}).limit(10);
   if (contestants.length === 0) {
     this.send('There are no losers yet. Go out there and play some games!');
     return;
@@ -55,7 +55,7 @@ export async function loserboard() {
 }
 
 export async function leaderboard() {
-  const contestants = await Contestant.find().sort({'stats.money': -1}).limit(10);
+  const contestants = await Contestant.find({'stats.money': {$gt: 0}}).sort({'stats.money': -1}).limit(10);
   if (contestants.length === 0) {
     this.send('There are no winners yet. Go out there and play some games!');
     return;
