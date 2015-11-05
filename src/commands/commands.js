@@ -173,6 +173,7 @@ export async function challenge({game, contestant, body, correct, start}) {
     if (autoChallengePass) {
       const {channelScore} = await game.endChallenge(true);
       this.send(`It looks like you're correct! Your score is now ${formatCurrency(channelScore.value)}.`);
+      return;
     }
 
     const contestantString = contestants.map(contestant => `@${contestant.name}`).join(', ');
