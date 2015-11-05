@@ -9,15 +9,20 @@ export default async function autoChallenge(answer, guess) {
   if (!GOOGLE_API_KEY) {
     return false;
   }
-  const [{items: [answerResult]}, {items: [guessResult]}] = await Promise.all([
-    fetch(`${URL_BASE}&q=${answer}`),
-    fetch(`${URL_BASE}&q=${guess}`)
-  ]);
+  try {
+    const [{items: [answerResult]}, {items: [guessResult]}] = await Promise.all([
+      fetch(`${URL_BASE}&q=${answer}`).then(res => res.json()),
+      fetch(`${URL_BASE}&q=${guess}`).then(res => res.json())
+    ]);
 
-  if (answerResult && guessResult) {
-    if (answerResult.link === guessResult.link) {
-      return true;
+    if (answerResult && guessResult) {
+      if (answerResult.link === guessResult.link) {
+        return true;
+      }
     }
+  } catch (e) {
+    console.log('Error with autochallenge occurred.');
+    console.log(e);
   }
   return false;
 }
