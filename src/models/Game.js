@@ -152,7 +152,7 @@ schema.methods.startChallenge = async function({contestant}) {
   }
 };
 
-schema.methods.endChallenge = async function() {
+schema.methods.endChallenge = async function(forceWin = false) {
   const slackid = this.challenge.active;
   const votes = this.challenge.votes;
   const question = this.challenge.question;
@@ -166,14 +166,14 @@ schema.methods.endChallenge = async function() {
   // Force a save:
   await this.save();
 
-  if (votes.length < config.CHALLENGE_MIN) {
+  if (!forceWin && votes.length < config.CHALLENGE_MIN) {
     throw new Error('min');
   }
   const yesVotes = votes.map(vote => vote.correct ? 1 : 0).reduce((prev, curr) => {
     return prev + curr;
   }, 0);
 
-  if ((yesVotes / votes.length) >= config.CHALLENGE_THRESHOLD) {
+  if (forceWin || (yesVotes / votes.length) >= config.CHALLENGE_THRESHOLD) {
     const contestant = await this.model('Contestant').findOne({
       slackid
     });

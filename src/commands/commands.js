@@ -1,5 +1,6 @@
 import moment from 'moment';
 import numeral from 'numeral';
+import autoChallenge from './autochallenge';
 import {Contestant} from '../models/Contestant';
 import {Game} from '../models/Game';
 import {boardImage, clueImage, dailydoubleImage, captureCluesForGame} from '../cola';
@@ -164,8 +165,18 @@ export async function challenge({game, contestant, body, correct, start}) {
       }),
       game.startChallenge({contestant})
     ]);
+
+    this.send('Let me think...');
+
+    // Attempt to resolve this automatically without resorting to asking the room:
+    const autoChallengePass = await autoChallenge(answer, guess);
+    if (autoChallengePass) {
+      const {channelScore} = await game.endChallenge(true);
+      this.send(`It looks like you're correct! Your score is now ${formatCurrency(channelScore.value)}.`);
+    }
+
     const contestantString = contestants.map(contestant => `@${contestant.name}`).join(', ');
-    this.send(`A challenge has been called on the last question.\nI thought the correct answer was \`${answer}\`, and the guess was \`${guess}\`.`);
+    this.send(`I'm not sure, let's see what the room thinks.\nI thought the correct answer was \`${answer}\`, and the guess was \`${guess}\`.`);
     this.send(`${contestantString}, do you think they were right? Respond with just "y" or "n" to vote.`);
 
     setTimeout(async () => {
