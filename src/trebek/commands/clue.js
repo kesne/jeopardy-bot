@@ -1,11 +1,12 @@
 import Command from '../Command';
 import {Trigger, Only, Provide, currency} from '../utils';
+import endgameMessage from './shared/endgame';
 import {boardImage, dailydoubleImage, clueImage} from '../../cola';
 import * as config from '../../config';
 
 @Trigger(
   /(?:ill take |give me |choose )?(.*) for (\d{3,4})(?: alex| trebek)?/,
-  'same'
+  /(same)/
 )
 @Only(
   'gameactive',
@@ -14,7 +15,8 @@ import * as config from '../../config';
 @Provide(
   'games',
   'game',
-  'contestant'
+  'contestant',
+  'channelContestants'
 )
 class Clue extends Command {
   async response([category, value], [sameLowest]) {
@@ -57,7 +59,8 @@ class Clue extends Command {
       // Make sure that the daily double image displays before we do anything else:
       await this.say('Answer: Daily Double', dailyDoubleUrl);
       const channelScore = this.contestant.channelScore(this.data.channel_id).value;
-      this.say(`Your score is ${currency(channelScore)}. What would you like to wager, @${this.contestant.name}? (max of ${currency(Math.max(channelScore, clue.value))}, min of $5)`);
+      this.say(`Your score is ${currency(channelScore)}. What would you like to wager, @${this.contestant.name}?` +
+               `(max of ${currency(Math.max(channelScore, clue.value))}, min of $5)`);
       // TODO: Wager timeouts
     } else {
       const url = await clueImage({
@@ -71,14 +74,15 @@ class Clue extends Command {
       // Additional feedback after we timeout (plus five seconds for some flexibility):
       if (config.MODE !== 'response') {
         setTimeout(async () => {
+          console.log('Made it to async timeout');
           // Grab the lock so we block incoming requests:
           await this.lock();
-          // We need to refresh the document because it could be outdated:
-          const game = await this.games.forChannel({
-            channel_id: game.channel_id
-          });
           // Try to be safe and unlock even when we fail:
           try {
+            // We need to refresh the document because it could be outdated:
+            const game = await this.games.forChannel({
+              channel_id: this.game.channel_id
+            });
             if (game.isTimedOut()) {
               // Get the current clue:
               const clue = game.getClue();
@@ -89,7 +93,7 @@ class Clue extends Command {
               this.sayOptional(`Time's up! The correct answer is \`${clue.answer}\`.`);
 
               if (game.isComplete()) {
-                // this.sayOptional(await endGameMessage({game, body}));
+                this.sayOptional(await endgameMessage(this.game, this.channelContestants, this.data.channel_id));
               } else {
                 const url = await boardImage({game});
                 this.sayOptional('Select a new clue.', url);

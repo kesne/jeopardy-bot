@@ -86,7 +86,7 @@ export default class Challenge extends Command {
         await this.lock();
         // We need to refresh the document because it could be outdated:
         const game = await this.games.forChannel({
-          channel_id: game.channel_id
+          channel_id: this.game.channel_id
         });
         try {
           const {channelScore} = await game.endChallenge();
