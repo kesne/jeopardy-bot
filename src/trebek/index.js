@@ -35,6 +35,7 @@ export default async function(input, data = {}) {
   } catch (e) {
     // Log all errors, at the risk of being noisy:
     console.log(e);
+    console.log(e.stack);
   } finally {
     if (!Command.nolock) {
       await unlock(data.channel_id);
