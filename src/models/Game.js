@@ -421,6 +421,9 @@ schema.methods.guess = async function({contestant, guess}) {
     }
 
     // String matching:
+    if (guess === answer) {
+      return true;
+    }
     const similarity = DiceCoefficient(guess, answer);
     if (similarity >= config.ACCEPTED_SIMILARITY) {
       return true;
