@@ -333,7 +333,7 @@ schema.methods.newClue = async function({category, value, contestant}) {
       }
       return 0;
     }).filter(x => {
-      return x.rank > 0.5;
+      return x.rank > 0.4;
     })[0];
 
     // If we can extract a category from the input, let's use it:

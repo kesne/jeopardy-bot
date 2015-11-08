@@ -7,6 +7,7 @@ const commands = Object.keys(commandObject)
   .filter(n => typeof n === 'function');
 
 export default async function(input, data = {}) {
+  // TODO: Strip punctuation, trim, lowercase, space normalize.
   input = input.toLowerCase();
 
   let Command;
@@ -32,6 +33,7 @@ export default async function(input, data = {}) {
     await command.promise;
     returnValue = command.message;
   } catch (e) {
+    // Log all errors, at the risk of being noisy:
     console.log(e);
   } finally {
     if (!Command.nolock) {

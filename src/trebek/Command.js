@@ -87,7 +87,7 @@ export default class Command {
       if (m !== null) {
         valid = true;
       }
-      return m && m.slice(1);
+      return m ? m.slice(1) : [];
     });
 
     return {
