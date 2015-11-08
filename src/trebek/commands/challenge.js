@@ -1,7 +1,11 @@
-// TODO: Autochallenge
+import fetch from 'node-fetch';
 import Command from '../Command';
 import {Trigger, Only, Provide, currency} from '../utils';
 import * as config from '../../config';
+
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
+const cx = '013673686761662547163:nw_cf3t8esg';
+const URL_BASE = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${cx}`;
 
 @Trigger(
   /(challenge)|(y)|(n)/
@@ -18,6 +22,29 @@ import * as config from '../../config';
   'contestant'
 )
 export default class Challenge extends Command {
+  async autoChallenge(answer, guess) {
+    // We can only auto challenge if we have an API key:
+    if (!GOOGLE_API_KEY) {
+      return false;
+    }
+    try {
+      const [{items: [answerResult]}, {items: [guessResult]}] = await Promise.all([
+        fetch(`${URL_BASE}&q=${answer}`).then(res => res.json()),
+        fetch(`${URL_BASE}&q=${guess}`).then(res => res.json())
+      ]);
+
+      if (answerResult && guessResult) {
+        if (answerResult.link === guessResult.link) {
+          return true;
+        }
+      }
+    } catch (e) {
+      console.log('Error with autochallenge occurred.');
+      console.log(e);
+    }
+    return false;
+  }
+
   async response([challenge, yes]) {
     if (!challenge && this.game.isChallengeStarted()) {
       const correct = Boolean(yes);
@@ -40,8 +67,19 @@ export default class Challenge extends Command {
           contestant: this.contestant
         })
       ]);
+
+      await this.say('Let me think...');
+
+      // Attempt to resolve this automatically without resorting to asking the room:
+      const autoChallengePass = await this.autoChallenge(answer, guess);
+      if (autoChallengePass) {
+        const {channelScore} = await this.game.endChallenge(true);
+        this.send(`It looks like you're correct! Your score is now ${currency(channelScore.value)}.`);
+        return;
+      }
+
       const contestantString = contestants.map(contestant => `@${contestant.name}`).join(', ');
-      await this.say(`A challenge has been called on the last question.\nI thought the correct answer was \`${answer}\`, and the guess was \`${guess}\`.`);
+      await this.say(`I'm not sure, let's see what the room thinks.\nI thought the correct answer was \`${answer}\`, and the guess was \`${guess}\`.`);
       await this.say(`${contestantString}, do you think they were right? Respond with just "y" or "n" to vote.`);
 
       setTimeout(async () => {

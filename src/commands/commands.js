@@ -1,9 +1,208 @@
 import moment from 'moment';
 import numeral from 'numeral';
+import autoChallenge from './autochallenge';
 import {Contestant} from '../models/Contestant';
 import {Game} from '../models/Game';
 import {boardImage, clueImage, dailydoubleImage, captureCluesForGame} from '../cola';
 import * as config from '../config';
+
+const formatter = '$0,0';
+const formatCurrency = value => {
+  return numeral(value).format(formatter);
+};
+
+export function poke() {
+  this.send(`I'm here, I'm here...`);
+}
+
+export function help() {
+  this.send(`
+Here, this should help you out!
+>>>*Games*
+    “help” - Displays this helpful message.
+    “new game” - Starts a new game.
+    “end game” - Ends the current game.
+*Selecting Categories*
+    “I’ll take ________ for $___”
+    “Give me ________ for $___”
+    “Choose ________ for $___”
+    “ ________ for $___”
+    “Same (category) for $___”
+*Guessing*
+    “What [is|are] _______”
+    “Who [is|are] ________”
+    “Where [is|are] ______”
+*Wagering*
+    “$___”
+*Scores*
+    “scores” - Shows the score for the current game.
+    “leaderboard” - Shows the scores and wins from all games.`);
+}
+
+export async function loserboard() {
+  const contestants = await Contestant.find({'stats.money': {$lt: 0}}).sort({'stats.money': 1}).limit(10);
+  if (contestants.length === 0) {
+    this.send('There are no losers yet. Go out there and play some games!');
+    return;
+  }
+
+  // Format the leaders:
+  const leaders = contestants.map((contestant, i) => (
+`${i + 1}. ${contestant.nonMentionedName}:
+> _${formatCurrency(contestant.stats.money)}_ *|* _${contestant.stats.won} wins_ *|* _${contestant.stats.lost} losses_`
+  ));
+
+  this.send(`Let's take a look at the bottom ${leaders.length} players:\n\n${leaders.join('\n')}`);
+}
+
+export async function leaderboard() {
+  const contestants = await Contestant.find({'stats.money': {$gt: 0}}).sort({'stats.money': -1}).limit(10);
+  if (contestants.length === 0) {
+    this.send('There are no winners yet. Go out there and play some games!');
+    return;
+  }
+
+  // Format the leaders:
+  const leaders = contestants.map((contestant, i) => (
+`${i + 1}. ${contestant.nonMentionedName}:
+> _${formatCurrency(contestant.stats.money)}_ *|* _${contestant.stats.won} wins_ *|* _${contestant.stats.lost} losses_`
+  ));
+
+  this.send(`Let's take a look at the top ${leaders.length} players:\n\n${leaders.join('\n')}`);
+}
+
+export async function scores({body}) {
+  const leaders = await scoresMessage({body});
+
+  if (!leaders) {
+    this.send('There are no scores yet!');
+    return;
+  }
+
+  await this.send('Here are the current scores for this game:');
+
+  this.send(`\n\n${leaders}`);
+}
+
+export async function newgame({game, body}) {
+  if (game && !game.isComplete()) {
+    this.send('It looks like a game is already in progress! You need to finish or end that one first before starting a new game.');
+    return;
+  }
+
+  this.sendOptional('Starting a new game for you...');
+
+  // Start the game:
+  game = await Game.start({
+    channel_id: body.channel_id
+  });
+
+  const url = await boardImage({game});
+
+  // Kick off clue capturing. We don't await this because we want it to happen in the background.
+  captureCluesForGame({game});
+
+  this.send(`Let's get this game started! Go ahead and select a category and value.`, url);
+}
+
+export async function endgame({game}) {
+  if (!game) {
+    this.send(`There's no game in progress. You can always start a new game by typing "new game".`);
+    return;
+  }
+  // Try to end the game:
+  await game.end();
+  this.send(`Alright, I've ended that game for you. You can always start a new game by typing "new game".`);
+}
+
+// For daily doubles:
+export async function wager({game, contestant, body, value}) {
+  // Sanity check (this function is easy to trigger accidently):
+  if (!game || !game.isDailyDouble() || game.dailyDouble.contestant !== contestant.slackid || game.dailyDouble.wager) {
+    return;
+  }
+  // Validate the value of the wager:
+  if (value < 5) {
+    this.send('That wager is too low.');
+    return;
+  }
+  // Wager must be less than or equal to the value of the clue, or all of your money.
+  if (value > contestant.channelScore(body.channel_id).value && value > game.getClue().value) {
+    this.send('That wager is too high.');
+    return;
+  }
+
+  // Stash the daily double wager:
+  game.dailyDouble.wager = value;
+
+  // Parallelize for better performance:
+  const [url] = await Promise.all([
+    clueImage({game}),
+    game.save()
+  ]);
+
+  // TODO: Daily Double timeouts
+  this.send(`For ${formatCurrency(value)}, here's your clue.`, url);
+}
+
+// TODO: Environment variable to enable challenges.
+// TODO: Challenges are only available in hybrid mode. Make sure that's documented and set.
+export async function challenge({game, contestant, body, correct, start}) {
+  if (!start && game.isChallengeStarted()) {
+    // Register the vote if we haven't already voted:
+    const hasVoted = game.challenge.votes.some(vote => vote.contestant === contestant.slackid);
+    if (!hasVoted) {
+      game.challenge.votes.push({
+        contestant: contestant.slackid,
+        correct
+      });
+      await game.save();
+    }
+  } else if (start && !game.isChallengeStarted()) {
+    const [contestants, {guess, answer}] = await Promise.all([
+      Contestant.find().where('scores').elemMatch({
+        channel_id: body.channel_id
+      }),
+      game.startChallenge({contestant})
+    ]);
+
+    this.send('Let me think...');
+
+    // Attempt to resolve this automatically without resorting to asking the room:
+    const autoChallengePass = await autoChallenge(answer, guess);
+    if (autoChallengePass) {
+      const {channelScore} = await game.endChallenge(true);
+      this.send(`It looks like you're correct! Your score is now ${formatCurrency(channelScore.value)}.`);
+      return;
+    }
+
+    const contestantString = contestants.map(contestant => `@${contestant.name}`).join(', ');
+    this.send(`I'm not sure, let's see what the room thinks.\nI thought the correct answer was \`${answer}\`, and the guess was \`${guess}\`.`);
+    this.send(`${contestantString}, do you think they were right? Respond with just "y" or "n" to vote.`);
+
+    setTimeout(async () => {
+      await this.lock();
+      // We need to refresh the document because it could be outdated:
+      game = await Game.forChannel({
+        channel_id: game.channel_id
+      });
+      try {
+        const {channelScore} = await game.endChallenge();
+        this.send(`Congrats, ${contestant.name}, your challenge has succeeded. Your score is now ${formatCurrency(channelScore.value)}.`);
+      } catch (e) {
+        if (e.message.includes('min')) {
+          this.send('The challenge failed. There were not enough votes. Carry on!');
+        } else if (e.message.includes('votes')) {
+          this.send('The challenge failed. Not enough people agreed. Carry on!');
+        } else {
+          console.log('Unknown challenge error...', e);
+        }
+      } finally {
+        this.unlock();
+      }
+    }, (config.CHALLENGE_TIMEOUT + 1) * 1000);
+  }
+}
 
 export async function guess({game, contestant, body, guess}) {
   // Cache the clue reference:
@@ -96,7 +295,7 @@ export async function guess({game, contestant, body, guess}) {
 }
 
 export async function category({game, contestant, body, category, value}) {
-  
+
 }
 
 async function scoresMessage({body}) {
