@@ -28,6 +28,7 @@
       width: 600px;
       margin: 0 auto;
       position: absolute;
+      font-weight: bold;
       top: 50%;
       left: 50%;
       white-space: pre-line;
