@@ -74,7 +74,6 @@ class Clue extends Command {
       // Additional feedback after we timeout (plus five seconds for some flexibility):
       if (config.MODE !== 'response') {
         setTimeout(async () => {
-          console.log('Made it to async timeout');
           // Grab the lock so we block incoming requests:
           await this.lock();
           // Try to be safe and unlock even when we fail:

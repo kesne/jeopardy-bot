@@ -8,7 +8,7 @@ const cx = '013673686761662547163:nw_cf3t8esg';
 const URL_BASE = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${cx}`;
 
 @Trigger(
-  /(challenge)|(y)|(n)/
+  /^(challenge)$|^(y)$|^(n)$/
 )
 @Only(
   'gameactive',
