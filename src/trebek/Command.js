@@ -96,6 +96,7 @@ export default class Command {
     };
   }
 
+  // TODO: Promise.all this to speed it up:
   async getProviders() {
     const provides = {};
     const providers = this.constructor.providers || [];
@@ -109,6 +110,11 @@ export default class Command {
         val = Contestant;
       }
       // Values:
+      if (provide === 'channelContestants') {
+        val = await Contestant.find().where('scores').elemMatch({
+          channel_id: this.data.channel_id
+        });
+      }
       if (provide === 'game') {
         val = await Game.forChannel(this.data);
       }

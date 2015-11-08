@@ -1,6 +1,7 @@
 import moment from 'moment';
 import Command from '../Command';
 import {Trigger, Only, Provide, currency} from '../utils';
+import endgameMessage from './shared/endgame';
 import {boardImage} from '../../cola';
 import * as config from '../../config';
 
@@ -10,7 +11,7 @@ import * as config from '../../config';
 )
 @Provide(
   'game',
-  'contestants',
+  'channelContestants',
   'contestant',
 )
 @Only(
@@ -51,8 +52,7 @@ class Guess extends Command {
         await this.say(`Time's up, ${this.contestant.name}! Remember, you have ${config.CLUE_TIMEOUT} seconds to answer. The correct answer is \`${clue.answer}\`.`);
 
         if (this.game.isComplete()) {
-          // TODO: Shared end game message:
-          // this.say(`${ await endGameMessage({game, body}) }`);
+          this.say(`${ await endgameMessage(this.game, this.channelContestants, this.data.channel_id) }`);
         } else {
           const url = await boardImage({
             game: this.game
@@ -93,7 +93,7 @@ class Guess extends Command {
       await this.say(`That is correct, ${this.contestant.name}. Your score is ${currency(this.contestant.channelScore(this.data.channel_id).value)}.`);
 
       if (this.game.isComplete()) {
-        // this.say(`${ await endGameMessage({game, body}) }`);
+        this.say(`${ await endgameMessage(this.game, this.channelContestants, this.data.channel_id) }`);
       } else {
         // Get the new board url:
         const url = await boardImage({

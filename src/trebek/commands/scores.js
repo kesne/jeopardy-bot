@@ -5,14 +5,10 @@ import scoresMessage from './shared/scores';
 @NoLock
 @Trigger('scores')
 @Only('gameactive')
-@Provide('game', 'contestants')
+@Provide('game', 'channelContestants')
 export default class Scores extends Command {
   async response() {
-    const contestants = await this.contestants.find().where('scores').elemMatch({
-      channel_id: this.data.channel_id
-    });
-
-    const leaders = scoresMessage(contestants, this.data.channel_id);
+    const leaders = scoresMessage(this.channelContestants, this.data.channel_id);
 
     if (!leaders) {
       this.say('There are no scores yet!');
