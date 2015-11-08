@@ -464,4 +464,4 @@ schema.methods.answer = function() {
   return this.save();
 };
 
-export const Game = model('Game', schema);
+export default model('Game', schema);
