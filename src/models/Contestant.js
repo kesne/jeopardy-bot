@@ -121,4 +121,4 @@ schema.methods.endGame = function({channel_id, won, lost}) {
   return this.save();
 };
 
-export const Contestant = model('Contestant', schema);
+export default model('Contestant', schema);

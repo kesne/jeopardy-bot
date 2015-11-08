@@ -2,14 +2,13 @@ import 'babel/polyfill';
 import mongoose from 'mongoose';
 import express from 'express';
 import bodyParser from 'body-parser';
-import {lock, unlock} from './commands/locks';
 import {join} from 'path';
 import {dust} from 'adaro';
 
-import {read} from './MessageReader';
-import {exec} from './commands/exec';
-import {Game} from './models/Game';
-import {Contestant} from './models/Contestant';
+import trebek from './trebek';
+import {lock, unlock} from './trebek/locks';
+import Game from './models/Game';
+import Contestant from './models/Contestant';
 import * as config from './config';
 
 mongoose.connect(config.MONGO);
@@ -33,59 +32,28 @@ app.post('/command', async (req, res) => {
     return res.end();
   }
 
-  // Try to parse the message:
-  const message = read(req.body);
-
-  // If we can't get a valid message out, just dump the request:
-  if (!message || !message.command) {
-    return res.end();
+  let input = req.body.text;
+  // Parse out the trigger word:
+  if (req.body.trigger_word) {
+    const replacer = new RegExp(req.body.trigger_word, '');
+    input = input.replace(replacer, '');
   }
-  req.message = message;
-
-  const channel_id = req.body.channel_id;
 
   try {
-    await lock(channel_id);
-
-    // Hold the channel (block other requests from processing):
-    const response = await handleRequest(req);
-
+    const response = await trebek(input, req.body);
     if (response) {
-      res.json(response);
+      res.json({
+        username: config.USERNAME,
+        icon_emoji: ':jbot:',
+        text: response
+      });
     } else {
       res.end();
     }
-
-    await unlock(channel_id);
   } catch (e) {
-    console.log(e);
-    console.log(e.stack);
+    res.end();
   }
 });
-
-async function handleRequest(req) {
-  // Load the current game and the contestant into the request:
-  const [contestant, game] = await Promise.all([
-    Contestant.get(req.body),
-    Game.forChannel(req.body)
-  ]);
-
-  const text = await exec({
-    body: req.body,
-    contestant,
-    game,
-    // Spread the parsed request text into this object:
-    ...req.message
-  });
-
-  if (text) {
-    return {
-      username: config.USERNAME,
-      icon_emoji: ':jbot:',
-      text
-    };
-  }
-}
 
 // Heroku landing page:
 app.get('/welcome', (req, res) => {

@@ -4,7 +4,7 @@ import {Schema, model} from 'mongoose';
 import {DiceCoefficient, JaroWinklerDistance} from 'natural';
 
 import {generateGame} from '../japi';
-import {clean} from '../MessageReader';
+import {clean} from '../trebek/utils';
 import * as config from '../config';
 
 export const schema = new Schema({
@@ -333,7 +333,7 @@ schema.methods.newClue = async function({category, value, contestant}) {
       }
       return 0;
     }).filter(x => {
-      return x.rank > 0.5;
+      return x.rank > 0.4;
     })[0];
 
     // If we can extract a category from the input, let's use it:
@@ -464,4 +464,4 @@ schema.methods.answer = function() {
   return this.save();
 };
 
-export const Game = model('Game', schema);
+export default model('Game', schema);
