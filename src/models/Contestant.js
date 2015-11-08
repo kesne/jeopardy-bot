@@ -66,6 +66,8 @@ schema.statics.get = async function({user_id: slackid, user_name: name}) {
       name,
       slackid
     });
+  } else if (user.name !== name) {
+    user.name = name;
   }
   return user;
 };
