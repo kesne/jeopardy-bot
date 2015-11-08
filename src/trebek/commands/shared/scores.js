@@ -3,6 +3,7 @@ import {currency} from '../../utils';
 export default function scoresMessage(contestants, channel_id) {
   return contestants.map(contestant => {
     contestant._score = contestant.channelScore(channel_id).value;
+    return contestant;
   }).sort((a, b) => {
     if (b._score > a._score) {
       return 1;

@@ -16,10 +16,7 @@ export default class Command {
       this.data = data;
       this.matches = matches;
 
-      this.promise = this.getProviders().then(providers => {
-        // Load in data from our providers:
-        Object.assign(this, providers);
-
+      this.promise = this.getProviders().then(() => {
         // Finally, perform our requirement checks:
         this.checkRequirements();
 
@@ -96,34 +93,35 @@ export default class Command {
     };
   }
 
-  // TODO: Promise.all this to speed it up:
   async getProviders() {
-    const provides = {};
     const providers = this.constructor.providers || [];
-    for (const provide of providers) {
-      let val;
+    await Promise.all(providers.map(provide => {
       // Models:
       if (provide === 'games') {
-        val = Game;
+        this.games = Game;
       }
       if (provide === 'contestants') {
-        val = Contestant;
+        this.contestants = Contestant;
       }
       // Values:
       if (provide === 'channelContestants') {
-        val = await Contestant.find().where('scores').elemMatch({
+        return Contestant.find().where('scores').elemMatch({
           channel_id: this.data.channel_id
+        }).then(contestants => {
+          this.channelContestants = contestants;
         });
       }
       if (provide === 'game') {
-        val = await Game.forChannel(this.data);
+        return Game.forChannel(this.data).then(game => {
+          this.game = game;
+        });
       }
       if (provide === 'contestant') {
-        val = await Contestant.get(this.data);
+        return Contestant.get(this.data).then(contestant => {
+          this.contestant = contestant;
+        });
       }
-      provides[provide] = val;
-    }
-    return provides;
+    }));
   }
 
   checkRequirements() {
