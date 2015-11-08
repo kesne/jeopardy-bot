@@ -5,6 +5,17 @@ export function currency(value) {
   return numeral(value).format(formatter);
 }
 
+export function clean(text) {
+  text = text.toLowerCase().trim();
+  // Replace double spaces with single spaces:
+  text = text.replace(/ {2,}/g, ' ');
+  // Strip out punctuation:
+  text = text.replace(/['"“”’\-\.,!;:—]/g, '');
+  // Ampersands are hard:
+  text = text.replace(/&/g, 'and');
+  return text;
+}
+
 const VALID_REQUIREMENTS = [
   'gameactive',
   'gameinactive',

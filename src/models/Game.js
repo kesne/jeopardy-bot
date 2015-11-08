@@ -4,7 +4,7 @@ import {Schema, model} from 'mongoose';
 import {DiceCoefficient, JaroWinklerDistance} from 'natural';
 
 import {generateGame} from '../japi';
-import {clean} from '../MessageReader';
+import {clean} from '../trebek/utils';
 import * as config from '../config';
 
 export const schema = new Schema({
