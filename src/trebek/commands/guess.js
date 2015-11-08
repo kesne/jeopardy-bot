@@ -90,7 +90,7 @@ class Guess extends Command {
         this.game.answer()
       ]);
 
-      await this.say(`That is correct, ${this.contestant.name}. Your score is ${currency(this.contestant.channelScore(this.data.channel_id).value)}.`);
+      await this.say(`That is correct, ${this.contestant.name}. The answer was ${clue.answer}.\nYour score is ${currency(this.contestant.channelScore(this.data.channel_id).value)}.`);
 
       if (this.game.isComplete()) {
         this.say(`${ await endgameMessage(this.game, this.channelContestants, this.data.channel_id) }`);
