@@ -1,5 +1,6 @@
 import requireDir from 'require-dir';
 import {lock, unlock} from './locks';
+import {clean} from './utils';
 
 const commandObject = requireDir('./commands');
 const commands = Object.keys(commandObject)
@@ -7,8 +8,7 @@ const commands = Object.keys(commandObject)
   .filter(n => typeof n === 'function');
 
 export default async function(input, data = {}) {
-  // TODO: Strip punctuation, trim, lowercase, space normalize.
-  input = input.toLowerCase();
+  input = clean(input);
 
   let Command;
   let command;
