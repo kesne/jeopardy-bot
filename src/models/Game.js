@@ -320,10 +320,12 @@ schema.methods.newClue = async function({category, value, contestant}) {
   if (category === '--same--' && this.lastCategory) {
     selectedCategory = this.lastCategory;
   } else {
+    // Easier to match cleaned versions of our input:
+    category = clean(category);
     const cc = this.categories.map(cat => {
       return {
         id: cat.id,
-        rank: DiceCoefficient(cat.title, category)
+        rank: DiceCoefficient(clean(cat.title), category)
       };
     }).sort((a, b) => {
       if (a.rank > b.rank) {
