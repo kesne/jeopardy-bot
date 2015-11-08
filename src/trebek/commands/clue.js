@@ -5,7 +5,7 @@ import {boardImage, dailydoubleImage, clueImage} from '../../cola';
 import * as config from '../../config';
 
 @Trigger(
-  /(?:ill take |give me |choose )?(.*) for (\d{3,4})(?: alex| trebek)?/,
+  /(?:ill take |give me |choose )?(.*) for \$?(\d{3,4})(?: alex| trebek)?/,
   /(same)/
 )
 @Only(

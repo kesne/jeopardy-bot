@@ -26,8 +26,9 @@ class Help extends Command {
     “(I'll) wager $___”
     “$___”
 *Scores*
-    “scores” - Shows the score for the current game.
-    “leaderboard” - Shows the scores and wins from all games.`
+    “scores” - Shows the scores for the current game.
+    “leaderboard” - Shows the scores for the top players.
+    “loserboard” - Shows the scores for the bottom players.`
     );
   }
 }

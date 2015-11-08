@@ -21,7 +21,7 @@ export default class Loserboard extends Command {
     } else {
       const leaders = contestants.map((contestant, i) => {
         return `${i + 1}. ${contestant.nonMentionedName}:` +
-        `> _${currency(contestant.stats.money)}_ *|* _${contestant.stats.won} wins_ *|* _${contestant.stats.lost} losses_`;
+        `\n> _${currency(contestant.stats.money)}_ *|* _${contestant.stats.won} wins_ *|* _${contestant.stats.lost} losses_`;
       });
       this.say(
         `Let's take a look at the bottom ${leaders.length} players:\n\n${leaders.join('\n')}`
