@@ -39,7 +39,7 @@ export default class Command {
 
   sayOptional(...args) {
     if (config.MODE !== 'response') {
-      return this.send(...args);
+      return this.say(...args);
     }
   }
 
