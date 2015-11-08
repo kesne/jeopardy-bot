@@ -144,10 +144,10 @@ export default class Command {
       return (this.game.isDailyDouble() && this.game.dailyDouble.contestant === this.contestant.slackid && !this.game.dailyDouble.wager);
     }
     if (requirement === 'clue') {
-      return this.game.liveClue();
+      return this.game.activeQuestion;
     }
     if (requirement === 'noclue') {
-      return !this.game.liveClue();
+      return !this.game.activeQuestion;
     }
   }
 
