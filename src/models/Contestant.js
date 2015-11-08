@@ -67,7 +67,9 @@ schema.statics.get = async function({user_id: slackid, user_name: name}) {
       slackid
     });
   } else if (user.name !== name) {
+    // Update their slack username because it's changed.
     user.name = name;
+    await user.save();
   }
   return user;
 };
