@@ -27,7 +27,7 @@ export default class Command {
         this.message = '';
 
         // If we make it here, then we have everything we need to process the response:
-        return this.response(matches);
+        return this.response(...matches);
       });
     }
   }
@@ -87,7 +87,7 @@ export default class Command {
       if (m !== null) {
         valid = true;
       }
-      return m;
+      return m && m.slice(1);
     });
 
     return {

@@ -1,6 +1,7 @@
 import Command from '../Command';
-import {Trigger} from '../utils';
+import {Trigger, NoLock} from '../utils';
 
+@NoLock
 @Trigger('help')
 class Help extends Command {
   response() {
@@ -20,7 +21,9 @@ class Help extends Command {
     “What [is|are] _______”
     “Who [is|are] ________”
     “Where [is|are] ______”
+    “When [is|are] ______”
 *Wagering*
+    “(I'll) wager $___”
     “$___”
 *Scores*
     “scores” - Shows the score for the current game.

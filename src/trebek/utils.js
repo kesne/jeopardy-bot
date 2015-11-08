@@ -1,3 +1,10 @@
+import numeral from 'numeral';
+
+const formatter = '$0,0';
+export function currency(value) {
+  return numeral(value).format(formatter);
+}
+
 const VALID_REQUIREMENTS = [
   'gameactive',
   'gameinactive',
@@ -19,7 +26,7 @@ export function Trigger(...messages) {
       if (message instanceof RegExp) {
         message = message.source;
       }
-      return new RegExp(`^${message}$`, 'gi');
+      return new RegExp(`^${message}$`, 'i');
     });
     Constructor.triggers = triggers;
   };
@@ -46,4 +53,8 @@ export function Only(...requirements) {
   return function(Constructor) {
     Constructor.requirements = requirements;
   };
+}
+
+export function NoLock(Constructor) {
+  Constructor.nolock = true;
 }

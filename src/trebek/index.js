@@ -8,25 +8,35 @@ const commands = Object.keys(commandObject)
 
 export default async function(input, data = {}) {
   input = input.toLowerCase();
-  const command = commands.find(Command => {
-    const command = new Command(input, data);
+
+  let Command;
+  let command;
+  for (Command of commands) {
+    command = new Command(input, data);
     if (command.valid) {
-      return command;
+      break;
     }
-  });
+  }
 
   if (!command) {
     return null;
   }
 
-  lock(data.channel_id);
+  // Some commands don't need locks, so don't waste our time with them:
+  if (!Command.nolock) {
+    await lock(data.channel_id);
+  }
 
   let returnValue = null;
   try {
     await command.promise;
     returnValue = command.message;
+  } catch (e) {
+    console.log(e);
   } finally {
-    unlock(data.channel_id);
+    if (!Command.nolock) {
+      await unlock(data.channel_id);
+    }
   }
 
   return returnValue;

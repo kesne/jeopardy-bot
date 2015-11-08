@@ -1,8 +1,9 @@
 import Command from '../Command';
-import {Trigger, Provide, currency} from '../utils';
+import {Trigger, Provide, NoLock, currency} from '../utils';
 
 const MAX_LOSERS = 10;
 
+@NoLock
 @Trigger('loserboard')
 @Provide('contestants')
 export default class Loserboard extends Command {

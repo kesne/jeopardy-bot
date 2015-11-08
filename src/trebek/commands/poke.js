@@ -1,6 +1,7 @@
 import Command from '../Command';
-import {Trigger} from '../utils';
+import {Trigger, NoLock} from '../utils';
 
+@NoLock
 @Trigger('poke')
 export default class Poke extends Command {
   response() {

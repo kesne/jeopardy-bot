@@ -1,9 +1,10 @@
 // TODO: Move leaders and losers into one module.
 import Command from '../Command';
-import {Trigger, Provide, currency} from '../utils';
+import {Trigger, Provide, NoLock, currency} from '../utils';
 
 const MAX_LEADERS = 10;
 
+@NoLock
 @Trigger('leaderboard')
 @Provide('contestants')
 export default class Leaderboard extends Command {

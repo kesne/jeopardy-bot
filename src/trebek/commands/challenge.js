@@ -7,6 +7,7 @@ import {Trigger, Only} from '../utils';
 @Only(
   'gameactive',
   'noclue'
+  // ,'challenge'
 )
 export default class Challenge extends Command {
   async response([challenge, yes, no]) {

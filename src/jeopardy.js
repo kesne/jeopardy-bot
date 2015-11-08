@@ -35,19 +35,22 @@ app.post('/command', async (req, res) => {
   let input = req.body.text;
   // Parse out the trigger word:
   if (req.body.trigger_word) {
-    const replacer = new RegExp(trigger_word, '');
+    const replacer = new RegExp(req.body.trigger_word, '');
     input = input.replace(replacer, '');
   }
 
-  const response = await trebek(input, req.body);
-
-  if (response) {
-    res.json({
-      username: config.USERNAME,
-      icon_emoji: ':jbot:',
-      text: response
-    });
-  } else {
+  try {
+    const response = await trebek(input, req.body);
+    if (response) {
+      res.json({
+        username: config.USERNAME,
+        icon_emoji: ':jbot:',
+        text: response
+      });
+    } else {
+      res.end();
+    }
+  } catch (e) {
     res.end();
   }
 });
