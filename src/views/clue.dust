@@ -22,7 +22,7 @@
       color: white;
       text-shadow: 3px 3px 3px rgba(0, 0, 0, 0.6);
       text-transform: uppercase;
-      font-family: "Korinna-Regular", serif;
+      font-family: "Korinna", serif;
       letter-spacing: 1px;
       font-size: 40px;
       width: 600px;
