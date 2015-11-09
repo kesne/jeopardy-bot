@@ -60,13 +60,25 @@ app.get('/welcome', (req, res) => {
   res.render('welcome');
 });
 
-// Anything rendered by our capturing service goes through here:
-app.get('/renderable/:view', (req, res) => {
-  const data = decodeURIComponent(req.query.data);
-  const datas = data.split('@@~~AND~~@@');
-  res.render(req.params.view, {
-    data,
+app.get('/renderable/categories', (req, res) => {
+  const datas = decodeURIComponent(req.query.data).split('@@~~AND~~@@');
+  res.render('categories', {
     datas
+  });
+});
+
+const clueExtra = /^\(([^)]+)\)/;
+app.get('/renderable/clue', (req, res) => {
+  let extra;
+  let data = decodeURIComponent(req.query.data);
+  const extraRegexResult = clueExtra.exec(data);
+  if (extraRegexResult) {
+    data = data.substring(extraRegexResult[0].length);
+    extra = extraRegexResult[1];
+  }
+  res.render('clue', {
+    data,
+    extra
   });
 });
 

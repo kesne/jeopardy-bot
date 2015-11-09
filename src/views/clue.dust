@@ -32,7 +32,19 @@
       top: 50%;
       left: 50%;
       white-space: pre-line;
+      overflow: hidden;
+      text-overflow: ellipsis;
       -webkit-transform: translateX(-50%) translateY(-50%);
+    }
+
+    .extra {
+      color: white;
+      opacity: 0.2;
+      font-size: 35px;
+      margin: 30px auto;
+      text-transform: uppercase;
+      font-family: "Korinna-Regular", serif;
+      width: 600px;
     }
 
     .full-width {
@@ -47,6 +59,11 @@
 
   <div class="full-width">
     <div class="clue-container">
+      {?extra}
+        <div class="extra">
+          {extra}
+        </div>
+      {/extra}
       <div class="clue">
         {data}
       </div>
