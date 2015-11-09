@@ -1,6 +1,7 @@
 import AWS from 'aws-sdk';
 import moment from 'moment';
 import {basename} from 'path';
+import {parallel} from 'async';
 import {createReadStream} from 'fs';
 import {generateClue} from './generator';
 import * as config from '../config';
@@ -59,19 +60,21 @@ export function s3Upload(filepath) {
 }
 
 export async function captureAllClues(game) {
-  game.questions.forEach(clue => {
-    setTimeout(async () => {
+  // Generate clues, 6 at a time:
+  parallel(game.questions.map(clue => {
+    return async function(callback) {
       const filepath = await generateClue({
         game,
         clue
       });
       const filename = basename(filepath);
-      return await uploadToS3({
+      await uploadToS3({
         filename,
         filepath
       });
-    }, 0);
-  });
+      callback();
+    };
+  }), 6);
 }
 
 export function imageForClue({game, clue}) {
