@@ -25,7 +25,7 @@ export default class Leaderboard extends Command {
         `\n> _${currency(contestant.stats.money)}_ *|* _${contestant.stats.won} wins_ *|* _${contestant.stats.lost} losses_`;
       });
       this.say(
-        `Let's take a look at the bottom ${leaders.length} players:\n\n${leaders.join('\n')}`
+        `Let's take a look at the top ${leaders.length} players:\n\n${leaders.join('\n')}`
       );
     }
   }
