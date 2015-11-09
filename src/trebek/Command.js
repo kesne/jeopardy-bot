@@ -105,8 +105,8 @@ export default class Command {
       }
       // Async values:
       if (provide === 'channelContestants') {
-        this.channelContestants = async () => {
-          Contestant.find().where('scores').elemMatch({
+        this.channelContestants = () => {
+          return Contestant.find().where('scores').elemMatch({
             channel_id: this.data.channel_id
           });
         };
