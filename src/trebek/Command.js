@@ -103,14 +103,15 @@ export default class Command {
       if (provide === 'contestants') {
         this.contestants = Contestant;
       }
-      // Values:
+      // Async values:
       if (provide === 'channelContestants') {
-        return Contestant.find().where('scores').elemMatch({
-          channel_id: this.data.channel_id
-        }).then(contestants => {
-          this.channelContestants = contestants;
-        });
+        this.channelContestants = async () => {
+          Contestant.find().where('scores').elemMatch({
+            channel_id: this.data.channel_id
+          });
+        };
       }
+      // Values:
       if (provide === 'game') {
         return Game.forChannel(this.data).then(game => {
           this.game = game;

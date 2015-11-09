@@ -52,7 +52,8 @@ class Guess extends Command {
         await this.say(`Time's up, ${this.contestant.name}! Remember, you have ${config.CLUE_TIMEOUT} seconds to answer. The correct answer is \`${clue.answer}\`.`);
 
         if (this.game.isComplete()) {
-          this.say(`${ await endgameMessage(this.game, this.channelContestants, this.data.channel_id) }`);
+          const contestants = await this.channelContestants();
+          this.say(`${ await endgameMessage(this.game, contestants, this.data.channel_id) }`);
         } else {
           const url = await boardImage({
             game: this.game
@@ -93,7 +94,8 @@ class Guess extends Command {
       await this.say(`That is correct, ${this.contestant.name}. The answer was \`${clue.answer}\`.\nYour score is now ${currency(this.contestant.channelScore(this.data.channel_id).value)}.`);
 
       if (this.game.isComplete()) {
-        this.say(`${ await endgameMessage(this.game, this.channelContestants, this.data.channel_id) }`);
+        const contestants = await this.channelContestants();
+        this.say(`${ await endgameMessage(this.game, contestants, this.data.channel_id) }`);
       } else {
         // Get the new board url:
         const url = await boardImage({

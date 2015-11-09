@@ -8,7 +8,8 @@ import scoresMessage from './shared/scores';
 @Provide('game', 'channelContestants')
 export default class Scores extends Command {
   async response() {
-    const leaders = scoresMessage(this.channelContestants, this.data.channel_id);
+    const contestants = await this.channelContestants();
+    const leaders = scoresMessage(contestants, this.data.channel_id);
 
     if (!leaders) {
       this.say('There are no scores yet!');

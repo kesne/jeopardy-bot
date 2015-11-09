@@ -92,7 +92,8 @@ class Clue extends Command {
               this.sayOptional(`Time's up! The correct answer is \`${clue.answer}\`.`);
 
               if (game.isComplete()) {
-                this.sayOptional(await endgameMessage(this.game, this.channelContestants, this.data.channel_id));
+                const contestants = await this.channelContestants();
+                this.sayOptional(await endgameMessage(this.game, contestants, this.data.channel_id));
               } else {
                 const url = await boardImage({game});
                 this.sayOptional('Select a new clue.', url);
