@@ -9,10 +9,16 @@
   }
   body {
     background: black;
-    margin: 1px;
+    margin: 0;
     padding: 0;
+    border-spacing: 7px;
   }
 
+  #table {
+    border-spacing: 7px;
+    table-layout: fixed;
+    width: 100%;
+  }
   #category_header {
     padding: 10px;
     width: 192px;
@@ -21,7 +27,6 @@
     border-radius: 3px;
     text-align: center;
     vertical-align: middle;
-    display: table-cell;
     color: #ffffff;
     text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.6);
     overflow: hidden;
@@ -43,10 +48,14 @@
   </style>
 </head>
 <body>
-
-  <div id="category_header">
-    <div id="title">{data}</div>
-  </div>
-
+  <table id="table">
+    <tr>
+      {#datas}
+        <td id="category_header">
+          <div id="title">{.}</div>
+        </td>
+      {/datas}
+    </tr>
+  </table>
 </body>
 </html>

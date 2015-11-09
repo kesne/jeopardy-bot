@@ -62,8 +62,11 @@ app.get('/welcome', (req, res) => {
 
 // Anything rendered by our capturing service goes through here:
 app.get('/renderable/:view', (req, res) => {
+  const data = decodeURIComponent(req.query.data);
+  const datas = data.split('@@~~AND~~@@');
   res.render(req.params.view, {
-    data: decodeURIComponent(req.query.data)
+    data,
+    datas
   });
 });
 

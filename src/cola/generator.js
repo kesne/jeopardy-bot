@@ -19,7 +19,6 @@ const $values = {
 };
 
 // The y-position of the header row:
-const HEADER_Y = 6;
 const CLUE_OFFSET_Y = 118;
 const CLUE_HEIGHT = 124;
 
@@ -42,25 +41,19 @@ export async function generateClue({game, clue}) {
 }
 
 export async function generateBoard({game}) {
-  const categoryImageFiles = await Promise.all(
-    game.categories.map(category => (
-      // TODO: Keep some cache of these?
-      capture({
-        view: 'category',
-        id: `${game.id}_${category.id}`,
-        data: category.title,
-        size: '194x102',
-        channel_id: game.channel_id
-      })
-    ))
-  );
+  const categoriesImageFile = await capture({
+    view: 'categories',
+    id: `${game.id}_categories`,
+    size: '1200x102',
+    data: game.categories.map(cat => cat.title).join('@@~~AND~~@@'),
+    channel_id: game.channel_id
+  });
 
-  const categoryImages = categoryImageFiles.map(file => images(file));
+  const categoriesImage = images(categoriesImageFile);
 
   let board = startingBoard;
+  board.draw(categoriesImage, 0, 0);
   for (let col = 0; col < COLUMN_LOCATIONS.length; col++) {
-    // Draw the category title:
-    board = board.draw(categoryImages[col], COLUMN_LOCATIONS[col], HEADER_Y);
     for (let row = 0; row < 5; row++) {
       // Draw the dollar values:
       const question = game.questions[(row * 6) + col];
