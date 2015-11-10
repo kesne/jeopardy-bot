@@ -13,6 +13,6 @@ export default function scoresMessage(contestants, channel_id) {
     }
     return 0;
   }).map((contestant, i) => (
-    `${i + 1}. ${contestant.name}: ${currency(contestant._score)}`
+    `${i + 1}. ${contestant.nonMentionedName}: ${currency(contestant._score)}`
   )).join('\n');
 }
