@@ -55,7 +55,7 @@ async function loadEpisode(url) {
     const value = num * 200;
 
     let question = $clueText.html();
-    question = striptags(question, ['br']);
+    question = simplifyText(striptags(question, ['br']));
     question = question.replace(/<br\s*\/?>/gi, '\n');
 
     // Extract the answer and strip HTML tags:
