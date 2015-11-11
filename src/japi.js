@@ -54,7 +54,9 @@ async function loadEpisode(url) {
     // Generate the value based on the number:
     const value = num * 200;
 
-    const question = $clueText.text();
+    let question = $clueText.html();
+    question = striptags(question, ['br']);
+    question = question.replace(/<br\s*\/?>/gi, '\n');
 
     // Extract the answer and strip HTML tags:
     let [, answer] = /ponse">(.*)<\/e/.exec($clue.find('td:first-child > div').attr('onmouseover'));
