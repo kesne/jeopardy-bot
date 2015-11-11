@@ -19,7 +19,7 @@ export default async function(input, data = {}, customSay = false) {
     }
   }
 
-  if (!command) {
+  if (!command.valid) {
     return null;
   }
 
