@@ -6,47 +6,65 @@ import {createReadStream} from 'fs';
 import {generateClue} from './generator';
 import * as config from '../config';
 
+const region = 'us-west-2';
+const Bucket = 'jeopardybot';
+const ACL = 'public-read';
+const bucketUrl = `https://${Bucket}.s3-${region}.amazonaws.com`
+
 // Configure AWS:
-AWS.config.region = 'us-west-2';
+AWS.config.region = region;
 AWS.config.update({
   accessKeyId: config.AWS_KEY,
   secretAccessKey: config.AWS_SECRET_KEY
 });
 
-const Bucket = 'jeopardybot';
-
 const s3 = new AWS.S3();
-s3.createBucket({
-  Bucket,
-  ACL: 'public-read'
+
+s3.headBucket({
+  Bucket
+}, err => {
+  if (err) {
+    s3.createBucket({
+      ACL,
+      Bucket
+    }, () => {
+      configureBucket();
+    });
+  } else {
+    configureBucket();
+  }
 });
+
+function configureBucket() {
+  s3.putBucketLifecycleConfiguration({
+    Bucket,
+    LifecycleConfiguration: {
+      Rules: [
+        {
+          Prefix: 'jbot_',
+          Status: 'Enabled',
+          Expiration: {
+            Days: 3
+          }
+        }
+      ]
+    }
+  });
+}
 
 function uploadToS3({filename, filepath}) {
   return new Promise(resolve => {
     s3.upload({
+      ACL,
       Bucket,
-      Key: filename,
-      Body: createReadStream(filepath),
-      // Images expire in 3 days to prevent too many files:
-      Expires: moment().add(3, 'days').toDate()
+      Key: `jbot_${filename}`,
+      Body: createReadStream(filepath)
     }, resolve);
   });
 }
 
 function getS3Url(filename) {
-  return new Promise((resolve, reject) => {
-    s3.getSignedUrl('getObject', {
-      Bucket,
-      Key: filename,
-      Expires: moment.duration(3, 'days').asMilliseconds()
-    }, (err, url) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(url);
-      }
-    });
-  });
+  return `${bucketUrl}/jbot_${filename}`;
 }
 
 export function s3Upload(filepath) {
@@ -85,7 +103,7 @@ export function imageForClue({game, clue}) {
     const filename = `${game.channel_id}.clue.${game.id}_${clue.id}.png`;
     s3.headObject({
       Bucket,
-      Key: filename
+      Key: `jbot_${filename}`
     }, async (err, data) => {
       if (err || !data) {
         const filepath = await generateClue({

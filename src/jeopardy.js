@@ -67,7 +67,7 @@ app.get('/renderable/categories', (req, res) => {
   });
 });
 
-const clueExtra = /^\(([^)]+)\)/;
+const clueExtra = /^\(([^)]+)\)\s*\.?/;
 app.get('/renderable/clue', (req, res) => {
   let extra;
   let data = req.query.data;
