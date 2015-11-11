@@ -93,7 +93,7 @@ class Clue extends Command {
 
               if (game.isComplete()) {
                 const contestants = await this.channelContestants();
-                this.sayOptional(await endgameMessage(this.game, contestants, this.data.channel_id));
+                this.sayOptional(await endgameMessage(game, contestants, this.data.channel_id));
               } else {
                 const url = await boardImage({game});
                 this.sayOptional('Select a new clue.', url);

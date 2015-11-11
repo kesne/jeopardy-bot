@@ -74,7 +74,7 @@ export default class Challenge extends Command {
       const autoChallengePass = await this.autoChallenge(answer, guess);
       if (autoChallengePass) {
         const {channelScore} = await this.game.endChallenge(true);
-        this.say(`It looks like you're correct! Your score is now ${currency(channelScore.value)}.`);
+        this.say(`It looks like you're correct, ${this.contestant.name}! Your score is now ${currency(channelScore.value)}.`);
         return;
       }
 
