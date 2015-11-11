@@ -66,7 +66,8 @@ export const schema = new Schema({
 
   channel_id: {
     type: String,
-    required: true
+    required: true,
+    index: true
   },
 
   lastCategory: {

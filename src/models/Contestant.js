@@ -4,7 +4,8 @@ export const schema = new Schema({
   // Their slack ID:
   slackid: {
     type: String,
-    required: true
+    required: true,
+    index: true
   },
 
   // Their actual name (for pretty printing):
