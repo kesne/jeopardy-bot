@@ -30,7 +30,7 @@ export default async function(input, data = {}) {
 
   let returnValue = null;
   try {
-    await command.promise;
+    await command.start();
     returnValue = command.message;
   } catch (e) {
     // Log all errors, at the risk of being noisy:

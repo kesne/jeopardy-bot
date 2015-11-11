@@ -9,24 +9,24 @@ export default class Command {
   constructor(input, data) {
     const {valid, matches} = this.processTriggers(input);
 
-    // Only proceed if we have a match:
-    if (valid) {
-      // Load data into our instance:
-      this.valid = valid;
-      this.data = data;
-      this.matches = matches;
+    // Load data into our instance:
+    this.valid = valid;
+    this.data = data;
+    this.matches = matches;
+  }
 
-      this.promise = this.getProviders().then(() => {
-        // Finally, perform our requirement checks:
-        this.checkRequirements();
+  async start() {
+    // Load in our providers now:
+    await this.getProviders();
 
-        // Start our message string, which will be sent back to slack:
-        this.message = '';
+    // Finally, perform our requirement checks:
+    this.checkRequirements();
 
-        // If we make it here, then we have everything we need to process the response:
-        return this.response(...matches);
-      });
-    }
+    // Start our message string, which will be sent back to slack:
+    this.message = '';
+
+    // If we make it here, then we have everything we need to process the response:
+    return await this.response(...this.matches);
   }
 
   async say(message, url = '') {
@@ -105,8 +105,8 @@ export default class Command {
       }
       // Async values:
       if (provide === 'channelContestants') {
-        this.channelContestants = async () => {
-          Contestant.find().where('scores').elemMatch({
+        this.channelContestants = () => {
+          return Contestant.find().where('scores').elemMatch({
             channel_id: this.data.channel_id
           });
         };
