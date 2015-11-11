@@ -131,7 +131,7 @@ schema.methods.liveClue = function() {
 
 schema.methods.isDailyDouble = function() {
   const clue = this.getClue();
-  return clue.dailyDouble;
+  return clue && clue.dailyDouble;
 };
 
 schema.methods.isChallengeStarted = function() {
