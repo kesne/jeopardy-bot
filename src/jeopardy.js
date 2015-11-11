@@ -70,7 +70,7 @@ app.get('/renderable/categories', (req, res) => {
 const clueExtra = /^\(([^)]+)\)/;
 app.get('/renderable/clue', (req, res) => {
   let extra;
-  let data = decodeURIComponent(req.query.data);
+  let data = req.query.data;
   const extraRegexResult = clueExtra.exec(data);
   if (extraRegexResult) {
     data = data.substring(extraRegexResult[0].length);
