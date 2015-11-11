@@ -111,13 +111,21 @@ class Guess extends Command {
       await this.say(`That is incorrect, ${this.contestant.name}. Your score is now ${currency(this.contestant.channelScore(this.data.channel_id).value)}.`);
       // If the clue is a daily double, the game progresses
       if (this.game.isDailyDouble()) {
-        this.say(`The correct answer is \`${clue.answer}\`.`);
-        // Mark answer as complete.
-        await this.game.answer();
-        const url = await boardImage({
-          game: this.game
-        });
-        this.say('Select a new clue.', url);
+        await Promise.all([
+          this.game.answer(),
+          this.say(`The correct answer is \`${clue.answer}\`.`)
+        ]);
+
+        if (this.game.isComplete()) {
+          const contestants = await this.channelContestants();
+          this.say(`${ await endgameMessage(this.game, contestants, this.data.channel_id) }`);
+        } else {
+          // Get the new board url:
+          const url = await boardImage({
+            game: this.game
+          });
+          this.say(`Select a new clue.`, url);
+        }
       }
     }
   }
