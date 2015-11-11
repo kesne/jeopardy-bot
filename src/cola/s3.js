@@ -64,7 +64,7 @@ function uploadToS3({filename, filepath}) {
 }
 
 function getS3Url(filename) {
-  return `${bucketUrl}/jbot_${filename}`;
+  return `${bucketUrl}/jbot_${filename}?ts=${Date.now()}`;
 }
 
 export function s3Upload(filepath) {
