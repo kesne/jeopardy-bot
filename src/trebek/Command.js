@@ -15,12 +15,17 @@ export default class Command {
     this.matches = matches;
   }
 
-  async start() {
+  async start(customSay) {
     // Load in our providers now:
     await this.getProviders();
 
     // Finally, perform our requirement checks:
     this.checkRequirements();
+
+    // Inject custom say commands:
+    if (customSay) {
+      this.say = customSay;
+    }
 
     // Start our message string, which will be sent back to slack:
     this.message = '';

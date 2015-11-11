@@ -116,7 +116,6 @@ schema.methods.incorrect = function({value, channel_id}) {
 schema.methods.endGame = function({channel_id, won, lost}) {
   const {value} = this.channelScore(channel_id);
   this.stats.money += value;
-  console.log('ending game', won, lost);
   if (won) {
     this.stats.won++;
   }

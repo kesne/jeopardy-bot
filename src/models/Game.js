@@ -3,7 +3,7 @@ import dehumanize from 'dehumanize-date';
 import {Schema, model} from 'mongoose';
 import {DiceCoefficient, JaroWinklerDistance} from 'natural';
 
-import {generateGame} from '../japi';
+import generateGame from '../japi';
 import {clean} from '../trebek/utils';
 import * as config from '../config';
 

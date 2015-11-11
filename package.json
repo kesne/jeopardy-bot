@@ -8,7 +8,7 @@
     "postinstall": "npm run build",
     "build": "babel src --out-dir lib --copy-files",
     "start": "node lib/jeopardy",
-    "dev": "nodemon --exec babel-node src/jeopardy",
+    "dev": "nodemon --exec babel-node src/index",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src"
   },
@@ -48,6 +48,7 @@
     "eslint": "^1.6.0",
     "eslint-config-xo": "^0.6.0",
     "eslint-plugin-babel": "^2.1.1",
-    "nodemon": "^1.7.1"
+    "nodemon": "^1.7.1",
+    "slack-client": "^1.4.1"
   }
 }

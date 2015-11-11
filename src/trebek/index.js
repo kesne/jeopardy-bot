@@ -7,7 +7,7 @@ const commands = Object.keys(commandObject)
   .map(key => commandObject[key])
   .filter(n => typeof n === 'function');
 
-export default async function(input, data = {}) {
+export default async function(input, data = {}, customSay = false) {
   input = clean(input);
 
   let Command;
@@ -30,7 +30,7 @@ export default async function(input, data = {}) {
 
   let returnValue = null;
   try {
-    await command.start();
+    await command.start(customSay);
     returnValue = command.message;
   } catch (e) {
     // Log all errors, at the risk of being noisy:

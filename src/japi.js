@@ -85,7 +85,7 @@ async function loadEpisode(url) {
   };
 }
 
-export async function randomEpisode() {
+async function randomEpisode() {
   const season = Math.ceil(Math.random() * seasons);
   const res = await fetch(`http://www.j-archive.com/showseason.php?season=${season}`);
   const text = await res.text();
@@ -103,7 +103,7 @@ export async function randomEpisode() {
 }
 
 // Force-generate a new game:
-export async function generateGame() {
+export default async function generateGame() {
   let game;
   do {
     try {
