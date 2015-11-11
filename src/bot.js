@@ -23,8 +23,8 @@ export default class Bot {
 
   // onMessage({text, channel: channel_id, user: user_id, ts: timestamp}) {
   onMessage(incoming) {
-    const {text, channel: channel_id, user: user_id, ts: timestamp, subtype, message} = incoming;
-    
+    const {text, channel: channel_id, user: user_id, ts: timestamp, subtype} = incoming;
+
     // Ignore messages from myself:
     if (user_id === this.slack.self.id) {
       return;
@@ -35,15 +35,6 @@ export default class Bot {
     if (subtype === 'channel_join') {
       const {name: user_name} = this.slack.getUserByID(user_id);
       channel.send(`Welcome to #${channel.name}, @${user_name}! To learn how to play, just type "help".`);
-      return;
-    }
-
-    // Remind contestants on edits that we can't see them:
-    if (subtype === 'message_changed') {
-      const history = channel.getHistory()[message.ts];
-      if (history && history.trebek) {
-        channel.send(`I'm unable to process edited message. Try sending the message again.`);
-      }
       return;
     }
 
@@ -64,8 +55,6 @@ export default class Bot {
       user_id,
       user_name
     }, (message, url = '') => {
-      // Mark the message as "trebek" so that we can know when we've processed it.
-      incoming.trebek = true;
       if (!url) {
         channel.send(message);
       } else {
