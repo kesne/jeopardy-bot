@@ -14,14 +14,33 @@ export default class Bot {
     this.slack.on('message', this.onMessage.bind(this));
     this.slack.on('error', this.onError.bind(this));
 
+    // Slack's internal websocket reconnect isn't reliable:
+    this.slack.on('close', this.onClose.bind(this));
+    this.slack.on('loggedIn', this.onLoggedIn.bind(this));
+    const slackReconnect = this.slack.reconnect;
+    this.slack.reconnect = () => {
+      this.slack.reconnecting = true;
+      slackReconnect.call(this.slack);
+    };
+
     this.slack.login();
+  }
+
+  onLoggedIn() {
+    this.slack.reconnecting = false;
+  }
+
+  onClose() {
+    console.log('Slack websocket closed...');
+    if (this.slack.autoReconnect && !this.slack.reconnecting) {
+      this.slack.reconnect();
+    }
   }
 
   onOpen() {
     console.log(`JeopardyBot connected to ${this.slack.team.name} as @${this.slack.self.name}`);
   }
 
-  // onMessage({text, channel: channel_id, user: user_id, ts: timestamp}) {
   onMessage(incoming) {
     const {text, channel: channel_id, user: user_id, ts: timestamp, subtype} = incoming;
 
