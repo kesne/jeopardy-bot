@@ -3,3 +3,5 @@ node_modules/
 lib/
 npm-debug.log
 images/
+newrelic.js
+newrelic_agent.log
