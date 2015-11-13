@@ -1,4 +1,3 @@
-import './newrelicAdapter';
 import 'babel/polyfill';
 import mongoose from 'mongoose';
 import express from 'express';
