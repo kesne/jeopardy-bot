@@ -341,7 +341,7 @@ schema.methods.newClue = async function({category, value, contestant}) {
   if (value === -1) {
     // These questions are internally value-sorted lowest-to-highest.
     const lowestValueClue = this.questions.find(question => {
-      return (question.category_id === this.lastCategory && !question.answered);
+      return (question.category_id === selectedCategory && !question.answered);
     });
     if (lowestValueClue) {
       value = lowestValueClue.value;

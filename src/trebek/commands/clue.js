@@ -14,7 +14,6 @@ import * as config from '../../config';
   'noclue'
 )
 @Provide(
-  'games',
   'game',
   'contestant',
   'channelContestants'
@@ -84,7 +83,7 @@ class Clue extends Command {
           // Try to be safe and unlock even when we fail:
           try {
             // We need to refresh the document because it could be outdated:
-            const game = await this.games.forChannel({
+            const game = await this.models.Game.forChannel({
               channel_id: this.game.channel_id
             });
             if (game.isTimedOut()) {

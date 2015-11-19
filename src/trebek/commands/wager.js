@@ -11,8 +11,7 @@ import {clueImage} from '../../cola';
 )
 @Provide(
   'game',
-  'contestant',
-  'contestants'
+  'contestant'
 )
 class Wager extends Command {
   async response([value]) {

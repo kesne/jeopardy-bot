@@ -6,6 +6,7 @@ import {lock, unlock} from './locks';
 import * as config from '../config';
 
 export default class Command {
+
   constructor(input, data) {
     const {valid, matches} = this.processTriggers(input);
 
@@ -13,6 +14,11 @@ export default class Command {
     this.valid = valid;
     this.data = data;
     this.matches = matches;
+    // Inject the models:
+    this.models = {
+      Game,
+      Contestant
+    };
   }
 
   async start(customSay) {
@@ -101,13 +107,6 @@ export default class Command {
   async getProviders() {
     const providers = this.constructor.providers || [];
     await Promise.all(providers.map(provide => {
-      // Models:
-      if (provide === 'games') {
-        this.games = Game;
-      }
-      if (provide === 'contestants') {
-        this.contestants = Contestant;
-      }
       // Async values:
       if (provide === 'channelContestants') {
         this.channelContestants = () => {

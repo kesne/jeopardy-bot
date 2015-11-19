@@ -26,9 +26,7 @@ const VALID_REQUIREMENTS = [
 
 const VALID_PROVIDERS = [
   'game',
-  'games',
-  'contestant',
-  'contestants'
+  'contestant'
 ];
 
 export function Trigger(...messages) {

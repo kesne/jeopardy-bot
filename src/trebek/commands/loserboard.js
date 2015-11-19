@@ -1,14 +1,13 @@
 import Command from '../Command';
-import {Trigger, Provide, NoLock, currency} from '../utils';
+import {Trigger, NoLock, currency} from '../utils';
 
 const MAX_LOSERS = 10;
 
 @NoLock
 @Trigger(/loserboards?/)
-@Provide('contestants')
 export default class Loserboard extends Command {
   async response() {
-    const contestants = await this.contestants.find({
+    const contestants = await this.models.Contestant.find({
       'stats.money': {
         $lt: 0
       }

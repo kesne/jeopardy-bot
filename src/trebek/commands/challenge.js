@@ -16,9 +16,7 @@ const URL_BASE = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KE
   // ,'challenge'
 )
 @Provide(
-  'games',
   'game',
-  'contestants',
   'contestant'
 )
 export default class Challenge extends Command {
@@ -60,7 +58,7 @@ export default class Challenge extends Command {
     } else if (challenge && !this.game.isChallengeStarted()) {
       const channel_id = this.data.channel_id;
       const [contestants, {guess, answer}] = await Promise.all([
-        this.contestants.find().where('scores').elemMatch({
+        this.models.Contestant.find().where('scores').elemMatch({
           channel_id
         }),
         this.game.startChallenge({
@@ -85,7 +83,7 @@ export default class Challenge extends Command {
       setTimeout(async () => {
         await this.lock();
         // We need to refresh the document because it could be outdated:
-        const game = await this.games.forChannel({
+        const game = await this.models.Game.forChannel({
           channel_id: this.game.channel_id
         });
         try {

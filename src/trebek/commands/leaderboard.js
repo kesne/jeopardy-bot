@@ -1,15 +1,14 @@
 // TODO: Move leaders and losers into one module.
 import Command from '../Command';
-import {Trigger, Provide, NoLock, currency} from '../utils';
+import {Trigger, NoLock, currency} from '../utils';
 
 const MAX_LEADERS = 10;
 
 @NoLock
 @Trigger(/leaderboards?/)
-@Provide('contestants')
 export default class Leaderboard extends Command {
   async response() {
-    const contestants = await this.contestants.find({
+    const contestants = await this.models.Contestant.find({
       'stats.money': {
         $gt: 0
       }

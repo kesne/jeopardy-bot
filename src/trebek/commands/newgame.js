@@ -4,13 +4,13 @@ import {boardImage, captureCluesForGame} from '../../cola';
 
 @Trigger('new game')
 @Only('gameinactive')
-@Provide('game', 'games')
+@Provide('game')
 class NewGame extends Command {
   async response() {
     this.sayOptional('Starting a new game for you...');
 
     // Start the game:
-    const game = await this.games.start({
+    const game = await this.models.Game.start({
       channel_id: this.data.channel_id
     });
 
