@@ -6,7 +6,8 @@ import * as config from '../../config';
 
 @Trigger(
   /(?:ill take |give me |choose )?(.*) for \$?(\d{3,4})(?: alex| trebek)?/,
-  /(same)/
+  /(same)/,
+  /gimmie (.*)/
 )
 @Only(
   'gameactive',
@@ -19,7 +20,11 @@ import * as config from '../../config';
   'channelContestants'
 )
 class Clue extends Command {
-  async response([category, value], [sameLowest]) {
+  async response([category, value], [sameLowest], [gimmieCategory]) {
+    if (gimmieCategory) {
+      category = gimmieCategory;
+      value = -1;
+    }
     // We support some shorthands for clue selection:
     if (sameLowest) {
       category = '--same-lowest--';

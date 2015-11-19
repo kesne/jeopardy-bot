@@ -7,7 +7,7 @@ import * as config from '../../config';
 
 @Trigger(
   /(?:whats?|wheres?|whos?|whens?) (?:(?:is|are|was|were|the|an?) ){1,2}(.*)/,
-  /\$\$ ?(.*)/
+  /w (.*)/
 )
 @Provide(
   'game',

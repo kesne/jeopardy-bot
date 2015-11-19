@@ -292,22 +292,6 @@ schema.methods.newClue = async function({category, value, contestant}) {
   if (this.isChallengeStarted()) {
     throw new Error('challenge');
   }
-
-  if (category === '--same-lowest--' && this.lastCategory) {
-    // These questions are internally value-sorted lowest-to-highest.
-    const lowestValueClue = this.questions.find(question => {
-      return (question.category_id === this.lastCategory && !question.answered);
-    });
-    if (lowestValueClue) {
-      category = '--same--';
-      value = lowestValueClue.value;
-    }
-  }
-
-  value = parseInt(value, 10);
-  if (!config.VALUES.includes(value)) {
-    throw new RangeError('value');
-  }
   if (this.liveClue()) {
     throw new Error('already active');
   }
@@ -318,7 +302,7 @@ schema.methods.newClue = async function({category, value, contestant}) {
 
   // Handle asking for the same category:
   let selectedCategory;
-  if (category === '--same--' && this.lastCategory) {
+  if ((category === '--same--' || category === '--same-lowest--') && this.lastCategory) {
     selectedCategory = this.lastCategory;
   } else {
     // Easier to match cleaned versions of our input:
@@ -348,6 +332,24 @@ schema.methods.newClue = async function({category, value, contestant}) {
   // Invalid ask:
   if (!selectedCategory) {
     throw new RangeError('category');
+  }
+
+  // Allow string values:
+  value = parseInt(value, 10);
+
+  // We use -1 internally to represent "lowest available value":
+  if (value === -1) {
+    // These questions are internally value-sorted lowest-to-highest.
+    const lowestValueClue = this.questions.find(question => {
+      return (question.category_id === this.lastCategory && !question.answered);
+    });
+    if (lowestValueClue) {
+      value = lowestValueClue.value;
+    }
+  }
+
+  if (!config.VALUES.includes(value)) {
+    throw new RangeError('value');
   }
 
   const question = this.questions.find(q => {

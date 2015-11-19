@@ -3,7 +3,7 @@ import {Trigger, Only, Provide, NoLock} from '../utils';
 import scoresMessage from './shared/scores';
 
 @NoLock
-@Trigger('scores')
+@Trigger(/scores?/)
 @Only('gameactive')
 @Provide('game', 'channelContestants')
 export default class Scores extends Command {

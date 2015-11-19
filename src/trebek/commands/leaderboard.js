@@ -5,7 +5,7 @@ import {Trigger, Provide, NoLock, currency} from '../utils';
 const MAX_LEADERS = 10;
 
 @NoLock
-@Trigger('leaderboard')
+@Trigger(/leaderboards?/)
 @Provide('contestants')
 export default class Leaderboard extends Command {
   async response() {

@@ -15,8 +15,9 @@ class Help extends Command {
     “I’ll take ________ for $___”
     “Give me ________ for $___”
     “Choose ________ for $___”
-    “ ________ for $___”
+    “________ for $___”
     “Same (category) for $___”
+    “Gimmie ________”
 *Guessing*
     “What [is|are] _______”
     “Who [is|are] ________”

@@ -4,7 +4,7 @@ import {Trigger, Provide, NoLock, currency} from '../utils';
 const MAX_LOSERS = 10;
 
 @NoLock
-@Trigger('loserboard')
+@Trigger(/loserboards?/)
 @Provide('contestants')
 export default class Loserboard extends Command {
   async response() {
