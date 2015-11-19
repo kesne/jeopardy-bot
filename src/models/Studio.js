@@ -6,6 +6,14 @@ export const schema = new Schema({
     required: true
   },
 
+  // TODO: Disable by default?
+  // Studios can be disabled to turn the bot off in a channel:
+  enabled: {
+    type: Boolean,
+    default: true
+  },
+
+  // TODO: Elevate these to top level.
   // Generic config for the bot:
   config: {
     username: {

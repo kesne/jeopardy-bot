@@ -202,7 +202,7 @@ schema.methods.endChallenge = async function(forceWin = false) {
 };
 
 schema.methods.isTimedOut = function() {
-  return moment().isAfter(moment(this.questionStart).add(config.CLUE_TIMEOUT, 'seconds'));
+  return moment().isAfter(moment(this.questionStart).add(this.studio.timeout, 'seconds'));
 };
 
 schema.methods.isComplete = function() {
