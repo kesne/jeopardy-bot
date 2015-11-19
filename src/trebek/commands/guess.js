@@ -3,7 +3,6 @@ import Command from '../Command';
 import {Trigger, Only, Provide, currency} from '../utils';
 import endgameMessage from './shared/endgame';
 import {boardImage} from '../../cola';
-import * as config from '../../config';
 
 @Trigger(
   /(?:whats?|wheres?|whos?|whens?) (?:(?:is|are|was|were|the|an?) ){1,2}(.*)/,
@@ -49,7 +48,7 @@ class Guess extends Command {
         // We timed out, so mark this question as done.
         await this.game.answer();
 
-        await this.say(`Time's up, ${this.contestant.name}! Remember, you have ${config.CLUE_TIMEOUT} seconds to answer. The correct answer is \`${clue.answer}\`.`);
+        await this.say(`Time's up, ${this.contestant.name}! Remember, you have ${this.studio.config.timeout} seconds to answer. The correct answer is \`${clue.answer}\`.`);
 
         if (this.game.isComplete()) {
           const contestants = await this.channelContestants();

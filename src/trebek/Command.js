@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import FormData from 'form-data';
+import Studio from '../models/Studio';
 import Contestant from '../models/Contestant';
 import Game from '../models/Game';
 import {lock, unlock} from './locks';
@@ -23,10 +24,12 @@ export default class Command {
 
   async start(customSay) {
     // Load in our providers now:
-    await this.getProviders();
+    await this.installProviders();
 
     // Finally, perform our requirement checks:
     this.checkRequirements();
+
+    await this.installStudio();
 
     // Inject custom say commands:
     if (customSay) {
@@ -58,7 +61,7 @@ export default class Command {
     // Create our new form:
     const form = new FormData();
     form.append('token', config.API_TOKEN);
-    form.append('username', config.USERNAME);
+    form.append('username', this.studio.config.username);
     form.append('text', message);
     form.append('channel', this.data.channel_id);
     form.append('as_user', JSON.stringify(true));
@@ -104,7 +107,7 @@ export default class Command {
     };
   }
 
-  async getProviders() {
+  async installProviders() {
     const providers = this.constructor.providers || [];
     await Promise.all(providers.map(provide => {
       // Async values:
@@ -127,6 +130,10 @@ export default class Command {
         });
       }
     }));
+  }
+
+  async installStudio() {
+    this.studio = await Studio.get(this.data.channel_id);
   }
 
   checkRequirements() {

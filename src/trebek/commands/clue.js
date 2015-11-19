@@ -7,7 +7,7 @@ import * as config from '../../config';
 @Trigger(
   /(?:ill take |give me |choose )?(.*) for \$?(\d{3,4})(?: alex| trebek)?/,
   /(same)/,
-  /gimmie (.*)/
+  /gimme (.*)/
 )
 @Only(
   'gameactive',
@@ -19,9 +19,9 @@ import * as config from '../../config';
   'channelContestants'
 )
 class Clue extends Command {
-  async response([category, value], [sameLowest], [gimmieCategory]) {
-    if (gimmieCategory) {
-      category = gimmieCategory;
+  async response([category, value], [sameLowest], [gimmeCategory]) {
+    if (gimmeCategory) {
+      category = gimmeCategory;
       value = -1;
     }
     // We support some shorthands for clue selection:
@@ -106,7 +106,7 @@ class Clue extends Command {
           } finally {
             this.unlock();
           }
-        }, (config.CLUE_TIMEOUT * 1000) + 100);
+        }, (this.studio.config.timeout * 1000) + 100);
       }
     }
   }

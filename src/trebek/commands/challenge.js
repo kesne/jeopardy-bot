@@ -1,7 +1,6 @@
 import fetch from 'node-fetch';
 import Command from '../Command';
 import {Trigger, Only, Provide, currency} from '../utils';
-import * as config from '../../config';
 
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 const cx = '013673686761662547163:nw_cf3t8esg';
@@ -100,7 +99,7 @@ export default class Challenge extends Command {
         } finally {
           this.unlock();
         }
-      }, ((config.CHALLENGE_TIMEOUT) * 1000) + 100);
+      }, ((this.studio.config.challengeTimeout) * 1000) + 100);
     }
   }
 }

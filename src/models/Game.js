@@ -8,6 +8,14 @@ import {clean} from '../trebek/utils';
 import * as config from '../config';
 
 export const schema = new Schema({
+
+  // Studios are the places games are played:
+  studio: {
+    type: Schema.Types.ObjectId,
+    ref: 'Studio',
+    required: true
+  },
+
   categories: [{
     id: {
       type: Number,
@@ -135,7 +143,7 @@ schema.methods.isDailyDouble = function() {
 };
 
 schema.methods.isChallengeStarted = function() {
-  return this.challenge.active && this.challenge.started && moment().isBefore(moment(this.challenge.started).add(config.CHALLENGE_TIMEOUT, 'seconds'));
+  return this.challenge.active && this.challenge.started && moment().isBefore(moment(this.challenge.started).add(this.studio.config.challengeTimeout, 'seconds'));
 };
 
 schema.methods.startChallenge = async function({contestant}) {
@@ -167,14 +175,14 @@ schema.methods.endChallenge = async function(forceWin = false) {
   // Force a save:
   await this.save();
 
-  if (!forceWin && votes.length < config.CHALLENGE_MIN) {
+  if (!forceWin && votes.length < this.studio.config.minimumChallengeVotes) {
     throw new Error('min');
   }
   const yesVotes = votes.map(vote => vote.correct ? 1 : 0).reduce((prev, curr) => {
     return prev + curr;
   }, 0);
 
-  if (forceWin || (yesVotes / votes.length) >= config.CHALLENGE_THRESHOLD) {
+  if (forceWin || (yesVotes / votes.length) >= this.studio.config.challengeAcceptenceThreshold) {
     const contestant = await this.model('Contestant').findOne({
       slackid
     });
@@ -251,7 +259,7 @@ schema.methods.end = async function() {
 
 // Grab the active game for the channel:
 schema.statics.forChannel = function({channel_id}) {
-  return this.findOne({channel_id});
+  return this.findOne({channel_id}).populate('studio');
 };
 
 // Start a new game:
@@ -270,7 +278,10 @@ schema.statics.start = async function({channel_id}) {
   // Extract the questions and categories:
   const {clues: questions, categories} = episode.roundOne;
 
+  const studio = await this.model('Studio').get(channel_id);
+
   return this.create({
+    studio,
     channel_id,
     categories,
     questions
@@ -429,6 +440,7 @@ schema.methods.guess = async function({contestant, guess}) {
     if (guess === answer) {
       return true;
     }
+    // TODO: match modes:
     const similarity = DiceCoefficient(guess, answer);
     if (similarity >= config.ACCEPTED_SIMILARITY) {
       return true;

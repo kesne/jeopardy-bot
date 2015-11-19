@@ -6,22 +6,12 @@
   "keywords": ["node", "slack", "jeopardy", "bot", "trebek"],
   "success_url": "/welcome",
   "env": {
-    "JBOT_API_TOKEN": {
+    "API_TOKEN": {
       "description": "The Slack API key.",
       "required": false
     },
-    "JBOT_OUTGOING_WEBHOOK_TOKEN": {
+    "OUTGOING_WEBHOOK_TOKEN": {
       "description": "The token of the Slack outgoing webhook. Used to verify incoming requests.",
-      "required": false
-    },
-    "JBOT_USERNAME": {
-      "description": "The username you would like the bot to post as.",
-      "value": "jeopardybot",
-      "required": true
-    },
-    "JBOT_CLUE_TIMEOUT": {
-      "description": "The number of seconds users have to answer questions.",
-      "value": "45",
       "required": false
     }
   },

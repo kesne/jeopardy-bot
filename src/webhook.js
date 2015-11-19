@@ -21,6 +21,8 @@ export default class Webhook {
       }
 
       try {
+        // TODO: Get the username out of the response to handle homes.
+        break;
         const response = await trebek(input, req.body);
         if (response) {
           res.json({
