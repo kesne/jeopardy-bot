@@ -82,8 +82,9 @@ export const CHALLENGE_MIN = 2;
 // The threshold for a challenge to go through:
 export const CHALLENGE_THRESHOLD = 0.65;
 
+export const BOARD_CONTROL = Number(process.env.BOARD_CONTROL) || 1;
 // The number of seconds to give control of the board to the correct guesser.
-export const BOARD_CONTROL_TIMEOUT = Number(process.env.JBOT_BOARD_CONTROL) || 10;
+export const BOARD_CONTROL_TIMEOUT = Number(process.env.JBOT_BOARD_CONTROL) || 4;
 
 // Constants for answer similarity:
 export const ACCEPTED_SIMILARITY = 0.6;

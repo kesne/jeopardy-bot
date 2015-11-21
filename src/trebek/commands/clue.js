@@ -44,6 +44,8 @@ class Clue extends Command {
         this.say(`I'm sorry, I can't give you a clue for that value.`);
       } else if (e.message.includes('category')) {
         this.say(`I'm sorry, I don't know what category that is. Try being more specific.`);
+      } else if (e.message.includes('board control')) {
+        this.say(`Wait to select a category, board control is active.`);
       } else {
         console.log('Unexpected category selection error.', e);
       }
