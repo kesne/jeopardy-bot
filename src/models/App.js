@@ -2,11 +2,11 @@ import {Schema, model} from 'mongoose';
 
 export const schema = new Schema({
   username: {
-    type: String,
+    type: 'String',
     default: 'jeopardybot'
   },
   icon_emoji: {
-    type: String,
+    type: 'String',
     default: ':jbot:'
   },
   // icon_url: {
@@ -14,24 +14,24 @@ export const schema = new Schema({
   // },
   // TODO: Validate the mode is compatible with the API_TOKEN.
   mode: {
-    type: String,
+    type: 'String',
     enum: ['bot', 'hybrid', 'response'],
     required: true,
     default: 'response'
   },
   api_token: {
-    type: String
+    type: 'String'
   },
   verify_token: {
-    type: String
+    type: 'String'
   },
   
   aws: {
     key: {
-      type: String
+      type: 'String'
     },
     secret: {
-      type: String
+      type: 'String'
     }
   }
 });
@@ -49,7 +49,7 @@ let appConfig;
 schema.statics.findOrCreate = async function() {
   let doc = await this.findOne();
   if (!doc) {
-    doc = await this.create();
+    doc = await this.create({});
   }
   return doc;
 };

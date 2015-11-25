@@ -143,7 +143,7 @@ schema.methods.isDailyDouble = function() {
 };
 
 schema.methods.isChallengeStarted = function() {
-  return this.challenge.active && this.challenge.started && moment().isBefore(moment(this.challenge.started).add(this.studio.config.challengeTimeout, 'seconds'));
+  return this.challenge.active && this.challenge.started && moment().isBefore(moment(this.challenge.started).add(this.studio.values.challengeTimeout, 'seconds'));
 };
 
 schema.methods.startChallenge = async function({contestant}) {
@@ -175,14 +175,14 @@ schema.methods.endChallenge = async function(forceWin = false) {
   // Force a save:
   await this.save();
 
-  if (!forceWin && votes.length < this.studio.config.minimumChallengeVotes) {
+  if (!forceWin && votes.length < this.studio.values.minimumChallengeVotes) {
     throw new Error('min');
   }
   const yesVotes = votes.map(vote => vote.correct ? 1 : 0).reduce((prev, curr) => {
     return prev + curr;
   }, 0);
 
-  if (forceWin || (yesVotes / votes.length) >= this.studio.config.challengeAcceptenceThreshold) {
+  if (forceWin || (yesVotes / votes.length) >= this.studio.values.challengeAcceptenceThreshold) {
     const contestant = await this.model('Contestant').findOne({
       slackid
     });
@@ -202,7 +202,7 @@ schema.methods.endChallenge = async function(forceWin = false) {
 };
 
 schema.methods.isTimedOut = function() {
-  return moment().isAfter(moment(this.questionStart).add(this.studio.timeout, 'seconds'));
+  return moment().isAfter(moment(this.questionStart).add(this.studio.values.timeout, 'seconds'));
 };
 
 schema.methods.isComplete = function() {
@@ -263,7 +263,7 @@ schema.statics.forChannel = function({channel_id}) {
 };
 
 // Start a new game:
-schema.statics.start = async function({channel_id}) {
+schema.statics.start = async function({channel_id, channel_name}) {
   const game = await this.forChannel({channel_id});
 
   // Clear out existing (ended) games:
@@ -278,7 +278,10 @@ schema.statics.start = async function({channel_id}) {
   // Extract the questions and categories:
   const {clues: questions, categories} = episode.roundOne;
 
-  const studio = await this.model('Studio').get(channel_id);
+  const studio = await this.model('Studio').get({
+    id: channel_id,
+    name: channel_name
+  });
 
   return this.create({
     studio,

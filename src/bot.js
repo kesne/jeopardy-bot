@@ -54,6 +54,7 @@ export default class Bot {
     }
 
     const channel = this.slack.getChannelGroupOrDMByID(channel_id);
+    const channel_name = channel.name
 
     if (subtype === 'channel_join') {
       const {name: user_name} = this.slack.getUserByID(user_id);
@@ -73,6 +74,7 @@ export default class Bot {
     }
     const {name: user_name} = this.slack.getUserByID(user_id);
     trebek(text, {
+      channel_name,
       channel_id,
       timestamp,
       user_id,

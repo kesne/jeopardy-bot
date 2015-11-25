@@ -105,7 +105,7 @@ class Clue extends Command {
           } finally {
             this.unlock();
           }
-        }, (this.studio.config.timeout * 1000) + 100);
+        }, (this.studio.values.timeout * 1000) + 100);
       }
     }
   }

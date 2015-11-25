@@ -19,45 +19,47 @@ export const schema = new Schema({
     type: Boolean,
     default: false
   },
-
-  // The timeout for clues (in seconds):
-  timeout: {
-    type: Number,
-    min: 1,
-    default: 30
-  },
-  // Timeout for challenges (in seconds):
-  challengeTimeout: {
-    type: Number,
-    min: 1,
-    default: 15
-  },
-  // Minimum number of votes for a given challenge to be valid:
-  minimumChallengeVotes: {
-    type: Number,
-    min: 1,
-    default: 2
-  },
-  // The percentage of votes that need to 
-  challengeAcceptenceThreshold: {
-    type: Number,
-    min: 0,
-    max: 1,
-    default: 0.65
-  },
-  // TODO:
-  // The strictness of the answer checking:
-  answerSimilarityMode: {
-    type: String,
-    enum: ['strict', 'moderate', 'flexible'],
-    default: 'moderate'
-  },
-  // TODO:
-  // The type of games to generate:
-  gameType: {
-    type: String,
-    enum: ['any', 'regular', 'championship', 'kids', 'teens'],
-    default: 'any'
+  
+  values: {
+    // The timeout for clues (in seconds):
+    timeout: {
+      type: Number,
+      min: 1,
+      default: 30
+    },
+    // Timeout for challenges (in seconds):
+    challengeTimeout: {
+      type: Number,
+      min: 1,
+      default: 15
+    },
+    // Minimum number of votes for a given challenge to be valid:
+    minimumChallengeVotes: {
+      type: Number,
+      min: 1,
+      default: 2
+    },
+    // The percentage of votes that need to 
+    challengeAcceptenceThreshold: {
+      type: Number,
+      min: 0,
+      max: 1,
+      default: 0.65
+    },
+    // TODO:
+    // The strictness of the answer checking:
+    answerSimilarityMode: {
+      type: String,
+      enum: ['strict', 'moderate', 'flexible'],
+      default: 'moderate'
+    },
+    // TODO:
+    // The type of games to generate:
+    gameType: {
+      type: String,
+      enum: ['any', 'regular', 'championship', 'kids', 'teens'],
+      default: 'any'
+    }
   },
 
   // Feature flags:
@@ -166,10 +168,15 @@ schema.virtual('features.endGame.description').get(() =>
   'Allows the game to be ended with the "end game" message'
 );
 
-schema.statics.get = async function(id) {
+schema.statics.get = async function({id, name}) {
   let doc = await this.findOne({id});
   if (!doc) {
-    doc = await this.create({id});
+    doc = await this.create({id, name});
+  }
+  // The channel has been renamed:
+  if (doc.name !== name) {
+    doc.name = name;
+    await doc.save();
   }
   return doc;
 };

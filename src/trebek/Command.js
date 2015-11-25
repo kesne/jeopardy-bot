@@ -1,11 +1,9 @@
-import fetch from 'node-fetch';
-import FormData from 'form-data';
 import App from '../models/App';
 import Studio from '../models/Studio';
 import Contestant from '../models/Contestant';
 import Game from '../models/Game';
 import {lock, unlock} from './locks';
-import * as config from '../config';
+import {post} from './slack';
 
 export default class Command {
 
@@ -27,13 +25,16 @@ export default class Command {
     // Load in our providers now:
     await this.installProviders();
 
-    // Finally, perform our requirement checks:
+    // Perform our requirement checks:
     this.checkRequirements();
 
     await Promise.all([
       this.installStudio(),
       this.installApp()
     ]);
+    
+    // Check to make sure we have the correct features enabled:
+    this.checkFeatures();
 
     // Inject custom say commands:
     if (customSay) {
@@ -62,27 +63,7 @@ export default class Command {
   }
 
   async postToSlack(message, url) {
-    // Create our new form:
-    const form = new FormData();
-    form.append('token', this.app.api_token);
-    form.append('username', this.app.username);
-    // TODO: Icon emoji?
-    form.append('text', message);
-    form.append('channel', this.data.channel_id);
-    form.append('as_user', JSON.stringify(true));
-
-    if (url) {
-      form.append('attachments', JSON.stringify([{
-        fallback: 'Jeopardy Bot',
-        image_url: url,
-        color: '#F4AC79'
-      }]));
-    }
-
-    return fetch('https://slack.com/api/chat.postMessage', {
-      method: 'POST',
-      body: form
-    });
+    await post(message, url);
   }
 
   // Locking helpers
@@ -137,11 +118,26 @@ export default class Command {
   }
 
   async installStudio() {
-    this.studio = await Studio.get(this.data.channel_id);
+    this.studio = await Studio.get({
+      id: this.data.channel_id,
+      name: this.data.channel_name
+    });
+    if (!this.studio.enabled) {
+      throw new Error('Studio disabled');
+    }
   }
   
   async installApp() {
     this.app = await App.get();
+  }
+
+  checkFeatures() {
+    const features = this.constructor.features || [];
+    for (const feature of features) {
+      if (!this.studio.features[feature].enabled) {
+        throw new Error('Unmet feature.');
+      }
+    }
   }
 
   checkRequirements() {

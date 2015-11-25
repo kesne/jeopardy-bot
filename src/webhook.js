@@ -2,8 +2,8 @@ import trebek from './trebek';
 import App from './models/App';
 
 export default class Webhook {
-  constructor(app) {
-    app.post('/command', async (req, res) => {
+  constructor(expressApp) {
+    expressApp.post('/command', async (req, res) => {
       const app = await App.get();
       // Ignore unverified messages:
       if (app.verify_token && app.verify_token !== req.body.token) {
@@ -22,7 +22,6 @@ export default class Webhook {
       }
 
       try {
-        // break;
         const response = await trebek(input, req.body);
         if (response) {
           res.json({

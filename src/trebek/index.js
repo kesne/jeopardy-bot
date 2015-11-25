@@ -1,4 +1,6 @@
 import requireDir from 'require-dir';
+import App from '../models/App';
+import {channels, post} from './slack';
 import {lock, unlock} from './locks';
 import {clean} from './utils';
 
@@ -6,6 +8,20 @@ const commandObject = requireDir('./commands');
 const commands = Object.keys(commandObject)
   .map(key => commandObject[key])
   .filter(n => typeof n === 'function');
+
+export async function broadcast(message, channel) {
+  const app = await App.get();
+  if (app.hasApi()) {
+    if (!channel) {
+      const list = await channels();
+      list.forEach(channel => {
+        post(channel.id, message);
+      });
+    } else {
+      post(channel, message);
+    }
+  }
+}
 
 export default async function(input, data = {}, customSay = false) {
   input = clean(input);

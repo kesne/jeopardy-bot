@@ -258,11 +258,14 @@
       <div class="demo-drawer mdl-layout__drawer mdl-color--blue-grey-900 mdl-color-text--blue-grey-50">
         <nav class="demo-navigation mdl-navigation mdl-color--blue-grey-800">
           <a class="mdl-navigation__link" href="/admin/home"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">home</i>Home</a>
-          <a class="mdl-navigation__link" href="/admin/stats"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">trending_up</i>Stats</a>
+          <!-- <a class="mdl-navigation__link" href="/admin/stats"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">trending_up</i>Stats</a> -->
           <a class="mdl-navigation__link jbot-disabled" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">keyboard_arrow_down</i>Studios</a>
           
-          <a class="mdl-navigation__link jbot-sublink" href="/admin/studio/?name=jeopardy-games"><span class="jbot-hashtag mdl-color-text--blue-grey-500">#</span> jeopardy-games</a>
-          <a class="mdl-navigation__link jbot-sublink" href="/admin/studio/?name=jeopardy-champions"><span class="jbot-hashtag mdl-color-text--blue-grey-500">#</span> jeopardy-champions</a>
+          {#studios}
+            <a class="mdl-navigation__link jbot-sublink" href="/admin/studio/?studio={name}"><span class="jbot-hashtag mdl-color-text--blue-grey-500">#</span> {name}</a>
+          {:else}
+            <a href="" class="mdl-navigation__link jbot-sublink jbot-disabled">No studios are currently active</a>
+          {/studios}
         </nav>
       </div>
       <main class="mdl-layout__content mdl-color--grey-100">
@@ -272,6 +275,7 @@
       </main>
     </div>
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/0.10.1/fetch.min.js"></script>
     <script src="https://storage.googleapis.com/code.getmdl.io/1.0.6/material.min.js"></script>
   </body>
 </html>

@@ -8,8 +8,9 @@ import basicAuth from 'basic-auth-connect';
  
 import App from './models/App';
 import Studio from './models/Studio';
-import Bot from './bot';
+import SlackBot from './bot';
 import Webhook from './webhook';
+import {broadcast} from './trebek';
 import * as config from './config';
 
 mongoose.connect(config.MONGO);
@@ -19,6 +20,7 @@ const app = express();
 app.engine('dust', dust({
   cache: false,
   helpers: [
+    'dustjs-helpers',
     dust => {
       dust.helpers.iter = (chunk, context, bodies, params) => {
         const obj = context.resolve(params.obj);
@@ -51,28 +53,57 @@ app.get('/welcome', (req, res) => {
 // Admin Routes:
 app.use('/admin', basicAuth('jeopardy', 'airbnb'));
 app.get('/admin', (req, res) => {
-  res.redirect('admin/home');
+  res.redirect('/admin/home');
 });
 app.get('/admin/:view', async (req, res) => {
+  const a = await App.get();
   const studios = await Studio.find();
   let studio;
   if (req.query.studio) {
     studio = studios.find(s => s.name === req.query.studio);
+    if (!studio) {
+      return res.sendStatus(404);
+    }
+    studio = studio.toObject();
   }
   res.render(`admin/${req.params.view}`, {
     studios,
     studio,
+    app: a,
     // stats,
     query: req.query
   });
 });
 
 // Admin routes that update configuration:
-app.post('/admin/update/studio', (req, res) => {
+app.post('/admin/update/studio', async (req, res) => {
+  const studio = await Studio.findOne({
+    id: req.body.id,
+    name: req.body.studio
+  });
+  if (req.body.feature) {
+    studio.features[req.body.feature].enabled = req.body.enabled;
+  } else if (req.body.toggle) {
+    studio.enabled = !studio.enabled;
+  }
+  await studio.save();
+  res.redirect(`/admin/studio?studio=${req.body.studio}`);
+});
+app.post('/admin/update/app', async (req, res) => {
+  // TODO: App Module:
+  const a = await App.get();
+  a[req.body.name] = req.body.value;
+  await a.save();
   res.send('ok');
 });
-app.post('/admin/update/app', (req, res) => {
-  res.send('ok');
+app.post('/admin/broadcast', (req, res) => {
+  if (req.body.studio) {
+    broadcast(req.body.message, req.body.id);
+    res.redirect(`/admin/studio?studio=${req.body.studio}`);
+  } else {
+    broadcast(req.body.message);
+    res.redirect('/admin/home');
+  }
 });
 
 app.get('/renderable/categories', (req, res) => {
@@ -99,11 +130,11 @@ app.get('/renderable/clue', (req, res) => {
 
 // Boot up the jeopardy app:
 app.listen(config.PORT, async () => {
-  const app = await App.get();
+  const a = await App.get();
   console.log(`Jeopardy Bot listening on port ${config.PORT}`);
   // If we're in a mode that needs the webhook, then set it up:
-  if (app.isBot()) {
-    new Bot();
+  if (a.isBot()) {
+    new SlackBot();
   } else {
     new Webhook(app);
   }

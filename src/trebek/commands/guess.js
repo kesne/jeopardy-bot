@@ -48,7 +48,7 @@ class Guess extends Command {
         // We timed out, so mark this question as done.
         await this.game.answer();
 
-        await this.say(`Time's up, ${this.contestant.name}! Remember, you have ${this.studio.config.timeout} seconds to answer. The correct answer is \`${clue.answer}\`.`);
+        await this.say(`Time's up, ${this.contestant.name}! Remember, you have ${this.studio.values.timeout} seconds to answer. The correct answer is \`${clue.answer}\`.`);
 
         if (this.game.isComplete()) {
           const contestants = await this.channelContestants();
