@@ -1,0 +1,129 @@
+{>admin_layout /}
+
+{<content}
+
+  <style>
+  .jbot-full {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  .jbot-feature {
+    min-height: 0;
+    height: 150px !important;
+  }
+  </style>
+  
+  <h1><span class="mdl-color-text--blue-grey-500">#</span> jeopardy-games</h1>
+  
+  <!-- Tabs -->
+  <div class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
+    <div class="mdl-tabs__tab-bar">
+      <a href="#home-panel" class="mdl-tabs__tab is-active">Info</a>
+      <a href="#configure-panel" class="mdl-tabs__tab">Configure</a>
+      <a href="#features-panel" class="mdl-tabs__tab">Features</a>
+    </div>
+    <div class="mdl-tabs__panel is-active" id="home-panel">
+      <div class="mdl-grid">
+        <div class="mdl-cell mdl-cell--3-col"></div>
+        <div class="mdl-cell mdl-cell--6-col">
+          <div class="jbot-full mdl-card mdl-shadow--2dp">
+            <div class="mdl-card__title">
+              <h2 class="mdl-card__title-text">Enable Room</h2>
+            </div>
+            <div class="mdl-card__supporting-text">
+              <p>
+                This jeopardy studio is currently 
+                <strong>{?studio.enabled}enabled{:else}disabled{/studio.enabled}</strong>.
+                <br>
+                {?studio.enabled}
+                Disabling the bot will prevent games from being played, and will end any games currently 
+                being played in the studio.
+                <br><br>
+                If you disable the studio, a message will be sent to the room informing the users that 
+                the bot has been disabled.
+                {:else}
+                Enabling the bot will allow games to be played in the studio.
+                <br><br>
+                If you enable the studio, a message will be sent to the room informing the users that 
+                the bot has been enabled.
+                {/studio.enabled}
+              </p>
+            </div>
+            <div class="mdl-card__actions mdl-card--border">
+              <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                {?studio.enabled}Disable Room{:else}Enable Room{/studio.enabled}
+              </a>
+            </div>
+            <div class="mdl-card__menu">
+              <label class="mdl-switch mdl-js-switch jbot-disabled">
+                <input type="checkbox" class="mdl-switch__input" checked>
+              </label>
+            </div>
+          </div>
+          
+          <div class="jbot-full mdl-card mdl-shadow--2dp">
+            <div class="mdl-card__title">
+              <h2 class="mdl-card__title-text">Send Broadcast</h2>
+            </div>
+            <div class="mdl-card__supporting-text">
+              Send a message to this studio as the bot.
+              <form action="#">
+                <div class="mdl-textfield mdl-js-textfield">
+                  <textarea class="mdl-textfield__input" type="text" rows="5" id="broadcast"></textarea>
+                  <label class="mdl-textfield__label" for="broadcast">Message</label>
+                </div>
+              </form>
+            </div>
+            <div class="mdl-card__actions mdl-card--border">
+              <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                Send Message
+              </a>
+            </div>
+            <div class="mdl-card__menu">
+              <i class="material-icons">announcement</i>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+    
+    <div class="mdl-tabs__panel" id="configure-panel">
+      <p>The Beatles' members were:
+      <ul>
+        <li>John Lennon (1940-1980)</li>
+        <li>Paul McCartney (1942-)</li>
+        <li>George Harrison (1943-2001)</li>
+        <li>Ringo Starr (1940-)</li>
+      </ul>
+    </div>
+    <div class="mdl-tabs__panel" id="features-panel">
+      <div class="mdl-grid">
+        {@iter obj=studio.features}
+        <div class="mdl-cell mdl-cell--6-col">
+          <div class="jbot-full mdl-card mdl-shadow--2dp jbot-feature">
+            <div class="mdl-card__title">
+              <h2 class="mdl-card__title-text">{$value.name}</h2>
+            </div>
+            <div class="mdl-card__supporting-text">
+              <p>
+                {$value.description}
+              </p>
+            </div>
+            <div class="mdl-card__menu">
+              <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="feature-{$key}">
+                <input type="checkbox" id="feature-{$key}" class="mdl-switch__input" {?$value.enabled}checked{/$value.enabled}>
+                <span class="mdl-switch__label"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+        {/iter}
+      </div>
+    </div>
+  </div>
+  
+  <script>
+  
+  </script>
+{/content}

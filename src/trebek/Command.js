@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import FormData from 'form-data';
+import App from '../models/App';
 import Studio from '../models/Studio';
 import Contestant from '../models/Contestant';
 import Game from '../models/Game';
@@ -29,7 +30,10 @@ export default class Command {
     // Finally, perform our requirement checks:
     this.checkRequirements();
 
-    await this.installStudio();
+    await Promise.all([
+      this.installStudio(),
+      this.installApp()
+    ]);
 
     // Inject custom say commands:
     if (customSay) {
@@ -44,15 +48,15 @@ export default class Command {
   }
 
   async say(message, url = '') {
-    if (config.MODE === 'response') {
-      this.message += `${message} ${url} \n`;
-    } else {
+    if (this.app.hasApi()) {
       await this.postToSlack(message, url);
+    } else {
+      this.message += `${message} ${url} \n`;
     }
   }
 
   sayOptional(...args) {
-    if (config.MODE !== 'response') {
+    if (this.app.hasApi()) {
       return this.say(...args);
     }
   }
@@ -60,8 +64,9 @@ export default class Command {
   async postToSlack(message, url) {
     // Create our new form:
     const form = new FormData();
-    form.append('token', config.API_TOKEN);
-    form.append('username', this.studio.config.username);
+    form.append('token', this.app.api_token);
+    form.append('username', this.app.username);
+    // TODO: Icon emoji?
     form.append('text', message);
     form.append('channel', this.data.channel_id);
     form.append('as_user', JSON.stringify(true));
@@ -70,7 +75,6 @@ export default class Command {
       form.append('attachments', JSON.stringify([{
         fallback: 'Jeopardy Bot',
         image_url: url,
-        icon_emoji: ':jbot:',
         color: '#F4AC79'
       }]));
     }
@@ -134,6 +138,10 @@ export default class Command {
 
   async installStudio() {
     this.studio = await Studio.get(this.data.channel_id);
+  }
+  
+  async installApp() {
+    this.app = await App.get();
   }
 
   checkRequirements() {

@@ -35,15 +35,6 @@ if (MODE !== 'response' && MODE !== 'hybrid' && MODE !== 'bot') {
   MODE = 'response';
 }
 
-// A list of rooms that the bot will work in:
-export let ROOM_WHITELIST = process.env.JBOT_ROOMS || 'jeopardy';
-ROOM_WHITELIST = ROOM_WHITELIST.split(',');
-
-// The username of the bot:
-export const USERNAME = process.env.JBOT_USERNAME || 'jeopardybot';
-// The ID of the bot that we can use to ignore messages from ourself:
-export const BOT_ID = 'USLACKBOT';
-
 // The URL for the mongo database:
 export const MONGO = process.env.MONGO_URL || process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://localhost/jeopardy';
 

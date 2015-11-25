@@ -2,7 +2,6 @@ import Command from '../Command';
 import {Trigger, Only, Provide, currency} from '../utils';
 import endgameMessage from './shared/endgame';
 import {boardImage, dailydoubleImage, clueImage} from '../../cola';
-import * as config from '../../config';
 
 @Trigger(
   /(?:ill take |give me |choose )?(.*) for \$?(\d{3,4})(?: alex| trebek)?/,
@@ -76,7 +75,7 @@ class Clue extends Command {
       this.say(`Here's your clue.`, url);
 
       // Additional feedback after we timeout (plus five seconds for some flexibility):
-      if (config.MODE !== 'response') {
+      if (this.app.hasApi()) {
         setTimeout(async () => {
           // Grab the lock so we block incoming requests:
           await this.lock();

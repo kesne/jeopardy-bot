@@ -16,6 +16,6 @@ export async function imgurUpload(file, attempt = 1) {
     const {data} = await uploadFile(file);
     return data.link;
   } catch (e) {
-    return upload(file, attempt + 1);
+    return imgurUpload(file, attempt + 1);
   }
 }
