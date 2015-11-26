@@ -17,6 +17,12 @@
         Change the global settings of the bot.
         <div class="jbot-setting">
           <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input class="setting-value mdl-textfield__input" name="admin" type="text" value="{app.admin}" id="admin">
+            <label class="mdl-textfield__label" for="admin">Admin</label>
+          </div>
+        </div>
+        <div class="jbot-setting">
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
             <input class="setting-value mdl-textfield__input" name="username" type="text" value="{app.username}" id="username">
             <label class="mdl-textfield__label" for="username">Username</label>
           </div>

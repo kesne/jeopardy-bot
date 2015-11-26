@@ -1,6 +1,9 @@
 import {Schema, model} from 'mongoose';
 
 export const schema = new Schema({
+  admin: {
+    type: 'String'
+  },
   username: {
     type: 'String',
     default: 'jeopardybot'
