@@ -79,23 +79,6 @@
       </div>
     </form>
   </div>
-  <div class="mdl-cell mdl-cell--6-col mdl-card mdl-shadow--2dp">
-    <div class="mdl-card__title">
-      <h2 class="mdl-card__title-text">Send Broadcast</h2>
-    </div>
-    <div class="mdl-card__supporting-text">
-      Send a message to every studio that JeopardyBot is in. 
-      This will not send private messages.
-    </div>
-    <div class="mdl-card__actions mdl-card--border">
-      <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
-        Get Started
-      </a>
-    </div>
-    <div class="mdl-card__menu">
-      <i class="material-icons">announcement</i>
-    </div>
-  </div>
   
   <script>
     (function() {

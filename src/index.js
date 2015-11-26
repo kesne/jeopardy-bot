@@ -66,12 +66,39 @@ app.get('/admin/:view', async (req, res) => {
     }
     studio = studio.toObject();
   }
+  
+  const studioValues = [
+    {
+      name: 'Clue Timeout',
+      description: 'The number of seconds before a clue times out.',
+      key: 'timeout',
+      type: 'number'
+    },
+    {
+      name: 'Challenge Timeout',
+      description: 'The number of seconds before a challenge times out.',
+      key: 'challengeTimeout',
+      type: 'number'
+    },
+    {
+      name: 'Minimum Challenge Votes',
+      description: 'The minimum number of votes required for a challenge to be accepted.',
+      key: 'minimumChallengeVotes',
+      type: 'number'
+    },
+    {
+      name: 'Challenge Threshold',
+      description: 'The percentage of votes that are required for a challenge to be accepted.',
+      key: 'challengeAcceptenceThreshold',
+      type: 'number'
+    }
+  ];
   res.render(`admin/${req.params.view}`, {
     studios,
     studio,
-    app: a,
+    studioValues,
     // stats,
-    query: req.query
+    app: a
   });
 });
 
@@ -83,6 +110,8 @@ app.post('/admin/update/studio', async (req, res) => {
   });
   if (req.body.feature) {
     studio.features[req.body.feature].enabled = req.body.enabled;
+  } else if (req.body.values) {
+    studio.values[req.body.values] = req.body.value;
   } else if (req.body.toggle) {
     studio.enabled = !studio.enabled;
   }
@@ -90,7 +119,6 @@ app.post('/admin/update/studio', async (req, res) => {
   res.redirect(`/admin/studio?studio=${req.body.studio}`);
 });
 app.post('/admin/update/app', async (req, res) => {
-  // TODO: App Module:
   const a = await App.get();
   a[req.body.name] = req.body.value;
   await a.save();

@@ -21,6 +21,7 @@
       <a href="#home-panel" class="mdl-tabs__tab is-active">Info</a>
       <a href="#configure-panel" class="mdl-tabs__tab">Configure</a>
       <a href="#features-panel" class="mdl-tabs__tab">Features</a>
+      <!-- <a href="#monitor-panel" class="mdl-tabs__tab">Monitor</a> -->
     </div>
     <div class="mdl-tabs__panel is-active" id="home-panel">
       <div class="mdl-grid">
@@ -96,13 +97,26 @@
     </div>
     
     <div class="mdl-tabs__panel" id="configure-panel">
-      <p>The Beatles' members were:
-      <ul>
-        <li>John Lennon (1940-1980)</li>
-        <li>Paul McCartney (1942-)</li>
-        <li>George Harrison (1943-2001)</li>
-        <li>Ringo Starr (1940-)</li>
-      </ul>
+      <div class="mdl-grid">
+        {#studioValues}
+          <div class="mdl-cell mdl-cell--6-col">
+            <div class="jbot-full mdl-card mdl-shadow--2dp">
+              <div class="mdl-card__title">
+                <h2 class="mdl-card__title-text">{name}</h2>
+              </div>
+              <div class="mdl-card__supporting-text">
+                <p>
+                  {description}
+                </p>
+                <div class="mdl-textfield mdl-js-textfield">
+                  <input class="values-input mdl-textfield__input" data-key="{key}" type="{type}" id="value-{key}" value="{studio.values[key]}" />
+                  <label class="mdl-textfield__label" for="value-{key}">{name}</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        {/studioValues}
+      </div>
     </div>
     <div class="mdl-tabs__panel" id="features-panel">
       <div class="mdl-grid">
@@ -133,6 +147,7 @@
   <script>
     (function() {
       var features = document.querySelectorAll('.feature-toggle');
+      var values = document.querySelectorAll('.values-input');
       for (var i = 0; i < features.length; i++) {
         var feature = features[i];
         feature.addEventListener('change', function() {
@@ -148,6 +163,25 @@
               studio: '{studio.name}',
               feature: this.getAttribute('data-key'),
               enabled: this.checked
+            })
+          });
+        });
+      }
+      for (var i = 0; i < values.length; i++) {
+        var value = values[i];
+        value.addEventListener('change', function() {
+          fetch('/admin/update/studio', {
+            method: 'post',
+            credentials: 'same-origin',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              id: '{studio.id}',
+              studio: '{studio.name}',
+              values: this.getAttribute('data-key'),
+              value: this.value
             })
           });
         });

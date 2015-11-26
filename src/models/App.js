@@ -12,7 +12,6 @@ export const schema = new Schema({
   // icon_url: {
   //   type: String
   // },
-  // TODO: Validate the mode is compatible with the API_TOKEN.
   mode: {
     type: 'String',
     enum: ['bot', 'hybrid', 'response'],
@@ -44,8 +43,6 @@ schema.methods.hasApi = function() {
   return Boolean(this.api_token);
 };
 
-let appConfig;
-
 schema.statics.findOrCreate = async function() {
   let doc = await this.findOne();
   if (!doc) {
@@ -54,12 +51,23 @@ schema.statics.findOrCreate = async function() {
   return doc;
 };
 
+let appConfig;
 schema.statics.get = async function() {
   if (!appConfig) {
     appConfig = await this.findOrCreate();
   }
   return appConfig;
 };
+
+// Additional schema validation:
+schema.pre('save', function(next) {
+  // Invalid mode:
+  if (!this.api_token && (this.mode === 'bot' || this.mode === 'hybrid')) {
+    this.mode = 'reponse';
+    console.log(new Error('Mode requries an API token.'));
+  }
+  next();
+});
 
 // Update the cached reference:
 schema.post('save', doc => {
