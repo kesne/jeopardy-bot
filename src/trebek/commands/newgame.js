@@ -11,7 +11,8 @@ class NewGame extends Command {
 
     // Start the game:
     const game = await this.models.Game.start({
-      channel_id: this.data.channel_id
+      channel_id: this.data.channel_id,
+      channel_name: this.data.channel_name
     });
 
     const url = await boardImage({game});

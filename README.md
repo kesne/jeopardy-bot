@@ -54,14 +54,10 @@ _Note: If you configure a trigger word, all of the phrases will be prefixed by t
 
 ## Configuring
 
-You can configure the bot via environment variables. Most of the configuration options are prefixed with `JBOT_` to prevent conflicts.
+Use the upcoming web UI...
 
-- `JBOT_MODE` - The mode that the bot should act in. For more information, [see the section on modes](#modes). Defaults to "response" if no API token is set. If an API token is present, it defaults to "hybrid".
-- `JBOT_API_TOKEN` - The API token for "hybrid" mode to send enhanced messages.
-- `JBOT_OUTGING_WEBHOOK_TOKEN` - The token from the outgoing webhook, which is used to verify incoming requests.
-- `JBOT_USERNAME` _(defaults to "jeopardybot")_ - The username that messages from the bot will be posted as.
-- `JBOT_CLUE_TIMEOUT` _(defaults to "45")_ - The number of seconds that users have to answer a clue.
-- `JBOT_IMAGE_MIN` _(defaults to "0")_ - When set to "1", this configuration option will compress the images captured before uploading them to Imgur.
+- `API_TOKEN` - The API token for "hybrid" mode to send enhanced messages.
+- `OUTGING_WEBHOOK_TOKEN` - The token from the outgoing webhook, which is used to verify incoming requests.
 
 ### Configuring MongoDB
 

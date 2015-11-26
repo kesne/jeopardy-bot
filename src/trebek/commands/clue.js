@@ -2,7 +2,6 @@ import Command from '../Command';
 import {Trigger, Only, Provide, currency} from '../utils';
 import endgameMessage from './shared/endgame';
 import {boardImage, dailydoubleImage, clueImage} from '../../cola';
-import * as config from '../../config';
 
 @Trigger(
   /(?:ill take |give me |choose )?(.*) for \$?(\d{3,4})(?: alex| trebek)?/,
@@ -59,7 +58,7 @@ class Clue extends Command {
     this.sayOptional(`OK, \`${this.game.getCategory().title}\` for ${currency(clue.value)}...`);
 
     // You found a daily double!
-    if (this.game.isDailyDouble()) {
+    if (this.studio.features.dailyDoubles.enabled && this.game.isDailyDouble()) {
       const dailyDoubleUrl = await dailydoubleImage();
 
       // Make sure that the daily double image displays before we do anything else:
@@ -78,7 +77,7 @@ class Clue extends Command {
       this.say(`Here's your clue.`, url);
 
       // Additional feedback after we timeout (plus five seconds for some flexibility):
-      if (config.MODE !== 'response') {
+      if (this.app.hasApi()) {
         setTimeout(async () => {
           // Grab the lock so we block incoming requests:
           await this.lock();
@@ -108,7 +107,7 @@ class Clue extends Command {
           } finally {
             this.unlock();
           }
-        }, (config.CLUE_TIMEOUT * 1000) + 100);
+        }, (this.studio.values.timeout * 1000) + 100);
       }
     }
   }

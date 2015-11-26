@@ -1,7 +1,6 @@
 import fetch from 'node-fetch';
 import Command from '../Command';
-import {Trigger, Only, Provide, currency} from '../utils';
-import * as config from '../../config';
+import {Trigger, Only, Feature, Provide, currency} from '../utils';
 
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 const cx = '013673686761662547163:nw_cf3t8esg';
@@ -14,6 +13,9 @@ const URL_BASE = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KE
   'gameactive',
   'noclue'
   // ,'challenge'
+)
+@Feature(
+  'challenge'
 )
 @Provide(
   'game',
@@ -100,7 +102,7 @@ export default class Challenge extends Command {
         } finally {
           this.unlock();
         }
-      }, ((config.CHALLENGE_TIMEOUT) * 1000) + 100);
+      }, ((this.studio.values.challengeTimeout) * 1000) + 100);
     }
   }
 }

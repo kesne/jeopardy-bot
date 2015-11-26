@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>JeopardyBot - Admin</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.6/material.indigo-amber.min.css" />
+    <style>
+    html, body {
+      font-family: 'Roboto', 'Helvetica', sans-serif;
+    }
+    .demo-layout .demo-header .mdl-textfield {
+      padding-top: 27px;
+    }
+    .demo-layout .mdl-layout__header .mdl-layout__drawer-button {
+      color: rgba(0, 0, 0, 0.54);
+    }
+    .demo-drawer {
+      border: none;
+    }
+    /* iOS Safari specific workaround */
+    .demo-drawer .mdl-menu__container {
+      z-index: -1;
+    }
+    .demo-drawer .demo-navigation {
+      z-index: -2;
+    }
+    /* END iOS Safari specific workaround */
+    .demo-drawer .mdl-menu .mdl-menu__item {
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-align: center;
+      -webkit-align-items: center;
+          -ms-flex-align: center;
+              align-items: center;
+    }
+    .demo-drawer-header {
+      box-sizing: border-box;
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      -webkit-flex-direction: column;
+          -ms-flex-direction: column;
+              flex-direction: column;
+      -webkit-box-pack: end;
+      -webkit-justify-content: flex-end;
+          -ms-flex-pack: end;
+              justify-content: flex-end;
+      padding: 16px;
+      height: 151px;
+    }
+    .demo-navigation {
+      -webkit-box-flex: 1;
+      -webkit-flex-grow: 1;
+          -ms-flex-positive: 1;
+              flex-grow: 1;
+    }
+    .demo-layout .demo-navigation .mdl-navigation__link {
+      display: -webkit-box !important;
+      display: -webkit-flex !important;
+      display: -ms-flexbox !important;
+      display: flex !important;
+      -webkit-box-orient: horizontal;
+      -webkit-box-direction: normal;
+      -webkit-flex-direction: row;
+          -ms-flex-direction: row;
+              flex-direction: row;
+      -webkit-box-align: center;
+      -webkit-align-items: center;
+          -ms-flex-align: center;
+              align-items: center;
+      color: rgba(255, 255, 255, 0.56);
+      font-weight: 500;
+    }
+    .demo-layout .demo-navigation .mdl-navigation__link:hover {
+      background-color: #00BCD4;
+      color: #37474F;
+    }
+    .demo-navigation .mdl-navigation__link .material-icons {
+      font-size: 24px;
+      color: rgba(255, 255, 255, 0.56);
+      margin-right: 32px;
+    }
+    
+    .demo-drawer .mdl-navigation__link.jbot-sublink {
+      padding: 5px 20px 5px 60px;
+    }
+    .jbot-hashtag {
+      display: inline-block;
+      padding-right: 10px;
+    }
+    .jbot-disabled {
+      pointer-events: none;
+    }
+    .page-content {
+      max-width: 1080px;
+    }
+    </style>
+  </head>
+  <body>
+    <div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+      <header class="demo-header mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600">
+        <div class="mdl-layout__header-row">
+          <span class="mdl-layout-title">JeopardyBot</span>
+          <div class="mdl-layout-spacer"></div>
+          <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="hdrbtn">
+            <i class="material-icons">more_vert</i>
+          </button>
+          <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="hdrbtn">
+            <li class="mdl-menu__item"><a href="/welcome">JeopardyBot Setup</a></li>
+            <li class="mdl-menu__item"><a href="https://github.com/kesne/jeopardy-bot" target="_blank">Github</a></li>
+          </ul>
+        </div>
+      </header>
+      <div class="demo-drawer mdl-layout__drawer mdl-color--blue-grey-900 mdl-color-text--blue-grey-50">
+        <nav class="demo-navigation mdl-navigation mdl-color--blue-grey-800">
+          <a class="mdl-navigation__link" href="/admin/home"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">home</i>Home</a>
+          <!-- <a class="mdl-navigation__link" href="/admin/stats"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">trending_up</i>Stats</a> -->
+          <a class="mdl-navigation__link jbot-disabled" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">keyboard_arrow_down</i>Studios</a>
+          
+          {#studios}
+            <a class="mdl-navigation__link jbot-sublink" href="/admin/studio/?studio={name}"><span class="jbot-hashtag mdl-color-text--blue-grey-500">#</span> {name}</a>
+          {:else}
+            <a href="" class="mdl-navigation__link jbot-sublink jbot-disabled">No studios are currently active</a>
+          {/studios}
+        </nav>
+      </div>
+      <main class="mdl-layout__content mdl-color--grey-100">
+        <div class="mdl-grid page-content">
+          {+content /}
+        </div>
+      </main>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/0.10.1/fetch.min.js"></script>
+    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.6/material.min.js"></script>
+  </body>
+</html>

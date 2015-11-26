@@ -1,9 +1,9 @@
-import fetch from 'node-fetch';
-import FormData from 'form-data';
+import App from '../models/App';
+import Studio from '../models/Studio';
 import Contestant from '../models/Contestant';
 import Game from '../models/Game';
 import {lock, unlock} from './locks';
-import * as config from '../config';
+import {post} from './slack';
 
 export default class Command {
 
@@ -23,10 +23,18 @@ export default class Command {
 
   async start(customSay) {
     // Load in our providers now:
-    await this.getProviders();
+    await this.installProviders();
 
-    // Finally, perform our requirement checks:
+    // Perform our requirement checks:
     this.checkRequirements();
+
+    await Promise.all([
+      this.installStudio(),
+      this.installApp()
+    ]);
+    
+    // Check to make sure we have the correct features enabled:
+    this.checkFeatures();
 
     // Inject custom say commands:
     if (customSay) {
@@ -41,41 +49,21 @@ export default class Command {
   }
 
   async say(message, url = '') {
-    if (config.MODE === 'response') {
-      this.message += `${message} ${url} \n`;
-    } else {
+    if (this.app.hasApi()) {
       await this.postToSlack(message, url);
+    } else {
+      this.message += `${message} ${url} \n`;
     }
   }
 
   sayOptional(...args) {
-    if (config.MODE !== 'response') {
+    if (this.app.hasApi()) {
       return this.say(...args);
     }
   }
 
   async postToSlack(message, url) {
-    // Create our new form:
-    const form = new FormData();
-    form.append('token', config.API_TOKEN);
-    form.append('username', config.USERNAME);
-    form.append('text', message);
-    form.append('channel', this.data.channel_id);
-    form.append('as_user', JSON.stringify(true));
-
-    if (url) {
-      form.append('attachments', JSON.stringify([{
-        fallback: 'Jeopardy Bot',
-        image_url: url,
-        icon_emoji: ':jbot:',
-        color: '#F4AC79'
-      }]));
-    }
-
-    return fetch('https://slack.com/api/chat.postMessage', {
-      method: 'POST',
-      body: form
-    });
+    await post(message, url);
   }
 
   // Locking helpers
@@ -104,7 +92,7 @@ export default class Command {
     };
   }
 
-  async getProviders() {
+  async installProviders() {
     const providers = this.constructor.providers || [];
     await Promise.all(providers.map(provide => {
       // Async values:
@@ -127,6 +115,29 @@ export default class Command {
         });
       }
     }));
+  }
+
+  async installStudio() {
+    this.studio = await Studio.get({
+      id: this.data.channel_id,
+      name: this.data.channel_name
+    });
+    if (!this.studio.enabled) {
+      throw new Error('Studio disabled');
+    }
+  }
+  
+  async installApp() {
+    this.app = await App.get();
+  }
+
+  checkFeatures() {
+    const features = this.constructor.features || [];
+    for (const feature of features) {
+      if (!this.studio.features[feature].enabled) {
+        throw new Error('Unmet feature.');
+      }
+    }
   }
 
   checkRequirements() {

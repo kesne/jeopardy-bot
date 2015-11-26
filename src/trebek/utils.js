@@ -64,6 +64,12 @@ export function Only(...requirements) {
   };
 }
 
+export function Feature(...features) {
+  return function(Constructor) {
+    Constructor.features = features;
+  };
+}
+
 export function NoLock(Constructor) {
   Constructor.nolock = true;
 }

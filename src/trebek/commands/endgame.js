@@ -1,8 +1,9 @@
 import Command from '../Command';
-import {Trigger, Only, Provide} from '../utils';
+import {Trigger, Only, Feature, Provide} from '../utils';
 
 @Trigger('end game')
 @Only('gameactive')
+@Feature('endGame')
 @Provide('game')
 export default class EndGame extends Command {
   async response() {

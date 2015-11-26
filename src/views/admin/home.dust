@@ -1,0 +1,111 @@
+{>admin_layout /}
+
+{<content}
+
+  <style>
+  .jbot-settings {
+    width: 100%;
+  }
+  </style>
+  
+  <div class="mdl-cell mdl-cell--12-col">
+    <div class="jbot-settings mdl-card mdl-shadow--2dp">
+      <div class="mdl-card__title">
+        <h2 class="mdl-card__title-text">Settings</h2>
+      </div>
+      <div class="mdl-card__supporting-text">
+        Change the global settings of the bot.
+        <div class="jbot-setting">
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input class="setting-value mdl-textfield__input" name="admin" type="text" value="{app.admin}" id="admin">
+            <label class="mdl-textfield__label" for="admin">Admin</label>
+          </div>
+        </div>
+        <div class="jbot-setting">
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input class="setting-value mdl-textfield__input" name="username" type="text" value="{app.username}" id="username">
+            <label class="mdl-textfield__label" for="username">Username</label>
+          </div>
+        </div>
+        <div class="jbot-setting">
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input class="setting-value mdl-textfield__input" name="icon_emoji" type="text" value="{app.icon_emoji}" id="icon_emoji">
+            <label class="mdl-textfield__label" for="icon_emoji">Icon Emoji</label>
+          </div>
+        </div>
+        <hr />
+        <div class="jbot-setting">
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <label class="" for="mode">Mode</label>
+            <select class="setting-value mdl-textfield" name="mode" id="mode">
+              <option value="repsonse" {@eq key="response" value=app.mode}selected{/eq}>Response</option>
+              <option value="hybrid" {@eq key="hybrid" value=app.mode}selected{/eq}>Hybrid</option>
+              <option value="bot" {@eq key="bot" value=app.mode}selected{/eq}>Bot</option>
+            </select>
+            <span>Requires a restart.</span>
+          </div>
+        </div>
+        <div class="jbot-setting">
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input class="setting-value mdl-textfield__input" type="text" name="api_token" value="{app.api_token}" id="api_token">
+            <label class="mdl-textfield__label" for="api_token">API Token</label>
+          </div>
+        </div>
+        <div class="jbot-setting">
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input class="setting-value mdl-textfield__input" type="text" name="verify_token" value="{app.verify_token}" id="verify_token">
+            <label class="mdl-textfield__label" for="verify_token">Verify Token</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mdl-cell mdl-cell--6-col mdl-card mdl-shadow--2dp">
+    <form action="/admin/broadcast" method="post">
+      <div class="mdl-card__title">
+        <h2 class="mdl-card__title-text">Send Broadcast</h2>
+      </div>
+      <div class="mdl-card__supporting-text">
+        Send a message to every studio that the bot is in.
+        <br />
+        This will not send private messages.
+        <div class="mdl-textfield mdl-js-textfield">
+          <textarea class="mdl-textfield__input" type="text" rows="5" name="message" id="broadcast"></textarea>
+          <label class="mdl-textfield__label" for="broadcast">Message</label>
+        </div>
+      </div>
+      <div class="mdl-card__actions mdl-card--border">
+        <button type="submit" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+          Send Message
+        </button>
+      </div>
+      <div class="mdl-card__menu">
+        <i class="material-icons">announcement</i>
+      </div>
+    </form>
+  </div>
+  
+  <script>
+    (function() {
+      var features = document.querySelectorAll('.setting-value');
+      for (var i = 0; i < features.length; i++) {
+        var feature = features[i];
+        feature.addEventListener('change', function() {
+          fetch('/admin/update/app', {
+            method: 'post',
+            credentials: 'same-origin',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              name: this.getAttribute('name'),
+              value: this.value
+            })
+          });
+        });
+      }
+    })();
+  </script>
+{/content}

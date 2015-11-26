@@ -8,6 +8,14 @@ import {clean} from '../trebek/utils';
 import * as config from '../config';
 
 export const schema = new Schema({
+
+  // Studios are the places games are played:
+  studio: {
+    type: Schema.Types.ObjectId,
+    ref: 'Studio',
+    required: true
+  },
+
   categories: [{
     id: {
       type: Number,
@@ -138,12 +146,15 @@ schema.methods.liveClue = function() {
 };
 
 schema.methods.isDailyDouble = function() {
+  if (!this.features.dailyDoubles.enabled) {
+    return false;
+  }
   const clue = this.getClue();
   return clue && clue.dailyDouble;
 };
 
 schema.methods.isChallengeStarted = function() {
-  return this.challenge.active && this.challenge.started && moment().isBefore(moment(this.challenge.started).add(config.CHALLENGE_TIMEOUT, 'seconds'));
+  return this.challenge.active && this.challenge.started && moment().isBefore(moment(this.challenge.started).add(this.studio.values.challengeTimeout, 'seconds'));
 };
 
 schema.methods.startChallenge = async function({contestant}) {
@@ -175,14 +186,14 @@ schema.methods.endChallenge = async function(forceWin = false) {
   // Force a save:
   await this.save();
 
-  if (!forceWin && votes.length < config.CHALLENGE_MIN) {
+  if (!forceWin && votes.length < this.studio.values.minimumChallengeVotes) {
     throw new Error('min');
   }
   const yesVotes = votes.map(vote => vote.correct ? 1 : 0).reduce((prev, curr) => {
     return prev + curr;
   }, 0);
 
-  if (forceWin || (yesVotes / votes.length) >= config.CHALLENGE_THRESHOLD) {
+  if (forceWin || (yesVotes / votes.length) >= this.studio.values.challengeAcceptenceThreshold) {
     const contestant = await this.model('Contestant').findOne({
       slackid
     });
@@ -202,7 +213,7 @@ schema.methods.endChallenge = async function(forceWin = false) {
 };
 
 schema.methods.isTimedOut = function() {
-  return moment().isAfter(moment(this.questionStart).add(config.CLUE_TIMEOUT, 'seconds'));
+  return moment().isAfter(moment(this.questionStart).add(this.studio.values.timeout, 'seconds'));
 };
 
 schema.methods.isComplete = function() {
@@ -259,11 +270,11 @@ schema.methods.end = async function() {
 
 // Grab the active game for the channel:
 schema.statics.forChannel = function({channel_id}) {
-  return this.findOne({channel_id});
+  return this.findOne({channel_id}).populate('studio');
 };
 
 // Start a new game:
-schema.statics.start = async function({channel_id}) {
+schema.statics.start = async function({channel_id, channel_name}) {
   const game = await this.forChannel({channel_id});
 
   // Clear out existing (ended) games:
@@ -278,7 +289,13 @@ schema.statics.start = async function({channel_id}) {
   // Extract the questions and categories:
   const {clues: questions, categories} = episode.roundOne;
 
+  const studio = await this.model('Studio').get({
+    id: channel_id,
+    name: channel_name
+  });
+
   return this.create({
+    studio,
     channel_id,
     categories,
     questions
@@ -296,9 +313,14 @@ schema.methods.getCategory = function() {
 };
 
 schema.methods.isContestantBoardControl = function({slackid}) {
-  if (config.BOARD_CONTROL) {
+  if (this.studio.features.boardControl.enabled) {
     if (this.lastContestant && this.lastContestant === slackid) {
-      if (this.questionEnd && moment().isBefore(moment(this.questionEnd).add(config.BOARD_CONTROL_TIMEOUT, 'seconds'))) {
+      if (this.questionEnd &&
+        moment().isBefore(moment(this.questionEnd).add(
+          this.studio.values.boardControlTimeout,
+          'seconds'
+        ))
+      ) {
         return true;
       }
     }
@@ -451,6 +473,7 @@ schema.methods.guess = async function({contestant, guess}) {
     if (guess === answer) {
       return true;
     }
+    // TODO: match modes:
     const similarity = DiceCoefficient(guess, answer);
     if (similarity >= config.ACCEPTED_SIMILARITY) {
       return true;

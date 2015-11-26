@@ -1,5 +1,5 @@
 import Command from '../Command';
-import {Trigger, Only, Provide, currency} from '../utils';
+import {Trigger, Only, Feature, Provide, currency} from '../utils';
 import {clueImage} from '../../cola';
 
 @Trigger(
@@ -8,6 +8,9 @@ import {clueImage} from '../../cola';
 @Only(
   'gameactive',
   'mydailydouble'
+)
+@Feature(
+  'dailyDoubles'
 )
 @Provide(
   'game',

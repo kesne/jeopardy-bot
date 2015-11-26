@@ -1,14 +1,18 @@
 import Slack from 'slack-client';
 import trebek from './trebek';
-import * as config from './config';
+import App from './models/App';
 
-const slackToken = config.API_TOKEN;
 const autoReconnect = true;
 const autoMarkMessagesAsRead = true;
 
 export default class Bot {
   constructor() {
-    this.slack = new Slack(slackToken, autoReconnect, autoMarkMessagesAsRead);
+    this.start();
+  }
+  
+  async start() {
+    const app = await App.get();
+    this.slack = new Slack(app.api_token, autoReconnect, autoMarkMessagesAsRead);
 
     this.slack.on('open', this.onOpen.bind(this));
     this.slack.on('message', this.onMessage.bind(this));
@@ -50,6 +54,7 @@ export default class Bot {
     }
 
     const channel = this.slack.getChannelGroupOrDMByID(channel_id);
+    const channel_name = channel.name
 
     if (subtype === 'channel_join') {
       const {name: user_name} = this.slack.getUserByID(user_id);
@@ -69,6 +74,7 @@ export default class Bot {
     }
     const {name: user_name} = this.slack.getUserByID(user_id);
     trebek(text, {
+      channel_name,
       channel_id,
       timestamp,
       user_id,
