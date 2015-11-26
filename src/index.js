@@ -51,7 +51,7 @@ app.get('/welcome', (req, res) => {
 });
 
 // Admin Routes:
-app.use('/admin', basicAuth('jeopardy', 'airbnb'));
+app.use('/admin', basicAuth(config.ADMIN_USERNAME, config.ADMIN_PASSWORD));
 app.get('/admin', (req, res) => {
   res.redirect('/admin/home');
 });
