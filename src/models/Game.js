@@ -146,7 +146,7 @@ schema.methods.liveClue = function() {
 };
 
 schema.methods.isDailyDouble = function() {
-  if (!this.features.dailyDoubles.enabled) {
+  if (!this.studio.features.dailyDoubles.enabled) {
     return false;
   }
   const clue = this.getClue();
