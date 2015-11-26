@@ -312,20 +312,20 @@ schema.methods.getCategory = function() {
   return this.categories.find(cat => cat.id === clue.category_id);
 };
 
+schema.methods.isBoardControlled = function() {
+  return (
+    this.studio.features.boardControl.enabled &&
+    this.lastContestant &&
+    this.questionEnd && 
+    moment().isBefore(moment(this.questionEnd).add(
+      this.studio.values.boardControlTimeout,
+      'seconds'
+    ))
+  );
+};
+
 schema.methods.isContestantBoardControl = function({slackid}) {
-  if (this.studio.features.boardControl.enabled) {
-    if (this.lastContestant && this.lastContestant === slackid) {
-      if (this.questionEnd &&
-        moment().isBefore(moment(this.questionEnd).add(
-          this.studio.values.boardControlTimeout,
-          'seconds'
-        ))
-      ) {
-        return true;
-      }
-    }
-  }
-  return false;
+  return this.lastContestant && this.lastContestant === slackid;
 };
 
 // Get a new clue for a given value and title.
@@ -340,7 +340,7 @@ schema.methods.newClue = async function({category, value, contestant}) {
   if (this.getClue()) {
     await this.answer();
   }
-  if (this.studio.features.boardControl.enabled && !this.isContestantBoardControl(contestant)) {
+  if (this.isBoardControlled() && !this.isContestantBoardControl(contestant)) {
     throw new Error('board control');
   }
 
