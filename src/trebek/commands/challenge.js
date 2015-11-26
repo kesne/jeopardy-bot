@@ -15,7 +15,7 @@ const URL_BASE = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KE
   // ,'challenge'
 )
 @Feature(
-  'challenge'
+  'challenges'
 )
 @Provide(
   'game',
