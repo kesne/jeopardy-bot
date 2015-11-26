@@ -87,7 +87,7 @@ class Guess extends Command {
           channel_id: this.data.channel_id
         }),
         // Mark the question as answered:
-        this.game.answer()
+        this.game.answer(this.contestant)
       ]);
 
       await this.say(`That is correct, ${this.contestant.name}. The answer was \`${clue.answer}\`.\nYour score is now ${currency(this.contestant.channelScore(this.data.channel_id).value)}.`);

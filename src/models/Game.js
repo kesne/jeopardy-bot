@@ -77,6 +77,10 @@ export const schema = new Schema({
     required: true,
     index: true
   },
+  
+  lastContestant: {
+    type: String
+  },
 
   lastCategory: {
     type: Number
@@ -87,6 +91,10 @@ export const schema = new Schema({
   },
 
   questionStart: {
+    type: Date
+  },
+  
+  questionEnd: {
     type: Date
   },
 
@@ -304,6 +312,17 @@ schema.methods.getCategory = function() {
   return this.categories.find(cat => cat.id === clue.category_id);
 };
 
+schema.methods.isContestantBoardControl = function({slackid}) {
+  if (config.BOARD_CONTROL) {
+    if (this.lastContestant && this.lastContestant === slackid) {
+      if (this.questionEnd && moment().isBefore(moment(this.questionEnd).add(config.BOARD_CONTROL_TIMEOUT, 'seconds'))) {
+        return true;
+      }
+    }
+  }
+  return false;
+};
+
 // Get a new clue for a given value and title.
 schema.methods.newClue = async function({category, value, contestant}) {
   if (this.isChallengeStarted()) {
@@ -315,6 +334,9 @@ schema.methods.newClue = async function({category, value, contestant}) {
   // If there's an active clue that has timed out, let's go ahead and time it out:
   if (this.getClue()) {
     await this.answer();
+  }
+  if (!this.isContestantBoardControl(contestant)) {
+    throw new Error('board control');
   }
 
   // Handle asking for the same category:
@@ -468,13 +490,20 @@ schema.methods.guess = async function({contestant, guess}) {
   return correctAnswer;
 };
 
-schema.methods.answer = function() {
+schema.methods.answer = function(contestant) {
   this.questions.some(q => {
     if (this.activeQuestion === q.id) {
       q.answered = true;
       return true;
     }
   });
+  
+  // Stash the contestant for board control:
+  if (contestant) {
+    this.lastContestant = contestant.slackid;
+  } else {
+    this.lastContestant = undefined;
+  }
 
   // Set up the ruling to be started:
   this.challenge.votes = [];
@@ -485,6 +514,7 @@ schema.methods.answer = function() {
   this.contestantAnswers = [];
   this.activeQuestion = undefined;
   this.questionStart = undefined;
+  this.questionEnd = Date.now();
   this.dailyDouble = {};
 
   return this.save();
