@@ -340,7 +340,7 @@ schema.methods.newClue = async function({category, value, contestant}) {
   if (this.getClue()) {
     await this.answer();
   }
-  if (!this.isContestantBoardControl(contestant)) {
+  if (this.studio.features.boardControl.enabled && !this.isContestantBoardControl(contestant)) {
     throw new Error('board control');
   }
 
