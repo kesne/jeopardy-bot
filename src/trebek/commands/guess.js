@@ -28,7 +28,7 @@ class Guess extends Command {
     const clue = this.game.getClue();
 
     // Daily doubles don't timeout:
-    if (!clue.dailyDouble) {
+    if (!clue.dailyDouble || !this.studio.features.dailyDoubles.enabled) {
       const guessDate = parseInt(this.data.timestamp, 10) * 1000;
       if (moment(guessDate).isBefore(moment(this.game.questionStart))) {
         // We guessed before the question was fully posted:

@@ -13,7 +13,6 @@ export const schema = new Schema({
     required: true
   },
 
-  // TODO: Disable by default?
   // Studios can be disabled to turn the bot off in a channel:
   enabled: {
     type: Boolean,
@@ -70,6 +69,13 @@ export const schema = new Schema({
         default: true
       }
     },
+    
+    // autoChallenges: {
+    //   enabled: {
+    //     type: Boolean,
+    //     default: false
+    //   }
+    // },
     
     boardControl: {
       enabled: {

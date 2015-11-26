@@ -56,7 +56,7 @@ class Clue extends Command {
     this.sayOptional(`OK, \`${this.game.getCategory().title}\` for ${currency(clue.value)}...`);
 
     // You found a daily double!
-    if (this.game.isDailyDouble()) {
+    if (this.studio.features.dailyDoubles.enabled && this.game.isDailyDouble()) {
       const dailyDoubleUrl = await dailydoubleImage();
 
       // Make sure that the daily double image displays before we do anything else:

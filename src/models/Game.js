@@ -138,6 +138,9 @@ schema.methods.liveClue = function() {
 };
 
 schema.methods.isDailyDouble = function() {
+  if (!this.features.dailyDoubles.enabled) {
+    return false;
+  }
   const clue = this.getClue();
   return clue && clue.dailyDouble;
 };
