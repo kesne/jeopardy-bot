@@ -10,31 +10,6 @@ if (AWS_KEY) {
   AWS = true;
 }
 
-export const API_TOKEN = process.env.JBOT_API_TOKEN || '';
-
-// The outgoing webhook token used to verify requests:
-export const VERIFY_TOKEN = process.env.JBOT_OUTGOING_WEBHOOK_TOKEN || '';
-
-// The mode the bot is in:
-export let MODE = process.env.JBOT_MODE;
-
-// Set mode defaults:
-if (!MODE) {
-  if (API_TOKEN && VERIFY_TOKEN) {
-    MODE = 'hybrid';
-  } else if (API_TOKEN) {
-    MODE = 'bot';
-  } else {
-    MODE = 'response';
-  }
-}
-// Validate the mode configuration:
-if (MODE !== 'response' && MODE !== 'hybrid' && MODE !== 'bot') {
-  console.warn(`An invalid mode was provided. Found mode "${MODE}".`);
-  // Default it back to response:
-  MODE = 'response';
-}
-
 // The URL for the mongo database:
 export const MONGO = process.env.MONGO_URL || process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://localhost/jeopardy';
 

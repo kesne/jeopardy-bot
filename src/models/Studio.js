@@ -32,6 +32,11 @@ export const schema = new Schema({
       min: 1,
       default: 15
     },
+    boardControlTimeout: {
+      type: Number,
+      min: 1,
+      default: 4
+    },
     // Minimum number of votes for a given challenge to be valid:
     minimumChallengeVotes: {
       type: Number,

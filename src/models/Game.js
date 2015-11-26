@@ -313,9 +313,14 @@ schema.methods.getCategory = function() {
 };
 
 schema.methods.isContestantBoardControl = function({slackid}) {
-  if (config.BOARD_CONTROL) {
+  if (this.studio.features.boardControl.enabled) {
     if (this.lastContestant && this.lastContestant === slackid) {
-      if (this.questionEnd && moment().isBefore(moment(this.questionEnd).add(config.BOARD_CONTROL_TIMEOUT, 'seconds'))) {
+      if (this.questionEnd &&
+        moment().isBefore(moment(this.questionEnd).add(
+          this.studio.values.boardControlTimeout,
+          'seconds'
+        ))
+      ) {
         return true;
       }
     }

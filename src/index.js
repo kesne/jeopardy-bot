@@ -81,6 +81,12 @@ app.get('/admin/:view', async (req, res) => {
       type: 'number'
     },
     {
+      name: 'Board Control Timeout',
+      description: 'The number of seconds that control of the board is held.',
+      key: 'boardControlTimeout',
+      type: 'number'
+    },
+    {
       name: 'Minimum Challenge Votes',
       description: 'The minimum number of votes required for a challenge to be accepted.',
       key: 'minimumChallengeVotes',
