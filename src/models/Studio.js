@@ -101,6 +101,13 @@ export const schema = new Schema({
         type: Boolean,
         default: true
       }
+    },
+    
+    stats: {
+      enabled: {
+        type: Boolean,
+        default: true
+      }
     }
     
     // autoDoubleJeopardy: {
@@ -123,7 +130,7 @@ export const schema = new Schema({
     
     // buzzers: {
     //   name: 'Buzzers',
-    //   description: 'Requires users to buzz in with "buzz" to make a guess.',
+    //   description: 'Requires contestants to buzz in with "buzz" to make a guess.',
     //   enabled: {
     //     type: Boolean,
     //     default: false
@@ -177,6 +184,11 @@ schema.virtual('features.dailyDoubles.description').get(() =>
 schema.virtual('features.endGame.name').get(() => 'Manual Game End');
 schema.virtual('features.endGame.description').get(() =>
   'Allows the game to be ended with the "end game" message'
+);
+
+schema.virtual('features.stats.name').get(() => 'Stats');
+schema.virtual('features.stats.description').get(() =>
+  'Allows contestants to check the stats of themselves and other players.'
 );
 
 schema.statics.get = async function({id, name}) {

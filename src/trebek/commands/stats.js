@@ -1,8 +1,9 @@
 import Command from '../Command';
-import {Trigger, Provide, NoLock, currency} from '../utils';
+import {NoLock, Trigger, Feature, Provide, currency} from '../utils';
 
 @NoLock
 @Trigger(/stats?( [A-Z0-9.\-_]+)?/)
+@Feature('stats')
 @Provide('contestant')
 export default class Stats extends Command {
   async response([name]) {
@@ -12,7 +13,7 @@ export default class Stats extends Command {
         name
       });
     }
-    const score = contestant.channelScore(this.body.channel_id).value;
+    const score = contestant.channelScore(this.data.channel_id).value;
     
     this.say(`Stats for *@${contestant.name}*:
 > _${currency(score)} current game_ *|* _${currency(contestant.stats.money)} total_ *|* _${contestant.stats.won} wins_ *|* _${contestant.stats.lost} losses`);
