@@ -2,7 +2,7 @@ import Command from '../Command';
 import {NoLock, Trigger, Feature, Provide, currency} from '../utils';
 
 @NoLock
-@Trigger(/stats?( [A-Z0-9.\-_]+)?/)
+@Trigger(/stats?(?: ([A-Z0-9.\-_]+))?/)
 @Feature('stats')
 @Provide('contestant')
 export default class Stats extends Command {
@@ -12,6 +12,10 @@ export default class Stats extends Command {
       contestant = await this.models.Contestant.findOne({
         name
       });
+      // Handle bad input:
+      if (!contestant) {
+        return;
+      }
     }
     const score = contestant.channelScore(this.data.channel_id).value;
     
