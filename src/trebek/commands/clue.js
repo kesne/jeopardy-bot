@@ -34,7 +34,7 @@ class Clue extends Command {
 
     try {
       await this.game.newClue({
-        contestant: this.contestant.slackid,
+        contestant: this.contestant,
         category,
         value
       });

@@ -406,7 +406,7 @@ schema.methods.newClue = async function({category, value, contestant}) {
 
   // If the question is a daily double, add in the contestant:
   if (question.dailyDouble) {
-    this.dailyDouble.contestant = contestant;
+    this.dailyDouble.contestant = contestant.slackid;
   }
 
   // Reset the guesses:

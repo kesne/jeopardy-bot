@@ -20,6 +20,6 @@ export default class Stats extends Command {
     const score = contestant.channelScore(this.data.channel_id).value;
     
     this.say(`Stats for *@${contestant.name}*:
-> _${currency(score)} current game_ *|* _${currency(contestant.stats.money)} total_ *|* _${contestant.stats.won} wins_ *|* _${contestant.stats.lost} losses`);
+> _${currency(score)} current game_ *|* _${currency(contestant.stats.money)} total_ *|* _${contestant.stats.won} wins_ *|* _${contestant.stats.lost} losses_`);
   }
 }
