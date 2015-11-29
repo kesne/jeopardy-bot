@@ -10,6 +10,7 @@ const MAX_PLAYERS = 10;
 )
 export default class LeaderLosers extends Command {
   async response(leaders) {
+    console.log(arguments);
     const contestants = await this.models.Contestant.find({
       'stats.money': {
         [leaders ? '$gt' : '$lt']: 0
