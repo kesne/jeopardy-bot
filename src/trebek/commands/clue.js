@@ -6,7 +6,7 @@ import {boardImage, dailydoubleImage, clueImage} from '../../cola';
 @Trigger(
   /(?:ill take |give me |choose )?(.*) for \$?(\d{3,4})(?: alex| trebek)?/,
   /(same)/,
-  /(gimme)(?: for \$?(\d{3,4}))?(?: (.*))?/
+  /(gimme)(?: for \$?(\d{3,4}))?(?: (.+?))?/
 )
 @Only(
   'gameactive',
@@ -19,7 +19,7 @@ import {boardImage, dailydoubleImage, clueImage} from '../../cola';
 )
 class Clue extends Command {
   async response([category, value], [sameLowest], [gimme, gimmeValue, gimmeCategory]) {
-    // Random selection:
+    // Random clue:
     if (gimme && !gimmeValue && !gimmeCategory) {
       category = '--random--';
       value = -1;
@@ -39,6 +39,7 @@ class Clue extends Command {
       category = '--same-lowest--';
       value = -1;
     }
+    // If you want the same category for a given value:
     if (category === 'same' || category === 'same category') {
       category = '--same--';
     }

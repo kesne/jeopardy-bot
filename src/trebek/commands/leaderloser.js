@@ -9,8 +9,7 @@ const MAX_PLAYERS = 10;
   /loserboards?/
 )
 export default class LeaderLosers extends Command {
-  async response(leaders) {
-    console.log(arguments);
+  async response([leaders]) {
     const contestants = await this.models.Contestant.find({
       'stats.money': {
         [leaders ? '$gt' : '$lt']: 0
