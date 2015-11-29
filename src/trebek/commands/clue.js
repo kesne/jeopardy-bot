@@ -26,7 +26,7 @@ class Clue extends Command {
     }
     // Random value:
     if (gimmeValue) {
-      category = '--random';
+      category = '--random--';
       value = gimmeValue;
     }
     // Random category:
