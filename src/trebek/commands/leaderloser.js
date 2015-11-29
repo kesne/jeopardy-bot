@@ -15,7 +15,7 @@ export default class LeaderLosers extends Command {
         [leaders ? '$gt' : '$lt']: 0
       }
     }).sort({
-      'stats.money': leaders ? 1 : -1
+      'stats.money': leaders ? -1 : 1
     }).limit(MAX_PLAYERS);
 
     if (contestants.length === 0) {
