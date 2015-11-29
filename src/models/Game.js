@@ -349,6 +349,9 @@ schema.methods.newClue = async function({category, value, contestant}) {
   let selectedCategory;
   if ((category === '--same--' || category === '--same-lowest--') && this.lastCategory) {
     selectedCategory = this.lastCategory;
+  } if (category === '--random--') {
+    const unansweredQuestions = this.questions.filter(x => !x.answered);
+    selectedCategory = unansweredQuestions[Math.floor(Math.random() * unansweredQuestions.length)].category_id;
   } else {
     // Easier to match cleaned versions of our input:
     category = clean(category);

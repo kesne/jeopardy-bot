@@ -6,7 +6,7 @@ import {boardImage, dailydoubleImage, clueImage} from '../../cola';
 @Trigger(
   /(?:ill take |give me |choose )?(.*) for \$?(\d{3,4})(?: alex| trebek)?/,
   /(same)/,
-  /gimme (.*)/
+  /(gimme)(?: for \$?(\d{3,4}))?(?: (.*))?/
 )
 @Only(
   'gameactive',
@@ -18,7 +18,18 @@ import {boardImage, dailydoubleImage, clueImage} from '../../cola';
   'channelContestants'
 )
 class Clue extends Command {
-  async response([category, value], [sameLowest], [gimmeCategory]) {
+  async response([category, value], [sameLowest], [gimme, gimmeValue, gimmeCategory]) {
+    // Random selection:
+    if (gimme && !gimmeValue && !gimmeCategory) {
+      category = '--random--';
+      value = -1;
+    }
+    // Random value:
+    if (gimmeValue) {
+      category = '--random';
+      value = gimmeValue;
+    }
+    // Random category:
     if (gimmeCategory) {
       category = gimmeCategory;
       value = -1;

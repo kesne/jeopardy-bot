@@ -12,7 +12,7 @@ export default class LeaderLosers extends Command {
   async response(leaders) {
     const contestants = await this.models.Contestant.find({
       'stats.money': {
-        $gt: 0
+        [leaders ? '$gt' : '$lt']: 0
       }
     }).sort({
       'stats.money': leaders ? 1 : -1
