@@ -1,5 +1,6 @@
 import moment from 'moment';
 import dehumanize from 'dehumanize-date';
+import stn from 'string-to-number';
 import {Schema, model} from 'mongoose';
 import {DiceCoefficient, JaroWinklerDistance} from 'natural';
 
@@ -460,6 +461,11 @@ schema.methods.guess = async function({contestant, guess}) {
     if (isNumber(answer)) {
       // Numbers much be identical:
       return parseInt(answer, 10) === parseInt(guess, 10);
+    }
+    
+    // Handle number strings (two, ten, etc.):
+    if (stn(answer)) {
+      return stn(answer) === stn(answer);
     }
 
     // Date matching:
