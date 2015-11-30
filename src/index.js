@@ -5,9 +5,12 @@ import bodyParser from 'body-parser';
 import { join } from 'path';
 import adaro from 'adaro';
 import basicAuth from 'basic-auth-connect';
+import restify from 'express-restify-mongoose';
 
 import App from './models/App';
 import Studio from './models/Studio';
+import Contestant from './models/Contestant';
+
 import SlackBot from './slackbot';
 import Webhook from './webhook';
 import { broadcast } from './trebek';
@@ -16,6 +19,15 @@ import * as config from './config';
 mongoose.connect(config.MONGO);
 
 const app = express();
+
+// Set up REST routes to manipulate models:
+const apiRouter = new express.Router();
+apiRouter.use(basicAuth(config.ADMIN_USERNAME, config.ADMIN_PASSWORD));
+restify.serve(apiRouter, App, { lowercase: true });
+restify.serve(apiRouter, Studio, { lowercase: true });
+restify.serve(apiRouter, Contestant, { lowercase: true });
+app.use(apiRouter);
+
 
 app.engine('dust', adaro.dust({
   cache: false,
@@ -48,6 +60,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Install landing page:
 app.get('/welcome', (req, res) => {
   res.render('welcome');
+});
+
+app.use('/new-admin', express.static('lib/admin'));
+app.get('/new-admin', (req, res) => {
+  res.render('new_admin');
 });
 
 // Admin Routes:
