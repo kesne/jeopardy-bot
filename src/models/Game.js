@@ -329,6 +329,7 @@ schema.methods.isContestantBoardControl = function({ slackid }) {
 
 // Get a new clue for a given value and title.
 schema.methods.newClue = async function({ category, value, contestant }) {
+  console.log(category, value);
   if (this.isChallengeStarted()) {
     throw new Error('challenge');
   }
@@ -394,12 +395,12 @@ schema.methods.newClue = async function({ category, value, contestant }) {
     }
   }
 
-  if (!config.VALUES.includes(value)) {
+  if (!config.VALUES.includes(numberValue)) {
     throw new RangeError('value');
   }
 
   const question = this.questions.find(q => {
-    return (q.category_id === selectedCategory && q.value === value);
+    return (q.category_id === selectedCategory && q.value === numberValue);
   });
 
   if (question.answered) {
