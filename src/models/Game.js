@@ -329,7 +329,6 @@ schema.methods.isContestantBoardControl = function({ slackid }) {
 
 // Get a new clue for a given value and title.
 schema.methods.newClue = async function({ category, value, contestant }) {
-  console.log(category, value);
   if (this.isChallengeStarted()) {
     throw new Error('challenge');
   }
