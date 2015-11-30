@@ -1,23 +1,23 @@
-import {Schema, model} from 'mongoose';
+import { Schema, model } from 'mongoose';
 
 export const schema = new Schema({
   // Their slack ID:
   slackid: {
     type: String,
     required: true,
-    index: true
+    index: true,
   },
 
   // Their actual name (for pretty printing):
   name: {
     type: String,
-    required: true
+    required: true,
   },
 
   // Trebek can be insulting to sassy contestants:
   sassFactory: {
     type: Number,
-    default: 0
+    default: 0,
   },
 
   // The scores a user has in the active games.
@@ -26,12 +26,12 @@ export const schema = new Schema({
   scores: [{
     channel_id: {
       type: String,
-      required: true
+      required: true,
     },
     value: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
   }],
 
   // Simple stats:
@@ -39,33 +39,33 @@ export const schema = new Schema({
     // Aggregate of all of the money won/lost from all games.
     money: {
       type: Number,
-      default: 0
+      default: 0,
     },
     // Number of games won:
     won: {
       type: Number,
-      default: 0
+      default: 0,
     },
     // Number of games lost:
     lost: {
       type: Number,
-      default: 0
-    }
-  }
+      default: 0,
+    },
+  },
 });
 
 schema.virtual('nonMentionedName').get(function() {
   return `${this.name.charAt(0)}.${this.name.substring(1)}`;
 });
 
-schema.statics.get = async function({user_id: slackid, user_name: name}) {
+schema.statics.get = async function({ user_id: slackid, user_name: name }) {
   let user = await this.findOne({
-    slackid
+    slackid,
   });
   if (!user) {
     user = await this.create({
       name,
-      slackid
+      slackid,
     });
   } else if (user.name !== name) {
     // Update their slack username because it's changed.
@@ -76,14 +76,14 @@ schema.statics.get = async function({user_id: slackid, user_name: name}) {
 };
 
 schema.methods.channelScore = function(channel_id) {
-  const score = this.scores.find(score => {
-    return score.channel_id === channel_id;
+  const score = this.scores.find(s => {
+    return s.channel_id === channel_id;
   });
   // If no score for this channel exists, create it:
   if (!score) {
     this.scores.push({
       channel_id,
-      value: 0
+      value: 0,
     });
     // Just re-run the score lookup:
     return this.channelScore(channel_id);
@@ -101,20 +101,20 @@ schema.methods.removeChannelScore = function(channel_id) {
   });
 };
 
-schema.methods.correct = function({value, channel_id}) {
+schema.methods.correct = function({ value, channel_id }) {
   const score = this.channelScore(channel_id);
   score.value += value;
   return this.save();
 };
 
-schema.methods.incorrect = function({value, channel_id}) {
+schema.methods.incorrect = function({ value, channel_id }) {
   const score = this.channelScore(channel_id);
   score.value -= value;
   return this.save();
 };
 
-schema.methods.endGame = function({channel_id, won, lost}) {
-  const {value} = this.channelScore(channel_id);
+schema.methods.endGame = function({ channel_id, won, lost }) {
+  const { value } = this.channelScore(channel_id);
   this.stats.money += value;
   if (won) {
     this.stats.won++;

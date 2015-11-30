@@ -23,13 +23,13 @@ export const PORT = process.env.PORT || 8000;
  * GAME CONFIGURATION
  */
 
-// The question values we want:
+// Question values for jeopardy:
 export const VALUES = [
   200,
   400,
   600,
   800,
-  1000
+  1000,
 ];
 
 // Question values for double jeopardy:
@@ -38,7 +38,7 @@ export const DOUBLE_JEOPARDY_VALUES = [
   800,
   1200,
   1600,
-  2000
+  2000,
 ];
 
 // Constants for answer similarity:

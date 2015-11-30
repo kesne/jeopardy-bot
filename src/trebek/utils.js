@@ -6,14 +6,15 @@ export function currency(value) {
 }
 
 export function clean(text) {
-  text = text.toLowerCase().trim();
+  let cleanText = text;
+  cleanText = cleanText.toLowerCase().trim();
   // Replace double spaces with single spaces:
-  text = text.replace(/ {2,}/g, ' ');
+  cleanText = cleanText.replace(/ {2,}/g, ' ');
   // Strip out punctuation:
-  text = text.replace(/['"“”’\-\.,!;:—]/g, '');
+  cleanText = cleanText.replace(/['"“”’\-\.,!;:—]/g, '');
   // Ampersands are hard:
-  text = text.replace(/&/g, 'and');
-  return text;
+  cleanText = cleanText.replace(/&/g, 'and');
+  return cleanText;
 }
 
 const VALID_REQUIREMENTS = [
@@ -21,21 +22,22 @@ const VALID_REQUIREMENTS = [
   'gameinactive',
   'mydailydouble',
   'clue',
-  'noclue'
+  'noclue',
 ];
 
 const VALID_PROVIDERS = [
   'game',
-  'contestant'
+  'contestant',
 ];
 
 export function Trigger(...messages) {
   return function(Constructor) {
     const triggers = messages.map(message => {
+      let fullMessage = message;
       if (message instanceof RegExp) {
-        message = message.source;
+        fullMessage = message.source;
       }
-      return new RegExp(`^${message}$`, 'i');
+      return new RegExp(`^${fullMessage}$`, 'i');
     });
     Constructor.triggers = triggers;
   };
@@ -50,7 +52,7 @@ export function Provide(...providers) {
   if (!providers.some(p => VALID_PROVIDERS.includes(p))) {
     throw new Error('Invalid provider.');
   }
-  return function (Constructor) {
+  return function(Constructor) {
     Constructor.providers = providers;
   };
 }

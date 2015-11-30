@@ -1,14 +1,14 @@
 {
-  "extends": "xo/esnext",
+  "parser": "babel-eslint",
+  "extends": "airbnb",
+  "plugins": [
+    "babel"
+  ],
   "rules": {
-    "indent": [2, 2],
-    "camelcase": 0,
-    "space-before-function-paren": 0,
-    "no-else-return": 0,
-    "no-new": 0,
     "new-cap": 0,
-    "no-trailing-spaces": 0,
-    "prefer-reflect": 0,
-    "babel/generator-star-spacing": 0
+    "babel/new-cap": 2,
+    "object-curly-spacing": [2, "always"],
+    "camelcase": 1,
+    "func-names": 0
   }
 }

@@ -1,5 +1,5 @@
 import Command from '../Command';
-import {Trigger, NoLock} from '../utils';
+import { Trigger, NoLock } from '../utils';
 
 @NoLock
 @Trigger('help')

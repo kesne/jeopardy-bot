@@ -1,8 +1,8 @@
 import moment from 'moment';
 import Command from '../Command';
-import {Trigger, Only, Provide, currency} from '../utils';
+import { Trigger, Only, Provide, currency } from '../utils';
 import endgameMessage from './shared/endgame';
-import {boardImage} from '../../cola';
+import { boardImage } from '../../cola';
 
 @Trigger(
   /(?:whats?|wheres?|whos?|whens?) (?:(?:is|are|was|were|the|an?) ){1,2}(.*)/,
@@ -18,7 +18,8 @@ import {boardImage} from '../../cola';
   'clue'
 )
 class Guess extends Command {
-  async response([guess], [shorthandGuess]) {
+  async response([inputGuess], [shorthandGuess]) {
+    let guess = inputGuess;
     // Support the new guess shorthand:
     if (shorthandGuess) {
       guess = shorthandGuess;
@@ -40,7 +41,7 @@ class Guess extends Command {
     try {
       correct = await this.game.guess({
         guess,
-        contestant: this.contestant
+        contestant: this.contestant,
       });
     } catch (e) {
       // Timeout:
@@ -55,7 +56,7 @@ class Guess extends Command {
           this.say(`${ await endgameMessage(this.game, contestants, this.data.channel_id) }`);
         } else {
           const url = await boardImage({
-            game: this.game
+            game: this.game,
           });
           this.say(`Select a new clue.`, url);
         }
@@ -72,7 +73,7 @@ class Guess extends Command {
     }
 
     // Extract the value from the current clue:
-    let {value} = clue;
+    let { value } = clue;
 
     // Daily doubles have a different value:
     if (this.game.isDailyDouble()) {
@@ -84,10 +85,10 @@ class Guess extends Command {
         // Award the value:
         this.contestant.correct({
           value,
-          channel_id: this.data.channel_id
+          channel_id: this.data.channel_id,
         }),
         // Mark the question as answered:
-        this.game.answer(this.contestant)
+        this.game.answer(this.contestant),
       ]);
 
       await this.say(`That is correct, ${this.contestant.name}. The answer was \`${clue.answer}\`.\nYour score is now ${currency(this.contestant.channelScore(this.data.channel_id).value)}.`);
@@ -98,21 +99,21 @@ class Guess extends Command {
       } else {
         // Get the new board url:
         const url = await boardImage({
-          game: this.game
+          game: this.game,
         });
         this.say(`Select a new clue.`, url);
       }
     } else {
       await this.contestant.incorrect({
         value,
-        channel_id: this.data.channel_id
+        channel_id: this.data.channel_id,
       });
       await this.say(`That is incorrect, ${this.contestant.name}. Your score is now ${currency(this.contestant.channelScore(this.data.channel_id).value)}.`);
       // If the clue is a daily double, the game progresses
       if (this.game.isDailyDouble()) {
         await Promise.all([
           this.game.answer(),
-          this.say(`The correct answer is \`${clue.answer}\`.`)
+          this.say(`The correct answer is \`${clue.answer}\`.`),
         ]);
 
         if (this.game.isComplete()) {
@@ -121,7 +122,7 @@ class Guess extends Command {
         } else {
           // Get the new board url:
           const url = await boardImage({
-            game: this.game
+            game: this.game,
           });
           this.say(`Select a new clue.`, url);
         }

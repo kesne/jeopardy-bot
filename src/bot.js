@@ -9,7 +9,7 @@ export default class Bot {
   constructor() {
     this.start();
   }
-  
+
   async start() {
     const app = await App.get();
     this.slack = new Slack(app.api_token, autoReconnect, autoMarkMessagesAsRead);
@@ -46,7 +46,7 @@ export default class Bot {
   }
 
   onMessage(incoming) {
-    const {text, channel: channel_id, user: user_id, ts: timestamp, subtype} = incoming;
+    const { text, channel: channel_id, user: user_id, ts: timestamp, subtype } = incoming;
 
     // Ignore messages from myself:
     if (user_id === this.slack.self.id) {
@@ -54,10 +54,10 @@ export default class Bot {
     }
 
     const channel = this.slack.getChannelGroupOrDMByID(channel_id);
-    const channel_name = channel.name
+    const channel_name = channel.name;
 
     if (subtype === 'channel_join') {
-      const {name: user_name} = this.slack.getUserByID(user_id);
+      const { name: user_name } = this.slack.getUserByID(user_id);
       channel.send(`Welcome to #${channel.name}, @${user_name}! To learn how to play, just type "help".`);
       return;
     }
@@ -72,13 +72,13 @@ export default class Bot {
       channel.send('Sorry, but you can only use jeopardybot in open channels right now.');
       return;
     }
-    const {name: user_name} = this.slack.getUserByID(user_id);
+    const { name: user_name } = this.slack.getUserByID(user_id);
     trebek(text, {
       channel_name,
       channel_id,
       timestamp,
       user_id,
-      user_name
+      user_name,
     }, (message, url = '') => {
       if (!url) {
         channel.send(message);
@@ -90,8 +90,8 @@ export default class Bot {
             fallback: 'Jeopardy Bot',
             image_url: url,
             icon_emoji: ':jbot:',
-            color: '#F4AC79'
-          }]
+            color: '#F4AC79',
+          }],
         });
       }
       return Promise.resolve();

@@ -1,5 +1,5 @@
 import Command from '../Command';
-import {NoLock, Trigger, Feature, Provide, currency} from '../utils';
+import { NoLock, Trigger, Feature, Provide, currency } from '../utils';
 
 @NoLock
 @Trigger(/stats?(?: ([A-Z0-9.\-_]+))?/)
@@ -10,7 +10,7 @@ export default class Stats extends Command {
     let contestant = this.contestant;
     if (name) {
       contestant = await this.models.Contestant.findOne({
-        name
+        name,
       });
       // Handle bad input:
       if (!contestant) {
@@ -18,7 +18,7 @@ export default class Stats extends Command {
       }
     }
     const score = contestant.channelScore(this.data.channel_id).value;
-    
+
     this.say(`Stats for *@${contestant.name}*:
 > _${currency(score)} current game_ *|* _${currency(contestant.stats.money)} total_ *|* _${contestant.stats.won} wins_ *|* _${contestant.stats.lost} losses_`);
   }

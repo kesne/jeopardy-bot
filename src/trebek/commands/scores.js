@@ -1,5 +1,5 @@
 import Command from '../Command';
-import {Trigger, Only, Provide, NoLock} from '../utils';
+import { Trigger, Only, Provide, NoLock } from '../utils';
 import scoresMessage from './shared/scores';
 
 @NoLock

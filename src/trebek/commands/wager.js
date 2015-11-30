@@ -1,6 +1,6 @@
 import Command from '../Command';
-import {Trigger, Only, Feature, Provide, currency} from '../utils';
-import {clueImage} from '../../cola';
+import { Trigger, Only, Feature, Provide, currency } from '../utils';
+import { clueImage } from '../../cola';
 
 @Trigger(
   /(?:(?:ill )?wager)?\s*\$?(\d{1,6})/
@@ -17,7 +17,8 @@ import {clueImage} from '../../cola';
   'contestant'
 )
 class Wager extends Command {
-  async response([value]) {
+  async response([inputValue]) {
+    let value = inputValue;
     // Value comes through as a string:
     value = parseInt(value, 10);
 
@@ -42,9 +43,9 @@ class Wager extends Command {
     // Parallelize for better performance:
     const [url] = await Promise.all([
       clueImage({
-        game: this.game
+        game: this.game,
       }),
-      this.game.save()
+      this.game.save(),
     ]);
 
     // TODO: Daily Double timeouts

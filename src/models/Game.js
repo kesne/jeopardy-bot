@@ -1,11 +1,11 @@
 import moment from 'moment';
 import dehumanize from 'dehumanize-date';
 import stn from 'string-to-number';
-import {Schema, model} from 'mongoose';
-import {DiceCoefficient, JaroWinklerDistance} from 'natural';
+import { Schema, model } from 'mongoose';
+import { DiceCoefficient as dc, JaroWinklerDistance as jwd } from 'natural';
 
 import generateGame from '../japi';
-import {clean} from '../trebek/utils';
+import { clean } from '../trebek/utils';
 import * as config from '../config';
 
 export const schema = new Schema({
@@ -14,126 +14,126 @@ export const schema = new Schema({
   studio: {
     type: Schema.Types.ObjectId,
     ref: 'Studio',
-    required: true
+    required: true,
   },
 
   categories: [{
     id: {
       type: Number,
-      required: true
+      required: true,
     },
     title: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   }],
 
   challenge: {
     active: {
       type: String,
-      default: ''
+      default: '',
     },
     started: {
-      type: Date
+      type: Date,
     },
     question: {
-      type: Number
+      type: Number,
     },
     guesses: [{
       contestant: {
-        type: String
+        type: String,
       },
       guess: {
-        type: String
-      }
+        type: String,
+      },
     }],
     votes: [{
       contestant: {
         type: String,
-        required: true
+        required: true,
       },
       correct: {
         type: Boolean,
-        required: true
-      }
-    }]
+        required: true,
+      },
+    }],
   },
 
   // Information for the daily double:
   dailyDouble: {
     // The user that the daily double is currently assigned to:
     contestant: {
-      type: String
+      type: String,
     },
     // The wager of the daily double:
     wager: {
       type: Number,
       // Wager must be at least 5:
-      min: 5
-    }
+      min: 5,
+    },
   },
 
   channel_id: {
     type: String,
     required: true,
-    index: true
+    index: true,
   },
-  
+
   lastContestant: {
-    type: String
+    type: String,
   },
 
   lastCategory: {
-    type: Number
+    type: Number,
   },
 
   activeQuestion: {
-    type: Number
+    type: Number,
   },
 
   questionStart: {
-    type: Date
+    type: Date,
   },
-  
+
   questionEnd: {
-    type: Date
+    type: Date,
   },
 
   contestantAnswers: {
     type: Array,
-    default: []
+    default: [],
   },
 
   questions: [{
     id: {
       type: Number,
-      required: true
+      required: true,
     },
     answer: {
       type: String,
-      required: true
+      required: true,
     },
     question: {
       type: String,
-      required: true
+      required: true,
     },
     value: {
       type: Number,
-      required: true
+      required: true,
     },
     answered: {
       type: Boolean,
-      default: false
+      default: false,
     },
     dailyDouble: {
       type: Boolean,
-      default: false
+      default: false,
     },
     category_id: {
       type: Number,
-      required: true
-    }
-  }]
+      required: true,
+    },
+  }],
 });
 
 // Gets the clue with the timeout:
@@ -158,7 +158,7 @@ schema.methods.isChallengeStarted = function() {
   return this.challenge.active && this.challenge.started && moment().isBefore(moment(this.challenge.started).add(this.studio.values.challengeTimeout, 'seconds'));
 };
 
-schema.methods.startChallenge = async function({contestant}) {
+schema.methods.startChallenge = async function({ contestant }) {
   const lastGuess = this.challenge.guesses.find(guess => guess.contestant === contestant.slackid);
   if (!this.liveClue() && !this.challenge.active && this.challenge.question && lastGuess) {
     this.challenge.active = lastGuess.contestant;
@@ -166,11 +166,10 @@ schema.methods.startChallenge = async function({contestant}) {
     await this.save();
     return {
       guess: lastGuess.guess,
-      answer: this.questions.find(question => question.id === this.challenge.question).answer
+      answer: this.questions.find(question => question.id === this.challenge.question).answer,
     };
-  } else {
-    throw new Error('bad values');
   }
+  throw new Error('bad values');
 };
 
 schema.methods.endChallenge = async function(forceWin = false) {
@@ -196,21 +195,20 @@ schema.methods.endChallenge = async function(forceWin = false) {
 
   if (forceWin || (yesVotes / votes.length) >= this.studio.values.challengeAcceptenceThreshold) {
     const contestant = await this.model('Contestant').findOne({
-      slackid
+      slackid,
     });
-    const {value} = this.questions.find(q => q.id === question);
+    const { value } = this.questions.find(q => q.id === question);
     await contestant.correct({
       // Award twice the value, one to make up for the loss, and one for the new points:
       value: value * 2,
-      channel_id: this.channel_id
+      channel_id: this.channel_id,
     });
 
     return {
-      channelScore: contestant.channelScore(this.channel_id)
+      channelScore: contestant.channelScore(this.channel_id),
     };
-  } else {
-    throw new Error('votes');
   }
+  throw new Error('votes');
 };
 
 schema.methods.isTimedOut = function() {
@@ -230,14 +228,14 @@ schema.methods.end = async function() {
   const contestants = await this.model('Contestant').find({
     scores: {
       $elemMatch: {
-        channel_id: this.channel_id
-      }
-    }
+        channel_id: this.channel_id,
+      },
+    },
   });
   await Promise.all(
     contestants.sort((a, b) => {
-      const {value: aScore} = a.channelScore(this.channel_id);
-      const {value: bScore} = b.channelScore(this.channel_id);
+      const { value: aScore } = a.channelScore(this.channel_id);
+      const { value: bScore } = b.channelScore(this.channel_id);
       if (bScore > aScore) {
         return 1;
       }
@@ -262,7 +260,7 @@ schema.methods.end = async function() {
       return contestant.endGame({
         channel_id: this.channel_id,
         won,
-        lost
+        lost,
       });
     })
   );
@@ -270,13 +268,13 @@ schema.methods.end = async function() {
 };
 
 // Grab the active game for the channel:
-schema.statics.forChannel = function({channel_id}) {
-  return this.findOne({channel_id}).populate('studio');
+schema.statics.forChannel = function({ channel_id }) {
+  return this.findOne({ channel_id }).populate('studio');
 };
 
 // Start a new game:
-schema.statics.start = async function({channel_id, channel_name}) {
-  const game = await this.forChannel({channel_id});
+schema.statics.start = async function({ channel_id, channel_name }) {
+  const game = await this.forChannel({ channel_id });
 
   // Clear out existing (ended) games:
   if (game && !game.isComplete()) {
@@ -288,18 +286,18 @@ schema.statics.start = async function({channel_id, channel_name}) {
   // Grab a random episode from the API:
   const episode = await generateGame();
   // Extract the questions and categories:
-  const {clues: questions, categories} = episode.roundOne;
+  const { clues: questions, categories } = episode.roundOne;
 
   const studio = await this.model('Studio').get({
     id: channel_id,
-    name: channel_name
+    name: channel_name,
   });
 
   return this.create({
     studio,
     channel_id,
     categories,
-    questions
+    questions,
   });
 };
 
@@ -317,7 +315,7 @@ schema.methods.isBoardControlled = function() {
   return (
     this.studio.features.boardControl.enabled &&
     this.lastContestant &&
-    this.questionEnd && 
+    this.questionEnd &&
     moment().isBefore(moment(this.questionEnd).add(
       this.studio.values.boardControlTimeout,
       'seconds'
@@ -325,12 +323,12 @@ schema.methods.isBoardControlled = function() {
   );
 };
 
-schema.methods.isContestantBoardControl = function({slackid}) {
+schema.methods.isContestantBoardControl = function({ slackid }) {
   return this.lastContestant && this.lastContestant === slackid;
 };
 
 // Get a new clue for a given value and title.
-schema.methods.newClue = async function({category, value, contestant}) {
+schema.methods.newClue = async function({ category, value, contestant }) {
   if (this.isChallengeStarted()) {
     throw new Error('challenge');
   }
@@ -354,11 +352,11 @@ schema.methods.newClue = async function({category, value, contestant}) {
     selectedCategory = unansweredQuestions[Math.floor(Math.random() * unansweredQuestions.length)].category_id;
   } else {
     // Easier to match cleaned versions of our input:
-    category = clean(category);
+    const cleanCategory = clean(category);
     const cc = this.categories.map(cat => {
       return {
         id: cat.id,
-        rank: DiceCoefficient(clean(cat.title), category)
+        rank: dc(clean(cat.title), cleanCategory),
       };
     }).sort((a, b) => {
       if (a.rank > b.rank) {
@@ -383,16 +381,16 @@ schema.methods.newClue = async function({category, value, contestant}) {
   }
 
   // Allow string values:
-  value = parseInt(value, 10);
+  let numberValue = parseInt(value, 10);
 
   // We use -1 internally to represent "lowest available value":
-  if (value === -1) {
+  if (numberValue === -1) {
     // These questions are internally value-sorted lowest-to-highest.
     const lowestValueClue = this.questions.find(question => {
       return (question.category_id === selectedCategory && !question.answered);
     });
     if (lowestValueClue) {
-      value = lowestValueClue.value;
+      numberValue = lowestValueClue.value;
     }
   }
 
@@ -430,7 +428,7 @@ const isNumber = num => {
   return !isNaN(num);
 };
 
-schema.methods.guess = async function({contestant, guess}) {
+schema.methods.guess = async function({ contestant, guess }) {
   if (this.isChallengeStarted()) {
     throw new Error('challenge');
   }
@@ -457,15 +455,15 @@ schema.methods.guess = async function({contestant, guess}) {
   // Get the answers:
   const answers = this.liveClue().answer.split(/\(|\)/).filter(n => n);
   answers.push(answers.join(' '));
-  const correctAnswer = answers.some(answer => {
+  const correctAnswer = answers.some(a => {
     // Clean up the answer a little before matching:
-    answer = clean(answer);
+    const answer = clean(a);
     // Number matching:
     if (isNumber(answer)) {
       // Numbers much be identical:
       return parseInt(answer, 10) === parseInt(guess, 10);
     }
-    
+
     // Handle number strings (two, ten, etc.):
     if (stn(answer)) {
       return stn(answer) === stn(answer);
@@ -478,26 +476,27 @@ schema.methods.guess = async function({contestant, guess}) {
       return moment(answerDate).isSame(moment(guessDate));
     }
 
-    // String matching:
+    // Literal String matching:
     if (guess === answer) {
       return true;
     }
+
     // TODO: match modes:
-    const similarity = DiceCoefficient(guess, answer);
+    const similarity = dc(guess, answer);
     if (similarity >= config.ACCEPTED_SIMILARITY) {
       return true;
     } else if (similarity >= config.JARO_KICKER) {
-      const jaroSimilarity = JaroWinklerDistance(guess, answer);
+      const jaroSimilarity = jwd(guess, answer);
       return jaroSimilarity >= config.JARO_SIMILARITY;
-    } else {
-      return false;
     }
+
+    return false;
   });
   if (!correctAnswer) {
     // Add the guess to allow for a challenge:
     this.challenge.guesses.push({
       guess,
-      contestant: contestant.slackid
+      contestant: contestant.slackid,
     });
   }
   await this.save();
@@ -511,7 +510,7 @@ schema.methods.answer = function(contestant) {
       return true;
     }
   });
-  
+
   // Stash the contestant for board control:
   if (contestant) {
     this.lastContestant = contestant.slackid;

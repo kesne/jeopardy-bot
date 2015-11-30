@@ -1,5 +1,5 @@
 import Command from '../Command';
-import {Trigger, Only, Feature, Provide} from '../utils';
+import { Trigger, Only, Feature, Provide } from '../utils';
 
 @Trigger('end game')
 @Only('gameactive')

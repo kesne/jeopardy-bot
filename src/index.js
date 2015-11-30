@@ -2,22 +2,22 @@ import 'babel/polyfill';
 import mongoose from 'mongoose';
 import express from 'express';
 import bodyParser from 'body-parser';
-import {join} from 'path';
-import {dust} from 'adaro';
+import { join } from 'path';
+import adaro from 'adaro';
 import basicAuth from 'basic-auth-connect';
- 
+
 import App from './models/App';
 import Studio from './models/Studio';
 import SlackBot from './bot';
 import Webhook from './webhook';
-import {broadcast} from './trebek';
+import { broadcast } from './trebek';
 import * as config from './config';
 
 mongoose.connect(config.MONGO);
 
 const app = express();
 
-app.engine('dust', dust({
+app.engine('dust', adaro.dust({
   cache: false,
   helpers: [
     'dustjs-helpers',
@@ -30,20 +30,20 @@ app.engine('dust', dust({
             const value = obj[key];
             iterable.push({
               $key: key,
-              $value: value
+              $value: value,
             });
           }
         }
         return chunk.section(iterable, context, bodies);
       };
-    }
-  ]
+    },
+  ],
 }));
 app.set('view engine', 'dust');
 app.set('views', join(__dirname, 'views'));
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Install landing page:
 app.get('/welcome', (req, res) => {
@@ -66,45 +66,45 @@ app.get('/admin/:view', async (req, res) => {
     }
     studio = studio.toObject();
   }
-  
+
   const studioValues = [
     {
       name: 'Clue Timeout',
       description: 'The number of seconds before a clue times out.',
       key: 'timeout',
-      type: 'number'
+      type: 'number',
     },
     {
       name: 'Challenge Timeout',
       description: 'The number of seconds before a challenge times out.',
       key: 'challengeTimeout',
-      type: 'number'
+      type: 'number',
     },
     {
       name: 'Board Control Timeout',
       description: 'The number of seconds that control of the board is held.',
       key: 'boardControlTimeout',
-      type: 'number'
+      type: 'number',
     },
     {
       name: 'Minimum Challenge Votes',
       description: 'The minimum number of votes required for a challenge to be accepted.',
       key: 'minimumChallengeVotes',
-      type: 'number'
+      type: 'number',
     },
     {
       name: 'Challenge Threshold',
       description: 'The percentage of votes that are required for a challenge to be accepted.',
       key: 'challengeAcceptenceThreshold',
-      type: 'number'
-    }
+      type: 'number',
+    },
   ];
   res.render(`admin/${req.params.view}`, {
     studios,
     studio,
     studioValues,
     // stats,
-    app: a
+    app: a,
   });
 });
 
@@ -112,7 +112,7 @@ app.get('/admin/:view', async (req, res) => {
 app.post('/admin/update/studio', async (req, res) => {
   const studio = await Studio.findOne({
     id: req.body.id,
-    name: req.body.studio
+    name: req.body.studio,
   });
   if (req.body.feature) {
     studio.features[req.body.feature].enabled = req.body.enabled;
@@ -143,7 +143,7 @@ app.post('/admin/broadcast', (req, res) => {
 app.get('/renderable/categories', (req, res) => {
   const datas = decodeURIComponent(req.query.data).split('@@~~AND~~@@');
   res.render('categories', {
-    datas
+    datas,
   });
 });
 
@@ -158,7 +158,7 @@ app.get('/renderable/clue', (req, res) => {
   }
   res.render('clue', {
     data,
-    extra
+    extra,
   });
 });
 
@@ -166,10 +166,13 @@ app.get('/renderable/clue', (req, res) => {
 app.listen(config.PORT, async () => {
   const a = await App.get();
   console.log(`Jeopardy Bot listening on port ${config.PORT}`);
+  let liveInstance;
   // If we're in a mode that needs the webhook, then set it up:
   if (a.isBot()) {
-    new SlackBot();
+    liveInstance = new SlackBot();
   } else {
-    new Webhook(app);
+    liveInstance = new Webhook(app);
   }
+  // TODO: Allow teardown:
+  console.log(liveInstance);
 });

@@ -27,7 +27,7 @@ export default class Webhook {
           res.json({
             username: app.username,
             icon_emoji: app.icon_emoji,
-            text: response
+            text: response,
           });
         } else {
           res.end();

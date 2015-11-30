@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import Command from '../Command';
-import {Trigger, Only, Feature, Provide, currency} from '../utils';
+import { Trigger, Only, Feature, Provide, currency } from '../utils';
 
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 const cx = '013673686761662547163:nw_cf3t8esg';
@@ -28,9 +28,9 @@ export default class Challenge extends Command {
       return false;
     }
     try {
-      const [{items: [answerResult]}, {items: [guessResult]}] = await Promise.all([
+      const [{ items: [answerResult] }, { items: [guessResult] }] = await Promise.all([
         fetch(`${URL_BASE}&q=${answer}`).then(res => res.json()),
-        fetch(`${URL_BASE}&q=${guess}`).then(res => res.json())
+        fetch(`${URL_BASE}&q=${guess}`).then(res => res.json()),
       ]);
 
       if (answerResult && guessResult) {
@@ -53,19 +53,19 @@ export default class Challenge extends Command {
       if (!hasVoted) {
         this.game.challenge.votes.push({
           contestant: this.contestant.slackid,
-          correct
+          correct,
         });
         await this.game.save();
       }
     } else if (challenge && !this.game.isChallengeStarted()) {
       const channel_id = this.data.channel_id;
-      const [contestants, {guess, answer}] = await Promise.all([
+      const [contestants, { guess, answer }] = await Promise.all([
         this.models.Contestant.find().where('scores').elemMatch({
-          channel_id
+          channel_id,
         }),
         this.game.startChallenge({
-          contestant: this.contestant
-        })
+          contestant: this.contestant,
+        }),
       ]);
 
       await this.say('Let me think...');
@@ -73,7 +73,7 @@ export default class Challenge extends Command {
       // Attempt to resolve this automatically without resorting to asking the room:
       const autoChallengePass = await this.autoChallenge(answer, guess);
       if (autoChallengePass) {
-        const {channelScore} = await this.game.endChallenge(true);
+        const { channelScore } = await this.game.endChallenge(true);
         this.say(`It looks like you're correct, ${this.contestant.name}! Your score is now ${currency(channelScore.value)}.`);
         return;
       }
@@ -86,10 +86,10 @@ export default class Challenge extends Command {
         await this.lock();
         // We need to refresh the document because it could be outdated:
         const game = await this.models.Game.forChannel({
-          channel_id: this.game.channel_id
+          channel_id: this.game.channel_id,
         });
         try {
-          const {channelScore} = await game.endChallenge();
+          const { channelScore } = await game.endChallenge();
           this.say(`Congrats, ${this.contestant.name}, your challenge has succeeded. Your score is now ${currency(channelScore.value)}.`);
         } catch (e) {
           if (e.message.includes('min')) {

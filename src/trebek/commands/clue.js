@@ -1,7 +1,7 @@
 import Command from '../Command';
-import {Trigger, Only, Provide, currency} from '../utils';
+import { Trigger, Only, Provide, currency } from '../utils';
 import endgameMessage from './shared/endgame';
-import {boardImage, dailydoubleImage, clueImage} from '../../cola';
+import { boardImage, dailydoubleImage, clueImage } from '../../cola';
 
 @Trigger(
   /(?:ill take |give me |choose )?(.*) for \$?(\d{3,4})(?: alex| trebek)?/,
@@ -18,7 +18,9 @@ import {boardImage, dailydoubleImage, clueImage} from '../../cola';
   'channelContestants'
 )
 class Clue extends Command {
-  async response([category, value], [sameLowest], [gimme, gimmeValue, gimmeCategory]) {
+  async response([inputCategory, inputValue], [sameLowest], [gimme, gimmeValue, gimmeCategory]) {
+    let category = inputCategory;
+    let value = inputValue;
     // Random clue:
     if (gimme && !gimmeValue && !gimmeCategory) {
       category = '--random--';
@@ -48,7 +50,7 @@ class Clue extends Command {
       await this.game.newClue({
         contestant: this.contestant,
         category,
-        value
+        value,
       });
     } catch (e) {
       if (e.message.includes('value')) {
@@ -81,7 +83,7 @@ class Clue extends Command {
       // TODO: Wager timeouts
     } else {
       const url = await clueImage({
-        game: this.game
+        game: this.game,
       });
 
       // Mark that we're sending the clue now:
@@ -97,23 +99,23 @@ class Clue extends Command {
           try {
             // We need to refresh the document because it could be outdated:
             const game = await this.models.Game.forChannel({
-              channel_id: this.game.channel_id
+              channel_id: this.game.channel_id,
             });
             if (game.isTimedOut()) {
               // Get the current clue:
-              const clue = game.getClue();
+              const currentClue = game.getClue();
 
               // We timed out, so mark this question as done.
               await game.answer();
 
-              this.sayOptional(`Time's up! The correct answer is \`${clue.answer}\`.`);
+              this.sayOptional(`Time's up! The correct answer was \`${currentClue.answer}\`.`);
 
               if (game.isComplete()) {
                 const contestants = await this.channelContestants();
                 this.sayOptional(await endgameMessage(game, contestants, this.data.channel_id));
               } else {
-                const url = await boardImage({game});
-                this.sayOptional('Select a new clue.', url);
+                const boardUrl = await boardImage({ game });
+                this.sayOptional('Select a new clue.', boardUrl);
               }
             }
           } finally {

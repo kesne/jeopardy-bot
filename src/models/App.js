@@ -1,16 +1,16 @@
-import {Schema, model} from 'mongoose';
+import { Schema, model } from 'mongoose';
 
 export const schema = new Schema({
   admin: {
-    type: 'String'
+    type: 'String',
   },
   username: {
     type: 'String',
-    default: 'jeopardybot'
+    default: 'jeopardybot',
   },
   icon_emoji: {
     type: 'String',
-    default: ':jbot:'
+    default: ':jbot:',
   },
   // icon_url: {
   //   type: String
@@ -19,23 +19,23 @@ export const schema = new Schema({
     type: 'String',
     enum: ['bot', 'hybrid', 'response'],
     required: true,
-    default: 'response'
+    default: 'response',
   },
   api_token: {
-    type: 'String'
+    type: 'String',
   },
   verify_token: {
-    type: 'String'
+    type: 'String',
   },
-  
+
   aws: {
     key: {
-      type: 'String'
+      type: 'String',
     },
     secret: {
-      type: 'String'
-    }
-  }
+      type: 'String',
+    },
+  },
 });
 
 schema.methods.isBot = function() {

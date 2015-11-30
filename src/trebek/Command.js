@@ -2,13 +2,13 @@ import App from '../models/App';
 import Studio from '../models/Studio';
 import Contestant from '../models/Contestant';
 import Game from '../models/Game';
-import {lock, unlock} from './locks';
-import {post} from './slack';
+import { lock, unlock } from './locks';
+import { post } from './slack';
 
 export default class Command {
 
   constructor(input, data) {
-    const {valid, matches} = this.processTriggers(input);
+    const { valid, matches } = this.processTriggers(input);
 
     // Load data into our instance:
     this.valid = valid;
@@ -17,7 +17,7 @@ export default class Command {
     // Inject the models:
     this.models = {
       Game,
-      Contestant
+      Contestant,
     };
   }
 
@@ -30,9 +30,9 @@ export default class Command {
 
     await Promise.all([
       this.installStudio(),
-      this.installApp()
+      this.installApp(),
     ]);
-    
+
     // Check to make sure we have the correct features enabled:
     this.checkFeatures();
 
@@ -88,7 +88,7 @@ export default class Command {
 
     return {
       valid,
-      matches
+      matches,
     };
   }
 
@@ -99,7 +99,7 @@ export default class Command {
       if (provide === 'channelContestants') {
         this.channelContestants = () => {
           return Contestant.find().where('scores').elemMatch({
-            channel_id: this.data.channel_id
+            channel_id: this.data.channel_id,
           });
         };
       }
@@ -120,13 +120,13 @@ export default class Command {
   async installStudio() {
     this.studio = await Studio.get({
       id: this.data.channel_id,
-      name: this.data.channel_name
+      name: this.data.channel_name,
     });
     if (!this.studio.enabled) {
       throw new Error('Studio disabled');
     }
   }
-  
+
   async installApp() {
     this.app = await App.get();
   }

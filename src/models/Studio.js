@@ -1,69 +1,69 @@
-import {Schema, model} from 'mongoose';
+import { Schema, model } from 'mongoose';
 
 export const schema = new Schema({
   id: {
     type: String,
     required: true,
-    index: true
+    index: true,
   },
-  
+
   // Human-readable name of the studio:
   name: {
     type: String,
-    required: true
+    required: true,
   },
 
   // Studios can be disabled to turn the bot off in a channel:
   enabled: {
     type: Boolean,
-    default: false
+    default: false,
   },
-  
+
   values: {
     // The timeout for clues (in seconds):
     timeout: {
       type: Number,
       min: 1,
-      default: 30
+      default: 30,
     },
     // Timeout for challenges (in seconds):
     challengeTimeout: {
       type: Number,
       min: 1,
-      default: 15
+      default: 15,
     },
     boardControlTimeout: {
       type: Number,
       min: 1,
-      default: 4
+      default: 4,
     },
     // Minimum number of votes for a given challenge to be valid:
     minimumChallengeVotes: {
       type: Number,
       min: 1,
-      default: 2
+      default: 2,
     },
-    // The percentage of votes that need to 
+    // The percentage of votes that need to verify a challenge:
     challengeAcceptenceThreshold: {
       type: Number,
       min: 0,
       max: 1,
-      default: 0.65
+      default: 0.65,
     },
     // TODO:
     // The strictness of the answer checking:
     answerSimilarityMode: {
       type: String,
       enum: ['strict', 'moderate', 'flexible'],
-      default: 'moderate'
+      default: 'moderate',
     },
     // TODO:
     // The type of games to generate:
     gameType: {
       type: String,
       enum: ['any', 'regular', 'championship', 'kids', 'teens'],
-      default: 'any'
-    }
+      default: 'any',
+    },
   },
 
   // Feature flags:
@@ -71,45 +71,45 @@ export const schema = new Schema({
     challenges: {
       enabled: {
         type: Boolean,
-        default: true
-      }
+        default: true,
+      },
     },
-    
+
     // autoChallenges: {
     //   enabled: {
     //     type: Boolean,
     //     default: false
     //   }
     // },
-    
+
     boardControl: {
       enabled: {
         type: Boolean,
-        default: true
-      }
+        default: true,
+      },
     },
-    
+
     dailyDoubles: {
       enabled: {
         type: Boolean,
-        default: true
-      }
+        default: true,
+      },
     },
-    
+
     endGame: {
       enabled: {
         type: Boolean,
-        default: true
-      }
+        default: true,
+      },
     },
-    
+
     stats: {
       enabled: {
         type: Boolean,
-        default: true
-      }
-    }
-    
+        default: true,
+      },
+    },
+
     // autoDoubleJeopardy: {
     //   name: 'Automatic Double Jeopardy',
     //   description: 'Automatically starts a double jeopardy round after the normal jeopardy round ends.',
@@ -118,7 +118,7 @@ export const schema = new Schema({
     //     default: false
     //   }
     // },
-    
+
     // finalJeopardy: {
     //   name: 'Final Jeopardy Round',
     //   description: 'Asks a final jeopardy question at the end of the game.',
@@ -127,7 +127,7 @@ export const schema = new Schema({
     //     default: false
     //   }
     // },
-    
+
     // buzzers: {
     //   name: 'Buzzers',
     //   description: 'Requires contestants to buzz in with "buzz" to make a guess.',
@@ -136,7 +136,7 @@ export const schema = new Schema({
     //     default: false
     //   }
     // },
-    
+
     // roomTopic: {
     //   name: 'Room Topic',
     //   description: 'Sets the room topic based on the game state.',
@@ -150,20 +150,20 @@ export const schema = new Schema({
   // The total number of games that have been played in this studio:
   games: {
     type: Number,
-    default: 0
+    default: 0,
   },
   // The total number of guesses that have been made in this studio:
   guesses: {
     type: Number,
-    default: 0
-  }
+    default: 0,
+  },
 }, {
   toObject: {
-    virtuals: true
+    virtuals: true,
   },
   toJSON: {
-    virtuals: true
-  }
+    virtuals: true,
+  },
 });
 
 schema.virtual('features.challenges.name').get(() => 'Challenges');
@@ -191,10 +191,10 @@ schema.virtual('features.stats.description').get(() =>
   'Allows contestants to check the stats of themselves and other players.'
 );
 
-schema.statics.get = async function({id, name}) {
-  let doc = await this.findOne({id});
+schema.statics.get = async function({ id, name }) {
+  let doc = await this.findOne({ id });
   if (!doc) {
-    doc = await this.create({id, name});
+    doc = await this.create({ id, name });
   }
   // The channel has been renamed:
   if (doc.name !== name) {

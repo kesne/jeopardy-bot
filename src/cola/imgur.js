@@ -1,4 +1,4 @@
-import {uploadFile, setClientId} from 'imgur';
+import { uploadFile, setClientId } from 'imgur';
 
 // Allow setting the imgur api:
 if (process.env.IMGUR_API) {
@@ -13,7 +13,7 @@ export async function imgurUpload(file, attempt = 1) {
     throw new Error('Error uploading image. Max number');
   }
   try {
-    const {data} = await uploadFile(file);
+    const { data } = await uploadFile(file);
     return data.link;
   } catch (e) {
     return imgurUpload(file, attempt + 1);

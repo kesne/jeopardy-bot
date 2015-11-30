@@ -1,6 +1,6 @@
 import images from 'images';
-import {join} from 'path';
-import {tmpdir} from 'os';
+import { join } from 'path';
+import { tmpdir } from 'os';
 
 import capture from './capture';
 
@@ -15,7 +15,7 @@ const $values = {
   400: images(join(ASSETS, 'values', '400.png')),
   600: images(join(ASSETS, 'values', '600.png')),
   800: images(join(ASSETS, 'values', '800.png')),
-  1000: images(join(ASSETS, 'values', '1000.png'))
+  1000: images(join(ASSETS, 'values', '1000.png')),
 };
 
 // The y-position of the header row:
@@ -31,22 +31,33 @@ export async function generateDailydouble() {
   return `${dailyDoubleUrl}?random=${random}`;
 }
 
-export async function generateClue({game, clue}) {
+export async function generateClue({ game, clue }) {
   return await capture({
     view: 'clue',
     id: `${game.id}_${clue.id}`,
     data: clue.question,
-    channel_id: game.channel_id
+    channel_id: game.channel_id,
   });
 }
 
-export async function generateBoard({game}) {
+function saveImage(filename, image) {
+  return new Promise((resolve, reject) => {
+    image.saveAsync(filename, err => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(filename);
+    });
+  });
+}
+
+export async function generateBoard({ game }) {
   const categoriesImageFile = await capture({
     view: 'categories',
     id: `${game.id}_categories`,
     size: '1200x102',
     data: game.categories.map(cat => cat.title).join('@@~~AND~~@@'),
-    channel_id: game.channel_id
+    channel_id: game.channel_id,
   });
 
   const categoriesImage = images(categoriesImageFile);
@@ -67,16 +78,5 @@ export async function generateBoard({game}) {
     }
   }
 
-  return await saveImages(join(temporaryDirectory, `fullboard.${game.channel_id}.png`), board);
-}
-
-function saveImages(filename, images) {
-  return new Promise((resolve, reject) => {
-    images.saveAsync(filename, err => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(filename);
-    });
-  });
+  return await saveImage(join(temporaryDirectory, `fullboard.${game.channel_id}.png`), board);
 }

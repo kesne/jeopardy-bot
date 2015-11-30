@@ -1,4 +1,4 @@
-import {currency} from '../../utils';
+import { currency } from '../../utils';
 
 export default function scoresMessage(contestants, channel_id) {
   return contestants.map(contestant => {

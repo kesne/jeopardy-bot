@@ -1,10 +1,10 @@
 import fetch from 'node-fetch';
 import striptags from 'striptags';
-import {load} from 'cheerio';
-import {AllHtmlEntities} from 'html-entities';
+import { load } from 'cheerio';
+import { AllHtmlEntities } from 'html-entities';
 import unidecode from 'unidecode';
 
-const {decode} = new AllHtmlEntities();
+const { decode } = new AllHtmlEntities();
 
 function simplifyText(text) {
   return unidecode(decode(text)).replace(/\\/g, '');
@@ -29,20 +29,20 @@ async function loadEpisode(url) {
 
   // Extract categories:
   const categories = [];
-  $('#jeopardy_round .category_name').each((id, category) => {
+  $('#jeopardy_round .category_name').each((inputId, category) => {
     // Don't use zero-based index:
-    id += 1;
+    const id = inputId + 1;
     categories.push({
       id,
-      title: simplifyText($(category).text())
+      title: simplifyText($(category).text()),
     });
   });
 
   const clues = [];
 
-  $('#jeopardy_round .clue').each((id, clue) => {
+  $('#jeopardy_round .clue').each((inputId, clue) => {
     // Don't use zero-based index:
-    id += 1;
+    const id = inputId + 1;
 
     const $clue = $(clue);
     const $clueText = $clue.find('.clue_text');
@@ -71,7 +71,7 @@ async function loadEpisode(url) {
       question,
       answer,
       value,
-      dailyDouble
+      dailyDouble,
     });
   });
 
@@ -80,8 +80,8 @@ async function loadEpisode(url) {
     episode,
     roundOne: {
       categories,
-      clues
-    }
+      clues,
+    },
   };
 }
 
@@ -93,12 +93,12 @@ async function randomEpisode() {
   const links = $('td:first-child > a');
   const episodeLink = links.eq(Math.ceil(Math.random() * links.length)).attr('href');
 
-  const {episode, roundOne} = await loadEpisode(episodeLink);
+  const { episode, roundOne } = await loadEpisode(episodeLink);
 
   return {
     season,
     episode,
-    roundOne
+    roundOne,
   };
 }
 

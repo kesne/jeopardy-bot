@@ -1,8 +1,8 @@
 import Pageres from 'pageres';
 import Imagemin from 'imagemin';
-import {join} from 'path';
-import {tmpdir} from 'os';
-import {stat} from 'fs';
+import { join } from 'path';
+import { tmpdir } from 'os';
+import { stat } from 'fs';
 
 import * as config from '../config';
 
@@ -19,7 +19,7 @@ function fileExists(filename) {
   });
 }
 
-export default function captureScreenshotToFile({id, channel_id, view, data, size = '1200x740'}) {
+export default function captureScreenshotToFile({ id, channel_id, view, data, size = '1200x740' }) {
   const filename = `${channel_id}.${view}.${id}`;
   const filepath = join(temporaryDirectory, `${filename}.png`);
 
@@ -33,7 +33,7 @@ export default function captureScreenshotToFile({id, channel_id, view, data, siz
         .src(
           `localhost:${config.PORT}/renderable/${view}?data=${encodeURIComponent(data)}`,
           [size],
-          {crop: false, filename}
+          { crop: false, filename }
         )
         .dest(join(temporaryDirectory));
 
@@ -47,7 +47,7 @@ export default function captureScreenshotToFile({id, channel_id, view, data, siz
         new Imagemin()
           .src(filepath)
           .dest(filepath)
-          .use(Imagemin.optipng({optimizationLevel: 3}))
+          .use(Imagemin.optipng({ optimizationLevel: 3 }))
           .run(() => {
             console.timeEnd('Image Minification');
             resolve(filepath);
