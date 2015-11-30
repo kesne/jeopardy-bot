@@ -10,8 +10,15 @@ class App extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      studios: [],
+    };
 
+    fetch('/api/v1/studios/', {
+      credentials: 'include',
+    })
+      .then(res => res.json())
+      .then(studios => this.setState({ studios }));
   }
 
   render() {
@@ -19,11 +26,12 @@ class App extends React.Component {
       <Layout fixedDrawer>
         <Drawer title="Title">
             <Navigation>
-                <Link>Link</Link>
-                <Link>Link</Link>
-                <Link>Link</Link>
-                <Link>Link</Link>
-                <Link>Link</Link>
+              <Link to="/">Home</Link>
+              {/* <Link to="/studio">Studios</Link> */}
+              <Link to="/studio">Studios</Link>
+              {this.state.studios.map((studio) => (
+                <Link to={`/studio/${studio.id}`}>{studio.name}</Link>
+              ))}
             </Navigation>
         </Drawer>
         <Content />
