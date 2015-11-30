@@ -5,9 +5,17 @@ import App from './models/App';
 const autoReconnect = true;
 const autoMarkMessagesAsRead = true;
 
-export default class Bot {
+export default class SlackBot {
+
   constructor() {
     this.start();
+  }
+
+  destroy() {
+    if (this.slack) {
+      this.slack.autoReconnect = false;
+      this.slack.disconnect();
+    }
   }
 
   async start() {

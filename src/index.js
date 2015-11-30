@@ -8,7 +8,7 @@ import basicAuth from 'basic-auth-connect';
 
 import App from './models/App';
 import Studio from './models/Studio';
-import SlackBot from './bot';
+import SlackBot from './slackbot';
 import Webhook from './webhook';
 import { broadcast } from './trebek';
 import * as config from './config';
@@ -162,17 +162,34 @@ app.get('/renderable/clue', (req, res) => {
   });
 });
 
-// Boot up the jeopardy app:
-app.listen(config.PORT, async () => {
-  const a = await App.get();
-  console.log(`Jeopardy Bot listening on port ${config.PORT}`);
-  let liveInstance;
-  // If we're in a mode that needs the webhook, then set it up:
-  if (a.isBot()) {
+// Holds the instance of the bot or webhook:
+let liveInstance;
+
+function rebootInstance(bot = false) {
+  // Same mode:
+  if ((liveInstance instanceof SlackBot && bot) || (liveInstance instanceof Webhook && !bot)) {
+    return;
+  }
+  // If we're already running, let's tear down first:
+  if (liveInstance) {
+    liveInstance.destroy();
+  }
+  // Boot the new instance:
+  if (bot) {
     liveInstance = new SlackBot();
   } else {
     liveInstance = new Webhook(app);
   }
-  // TODO: Allow teardown:
-  console.log(liveInstance);
+}
+
+App.schema.post('save', (doc) => {
+  rebootInstance(doc.isBot());
+});
+
+// Boot up the jeopardy app:
+app.listen(config.PORT, async () => {
+  const a = await App.get();
+  console.log(`Jeopardy Bot listening on port ${config.PORT}`);
+  // If we're in a mode that needs the webhook, then set it up:
+  rebootInstance(a.isBot());
 });

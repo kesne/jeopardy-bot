@@ -1,8 +1,10 @@
+import removeRoute from 'express-remove-route';
 import trebek from './trebek';
 import App from './models/App';
 
 export default class Webhook {
   constructor(expressApp) {
+    this.app = expressApp;
     expressApp.post('/command', async (req, res) => {
       const app = await App.get();
       // Ignore unverified messages:
@@ -36,5 +38,9 @@ export default class Webhook {
         res.end();
       }
     });
+  }
+
+  destroy() {
+    removeRoute(this.app, '/command');
   }
 }

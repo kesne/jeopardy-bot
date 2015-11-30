@@ -7,7 +7,7 @@
     width: 100%;
   }
   </style>
-  
+
   <div class="mdl-cell mdl-cell--12-col">
     <div class="jbot-settings mdl-card mdl-shadow--2dp">
       <div class="mdl-card__title">
@@ -38,11 +38,10 @@
           <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
             <label class="" for="mode">Mode</label>
             <select class="setting-value mdl-textfield" name="mode" id="mode">
-              <option value="repsonse" {@eq key="response" value=app.mode}selected{/eq}>Response</option>
+              <option value="response" {@eq key="response" value=app.mode}selected{/eq}>Response</option>
               <option value="hybrid" {@eq key="hybrid" value=app.mode}selected{/eq}>Hybrid</option>
               <option value="bot" {@eq key="bot" value=app.mode}selected{/eq}>Bot</option>
             </select>
-            <span>Requires a restart.</span>
           </div>
         </div>
         <div class="jbot-setting">
@@ -85,7 +84,7 @@
       </div>
     </form>
   </div>
-  
+
   <script>
     (function() {
       var features = document.querySelectorAll('.setting-value');

@@ -26,6 +26,7 @@
     "decamelize": "^1.1.1",
     "dehumanize-date": "^2.1.0",
     "express": "^4.13.3",
+    "express-remove-route": "^0.1.1",
     "form-data": "^0.2.0",
     "html-entities": "^1.2.0",
     "imagemin": "^3.2.0",
