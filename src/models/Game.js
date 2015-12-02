@@ -147,7 +147,7 @@ schema.methods.liveClue = function() {
 };
 
 schema.methods.isDailyDouble = function() {
-  if (!this.studio.features.dailyDoubles.enabled) {
+  if (!this.studio.features.dailyDoubles) {
     return false;
   }
   const clue = this.getClue();
@@ -313,7 +313,7 @@ schema.methods.getCategory = function() {
 
 schema.methods.isBoardControlled = function() {
   return (
-    this.studio.features.boardControl.enabled &&
+    this.studio.features.boardControl &&
     this.lastContestant &&
     this.questionEnd &&
     moment().isBefore(moment(this.questionEnd).add(

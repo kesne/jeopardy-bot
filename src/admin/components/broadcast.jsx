@@ -4,19 +4,26 @@ import { Button, Card, CardText, CardTitle, CardMenu, CardActions, Icon, Textfie
 
 class Broadcast extends React.Component {
   render() {
+    const allBroadcast = this.props.studio === 'all';
     return (
-      <Card shadow={1}>
+      <Card shadow={0} style={{
+        width: '100%',
+      }}>
         <CardTitle>Send Broadcast</CardTitle>
         <CardText>
-          Send a message to this as the bot.
+          {allBroadcast ?
+            `Send a message to all public and private slack channels the bot is currently in.
+            This will not send any private messages.` :
+            'Send a message to this studio as the bot.'
+          }
           <Textfield
             onChange={() => {}}
-            label="Text lines..."
+            label="Message..."
             rows={3}
           />
         </CardText>
         <CardActions border>
-          <Button colored>Send Message</Button>
+          <Button colored ripple>Send Message</Button>
         </CardActions>
         <CardMenu>
           <Icon name="announcement" />
