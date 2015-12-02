@@ -134,7 +134,7 @@ export default class Command {
   checkFeatures() {
     const features = this.constructor.features || [];
     for (const feature of features) {
-      if (!this.studio.features[feature].enabled) {
+      if (!this.studio.features[feature]) {
         throw new Error('Unmet feature.');
       }
     }

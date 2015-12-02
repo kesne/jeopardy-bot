@@ -20,12 +20,15 @@ mongoose.connect(config.MONGO);
 
 const app = express();
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 // Set up REST routes to manipulate models:
 const apiRouter = new express.Router();
 apiRouter.use(basicAuth(config.ADMIN_USERNAME, config.ADMIN_PASSWORD));
 restify.serve(apiRouter, App, { lowercase: true });
-restify.serve(apiRouter, Studio, { lowercase: true });
-restify.serve(apiRouter, Contestant, { lowercase: true });
+restify.serve(apiRouter, Studio, { lowercase: true, idProperty: 'id' });
+restify.serve(apiRouter, Contestant, { lowercase: true, idProperty: 'slackid' });
 app.use(apiRouter);
 
 
@@ -53,9 +56,6 @@ app.engine('dust', adaro.dust({
 }));
 app.set('view engine', 'dust');
 app.set('views', join(__dirname, 'views'));
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 // Install landing page:
 app.get('/welcome', (req, res) => {
