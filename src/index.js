@@ -29,22 +29,6 @@ app.engine('dust', adaro.dust({
   cache: false,
   helpers: [
     'dustjs-helpers',
-    dust => {
-      dust.helpers.iter = (chunk, context, bodies, params) => {
-        const obj = context.resolve(params.obj);
-        const iterable = [];
-        for (const key in obj) {
-          if (obj.hasOwnProperty(key)) {
-            const value = obj[key];
-            iterable.push({
-              $key: key,
-              $value: value,
-            });
-          }
-        }
-        return chunk.section(iterable, context, bodies);
-      };
-    },
   ],
 }));
 app.set('view engine', 'dust');
@@ -56,9 +40,10 @@ app.get('/welcome', (req, res) => {
   res.render('welcome');
 });
 
-app.use('/new-admin', express.static('lib/admin'));
-app.get('/new-admin', (req, res) => {
-  res.render('new_admin');
+app.use('/admin', adminAuth);
+app.use('/admin', express.static('lib/admin'));
+app.get('/admin', (req, res) => {
+  res.render('admin');
 });
 
 app.get('/renderable/categories', (req, res) => {
