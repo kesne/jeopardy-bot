@@ -13,6 +13,13 @@ export const schema = new Schema({
     required: true,
   },
 
+  // The type of studio:
+  type: {
+    type: String,
+    enum: ['channel', 'private', 'dm'],
+    default: 'channel',
+  },
+
   // Studios can be disabled to turn the bot off in a channel:
   enabled: {
     type: Boolean,

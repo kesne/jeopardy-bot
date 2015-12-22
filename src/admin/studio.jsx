@@ -94,7 +94,7 @@ class Studio extends React.Component {
             width: '100%',
           }}>
             <CardTitle>
-              {studio.enabled ? 'Disable Studio' : 'Enable Studio'}
+              {studio.enabled ? 'Studio Enabled' : 'Studio Disabled'}
             </CardTitle>
             <CardText>
               This jeopardy studio is currently

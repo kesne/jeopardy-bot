@@ -53,7 +53,7 @@ class App extends React.Component {
               Home
             </Link>
             {/* <Link to="/stats">Stats</Link> */}
-            <Link to="/studio">
+            <Link to="/studio" className="jbot-disabled">
               <Icon name="keyboard_arrow_down" />
               Studios
             </Link>
