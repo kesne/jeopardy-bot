@@ -6,7 +6,6 @@ import { lock, unlock } from './locks';
 import { post } from './slack';
 
 export default class Command {
-
   constructor(input, data) {
     const { valid, matches } = this.processTriggers(input);
 
