@@ -62,6 +62,7 @@ class Studio extends React.Component {
         method: 'DELETE',
       }).then(res => {
         if (res.ok) {
+          this.props.onStudioDeleted();
           this.props.history.pushState(null, '/');
         }
       });
@@ -210,6 +211,7 @@ class Studio extends React.Component {
 Studio.propTypes = {
   params: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
+  onStudioDeleted: PropTypes.func.isRequired,
 };
 
 export default Studio;

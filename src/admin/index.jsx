@@ -16,7 +16,10 @@ class App extends React.Component {
 
   constructor(props) {
     super(props);
-    this.loadStudios();
+
+    this.onStudioDeleted = this.onStudioDeleted.bind(this);
+
+    this.getStudios();
     this.state = {
       studios: [],
     };
@@ -30,7 +33,11 @@ class App extends React.Component {
     // TODO:
   }
 
-  loadStudios() {
+  onStudioDeleted() {
+    this.getStudios();
+  }
+
+  getStudios() {
     fetch('/api/v1/studios/?sort=name', {
       credentials: 'include',
     }).then(res => {
@@ -73,7 +80,9 @@ class App extends React.Component {
         </Drawer>
         <Content>
           <div className="page-content">
-            {this.props.children}
+            {React.cloneElement(this.props.children, {
+              onStudioDeleted: this.onStudioDeleted,
+            })}
           </div>
         </Content>
       </Layout>
