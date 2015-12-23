@@ -83,7 +83,6 @@ class Settings extends React.Component {
               Mode
               <Tooltip
                 label="Change the bot mode based on the configurated slack integration."
-                large
               >
                 <Icon className="jbot-inline-icon" name="help" />
               </Tooltip>
@@ -102,7 +101,6 @@ class Settings extends React.Component {
                 API Token
                 <Tooltip
                   label="The Slack API Token, used to send responses back to Slack."
-                  large
                 >
                   <Icon className="jbot-inline-icon" name="help" />
                 </Tooltip>
@@ -119,8 +117,7 @@ class Settings extends React.Component {
             <h6 className="no-margin">
               Jeopardy Owner
               <Tooltip
-                label="The user that is responsible for the Jeopardy Bot."
-                large
+                label="The contestant that is responsible for the Jeopardy Bot."
               >
                 <Icon className="jbot-inline-icon" name="help" />
               </Tooltip>
