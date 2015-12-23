@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import { Button, Card, CardText, CardTitle, CardMenu, CardActions, Icon, Textfield } from 'react-mdl';
 
 const propTypes = {
+  app: PropTypes.object.isRequired,
   onValueChanged: PropTypes.func.isRequired,
 };
 
