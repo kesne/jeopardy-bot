@@ -56,6 +56,14 @@
   margin-bottom: 10px;
 }
 
+.jbot-inline-icon {
+  font-size: 14px;
+  overflow: hidden;
+  vertical-align: top;
+  margin-left: 5px;
+  cursor: help;
+}
+
 .no-margin {
   margin: 0;
 }

@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { Button, Card, CardText, CardTitle, CardMenu, CardActions, Icon, Textfield } from 'react-mdl';
+import { Button, Card, CardText, CardTitle, CardMenu, CardActions, Icon, Tooltip, Textfield } from 'react-mdl';
 
 const propTypes = {
   app: PropTypes.object.isRequired,
@@ -79,7 +79,15 @@ class Settings extends React.Component {
         <CardTitle>Settings</CardTitle>
         <CardText>
           <div>
-            <h6 className="no-margin">Mode</h6>
+            <h6 className="no-margin">
+              Mode
+              <Tooltip
+                label="Change the bot mode based on the configurated slack integration."
+                large
+              >
+                <Icon className="jbot-inline-icon" name="help" />
+              </Tooltip>
+            </h6>
             <select className="jbot-select" value={this.state.mode} onChange={this.onChangeMode}>
               <option value="" disabled>Select a mode...</option>
               <option value="bot">Bot</option>
@@ -90,7 +98,15 @@ class Settings extends React.Component {
 
           {this.state.mode !== 'response' ? (
             <div>
-              <h6 className="no-margin">API Token</h6>
+              <h6 className="no-margin">
+                API Token
+                <Tooltip
+                  label="The Slack API Token, used to send responses back to Slack."
+                  large
+                >
+                  <Icon className="jbot-inline-icon" name="help" />
+                </Tooltip>
+              </h6>
               <Textfield
                 onChange={this.onChangeApiToken}
                 value={this.state.api_token}
@@ -100,7 +116,15 @@ class Settings extends React.Component {
           ) : null}
 
           <div>
-            <h6 className="no-margin">Jeopardy Owner</h6>
+            <h6 className="no-margin">
+              Jeopardy Owner
+              <Tooltip
+                label="The user that is responsible for the Jeopardy Bot."
+                large
+              >
+                <Icon className="jbot-inline-icon" name="help" />
+              </Tooltip>
+            </h6>
             <select className="jbot-select" value={this.state.owner} onChange={this.onChangeOwner}>
               <option value="" disabled>Select an owner...</option>
               {this.state.contestants.map((contestant) => (

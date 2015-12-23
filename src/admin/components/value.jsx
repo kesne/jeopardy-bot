@@ -22,7 +22,9 @@ class Feature extends React.Component {
       }}>
         <CardTitle>{this.props.name}</CardTitle>
         <CardText>
-          {this.props.description}
+          <div>
+            {this.props.description}
+          </div>
           <Textfield
             onChange={this.onValueChange}
             value={this.props.currentValue}
