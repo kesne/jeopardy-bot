@@ -125,7 +125,7 @@ class Settings extends React.Component {
             <select className="jbot-select" value={this.state.owner} onChange={this.onChangeOwner}>
               <option value="" disabled>Select an owner...</option>
               {this.state.contestants.map((contestant) => (
-                <option key={contestant._id} value={contestant.slackid}>
+                <option key={contestant._id} value={contestant._id}>
                   {contestant.name}
                 </option>
               ))}
