@@ -78,7 +78,7 @@ export default class Challenge extends Command {
         return;
       }
 
-      const contestantString = contestants.map(contestant => `@${contestant.name}`).join(', ');
+      const contestantString = contestants.map(contestant => `<@${contestant.slackid}|${contestant.name}>`).join(', ');
       await this.say(`I'm not sure, let's see what the room thinks.\nI thought the correct answer was \`${answer}\`, and the guess was \`${guess}\`.`);
       await this.say(`${contestantString}, do you think they were right? Respond with just "y" or "n" to vote.`);
 

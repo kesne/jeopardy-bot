@@ -66,7 +66,7 @@ export default class SlackBot {
 
     if (subtype === 'channel_join') {
       const { name: user_name } = this.slack.getUserByID(user_id);
-      channel.send(`Welcome to #${channel.name}, @${user_name}! To learn how to play, just type "help".`);
+      channel.send(`Welcome to #${channel.name}, <@${user_id}|${user_name}>! To learn how to play, just type "help".`);
       return;
     }
 
