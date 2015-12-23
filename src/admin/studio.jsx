@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { Button, Card, CardActions, CardMenu, CardText, CardTitle, Tabs, Tab, Switch, Grid, Cell } from 'react-mdl';
+import { Button, Card, CardActions, CardMenu, CardText, CardTitle, Tabs, Tab, Switch, Grid, Cell, IconButton } from 'react-mdl';
 import Broadcast from './components/broadcast';
 import Features from './components/features';
 import Configure from './components/configure';
@@ -12,6 +12,7 @@ class Studio extends React.Component {
     this.onChangeTab = this.onChangeTab.bind(this);
     this.onFeatureChanged = this.onFeatureChanged.bind(this);
     this.onValueChanged = this.onValueChanged.bind(this);
+    this.onClickDelete = this.onClickDelete.bind(this);
 
     this.getStudio(props);
     this.state = {
@@ -50,6 +51,21 @@ class Studio extends React.Component {
     this.updateStudio({
       enabled,
     });
+  }
+
+  onClickDelete() {
+    if (
+      window.confirm('Are you sure that you would like to delete this studio?')
+    ) {
+      fetch(`/api/v1/studios/${this.state.studio.id}`, {
+        credentials: 'include',
+        method: 'DELETE',
+      }).then(res => {
+        if (res.ok) {
+          this.props.history.pushState(null, '/');
+        }
+      });
+    }
   }
 
   getStudio({ params }) {
@@ -160,17 +176,24 @@ class Studio extends React.Component {
   render() {
     return (
       <div>
-        <h3 style={{
-          margin: 0,
-          padding: 20,
-        }}>
-          <span className="mdl-color-text--grey-400" style={{
-            paddingRight: 10,
+        <div>
+          <h3 style={{
+            margin: 0,
+            padding: 20,
           }}>
-            #
-          </span>
-          {this.state.studio.name}
-        </h3>
+            <span className="mdl-color-text--grey-400" style={{
+              paddingRight: 10,
+            }}>
+              #
+            </span>
+            {this.state.studio.name}
+            <IconButton
+              name="delete"
+              className="pull-right mdl-color-text--grey-500"
+              onClick={this.onClickDelete}
+            />
+          </h3>
+        </div>
         <Tabs activeTab={0} onChange={this.onChangeTab} ripple>
           <Tab>Info</Tab>
           <Tab>Features</Tab>
@@ -186,6 +209,7 @@ class Studio extends React.Component {
 
 Studio.propTypes = {
   params: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired,
 };
 
 export default Studio;

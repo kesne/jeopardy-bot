@@ -64,6 +64,10 @@
   cursor: help;
 }
 
+.pull-right {
+  float: right;
+}
+
 .no-margin {
   margin: 0;
 }

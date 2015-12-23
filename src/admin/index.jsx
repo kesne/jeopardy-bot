@@ -31,7 +31,7 @@ class App extends React.Component {
   }
 
   loadStudios() {
-    fetch('/api/v1/studios/', {
+    fetch('/api/v1/studios/?sort=name', {
       credentials: 'include',
     }).then(res => {
       return res.json();
