@@ -45,11 +45,7 @@ class Settings extends React.Component {
   }
 
   onClickSave() {
-    const { owner, mode } = this.state;
-    let { api_token } = this.state;
-    if (mode === 'response') {
-      api_token = '';
-    }
+    const { owner, api_token, mode } = this.state;
     this.props.onValueChanged({
       owner,
       api_token,
