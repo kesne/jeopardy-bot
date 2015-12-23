@@ -13,11 +13,16 @@ class Studio extends React.Component {
     this.onFeatureChanged = this.onFeatureChanged.bind(this);
     this.onValueChanged = this.onValueChanged.bind(this);
 
-    this.getStudio();
+    this.getStudio(props);
     this.state = {
       activeTab: 0,
       studio: {},
     };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.getStudio(nextProps);
+    return false;
   }
 
   onChangeTab(activeTab) {
@@ -47,8 +52,8 @@ class Studio extends React.Component {
     });
   }
 
-  getStudio() {
-    fetch(`/api/v1/studios/${this.props.params.studio}`, {
+  getStudio({ params }) {
+    fetch(`/api/v1/studios/${params.studio}`, {
       credentials: 'include',
     }).then(res => {
       return res.json();

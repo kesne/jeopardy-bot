@@ -2,9 +2,15 @@ import React, { PropTypes } from 'react';
 import { render } from 'react-dom';
 import { Header, Layout, Drawer, Navigation, Content, Menu, MenuItem, Icon, IconButton } from 'react-mdl';
 import { Router, Route, Link, IndexRoute } from 'react-router';
+import { createHistory, useBasename } from 'history';
 
 import Home from './home';
 import Studio from './studio';
+
+// Run our app under the /base URL.
+const history = useBasename(createHistory)({
+  basename: '/admin',
+});
 
 class App extends React.Component {
 
@@ -80,7 +86,7 @@ App.propTypes = {
 };
 
 render((
-  <Router>
+  <Router history={history}>
     <Route path="/" component={App}>
       <IndexRoute component={Home}/>
       <Route path="studio/:studio" component={Studio} />

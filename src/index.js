@@ -42,7 +42,7 @@ app.get('/welcome', (req, res) => {
 
 app.use('/admin', adminAuth);
 app.use('/admin', express.static('lib/admin'));
-app.get('/admin', (req, res) => {
+app.get('/admin/*', (req, res) => {
   res.render('admin');
 });
 

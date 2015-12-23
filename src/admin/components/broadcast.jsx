@@ -1,4 +1,3 @@
-// TODO: Post to the server, clear the form, and show a little message.
 import React, { PropTypes } from 'react';
 import { Button, Card, CardText, CardTitle, CardMenu, CardActions, Icon, Textfield } from 'react-mdl';
 
