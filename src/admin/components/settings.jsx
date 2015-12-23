@@ -45,7 +45,11 @@ class Settings extends React.Component {
   }
 
   onClickSave() {
-    const { owner, api_token, mode } = this.state;
+    const { owner, mode } = this.state;
+    let { api_token } = this.state;
+    if (mode === 'response') {
+      api_token = '';
+    }
     this.props.onValueChanged({
       owner,
       api_token,
@@ -78,28 +82,36 @@ class Settings extends React.Component {
       }}>
         <CardTitle>Settings</CardTitle>
         <CardText>
-          <h6 className="no-margin">Mode</h6>
-          <select className="jbot-select" value={this.state.mode} onChange={this.onChangeMode}>
-            <option value="" disabled>Select a mode...</option>
-            <option value="bot">Bot</option>
-            <option value="hybrid">Hybrid</option>
-            <option value="response">Response</option>
-          </select>
+          <div>
+            <h6 className="no-margin">Mode</h6>
+            <select className="jbot-select" value={this.state.mode} onChange={this.onChangeMode}>
+              <option value="" disabled>Select a mode...</option>
+              <option value="bot">Bot</option>
+              <option value="hybrid">Hybrid</option>
+              <option value="response">Response</option>
+            </select>
+          </div>
 
-          <h6 className="no-margin">API Token</h6>
-          <Textfield
-            onChange={this.onChangeApiToken}
-            value={this.state.api_token}
-            label="API Token..."
-          />
+          {this.state.mode !== 'response' ? (
+            <div>
+              <h6 className="no-margin">API Token</h6>
+              <Textfield
+                onChange={this.onChangeApiToken}
+                value={this.state.api_token}
+                label="API Token..."
+              />
+            </div>
+          ) : null}
 
-          <h6 className="no-margin">Jeopardy Owner</h6>
-          <select className="jbot-select" value={this.state.owner} onChange={this.onChangeOwner}>
-            <option value="" disabled>Select an owner...</option>
-            {this.state.contestants.map((contestant) => (
-              <option value={contestant.slackid}>{contestant.name}</option>
-            ))}
-          </select>
+          <div>
+            <h6 className="no-margin">Jeopardy Owner</h6>
+            <select className="jbot-select" value={this.state.owner} onChange={this.onChangeOwner}>
+              <option value="" disabled>Select an owner...</option>
+              {this.state.contestants.map((contestant) => (
+                <option value={contestant.slackid}>{contestant.name}</option>
+              ))}
+            </select>
+          </div>
         </CardText>
         <CardActions border>
           <Button colored ripple onClick={this.onClickSave}>Save</Button>
