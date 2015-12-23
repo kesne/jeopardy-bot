@@ -30,7 +30,7 @@ class Broadcast extends React.Component {
         },
         body: JSON.stringify({
           message: this.state.message,
-          studio: this.props.studio === 'all' ? false : this.props.studio,
+          studio: this.props.all ? false : this.props.studio,
         }),
       }).then(res => {
         if (res.ok) {
@@ -49,14 +49,13 @@ class Broadcast extends React.Component {
   }
 
   render() {
-    const allBroadcast = this.props.studio === 'all';
     return (
       <Card shadow={0} style={{
         width: '100%',
       }}>
         <CardTitle>Send Broadcast</CardTitle>
         <CardText>
-          {allBroadcast ?
+          {this.props.all ?
             `Send a message to all public and private slack channels the bot is currently in.
             This will not send any private messages.` :
             'Send a message to this studio as the bot.'
@@ -86,7 +85,13 @@ class Broadcast extends React.Component {
 }
 
 Broadcast.propTypes = {
-  studio: PropTypes.string.isRequired,
+  studio: PropTypes.string,
+  all: PropTypes.bool,
+};
+
+Broadcast.defaultProps = {
+  studio: '',
+  all: false,
 };
 
 export default Broadcast;

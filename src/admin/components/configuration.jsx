@@ -1,32 +1,51 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import { Button, Card, CardText, CardTitle, CardMenu, CardActions, Icon, Textfield } from 'react-mdl';
 
 const propTypes = {
-
+  onValueChanged: PropTypes.func.isRequired,
 };
 
-const defaultProps = {
-
-};
+const defaultProps = {};
 
 class Configuration extends React.Component {
   constructor(props) {
     super(props);
 
-    this.fetchContestants();
+    this.onChangeUsername = this.onChangeUsername.bind(this);
+    this.onChangeIconEmoji = this.onChangeIconEmoji.bind(this);
+    this.onClickSave = this.onClickSave.bind(this);
 
-    this.state = {
-      contestants: [],
-    };
+    this.state = {};
   }
 
-  fetchContestants() {
-    fetch('/api/v1/contestants/', {
-      credentials: 'include',
-    }).then(res => {
-      return res.json();
-    }).then(contestants => {
-      this.setState({ contestants });
+  componentWillReceiveProps(props) {
+    this.getState(props.app);
+  }
+
+  onChangeUsername(e) {
+    this.setState({
+      username: e.target.value,
+    });
+  }
+
+  onChangeIconEmoji(e) {
+    this.setState({
+      icon_emoji: e.target.value,
+    });
+  }
+
+  onClickSave() {
+    const { username, icon_emoji } = this.state;
+    this.props.onValueChanged({
+      username,
+      icon_emoji,
+    });
+  }
+
+  getState({ username, icon_emoji }) {
+    this.setState({
+      username,
+      icon_emoji,
     });
   }
 
@@ -39,20 +58,20 @@ class Configuration extends React.Component {
         <CardText>
           <h6 className="no-margin">Username</h6>
           <Textfield
-            onChange={this.onChangeMessage}
-            value={this.state.message}
+            onChange={this.onChangeUsername}
+            value={this.state.username}
             label="Username..."
           />
 
           <h6 className="no-margin">Icon Emoji</h6>
           <Textfield
-            onChange={this.onChangeMessage}
-            value={this.state.message}
+            onChange={this.onChangeIconEmoji}
+            value={this.state.icon_emoji}
             label="Icon Emoji..."
           />
         </CardText>
         <CardActions border>
-          <Button colored ripple onClick={this.onClickSendMessage}>Save</Button>
+          <Button colored ripple onClick={this.onClickSave}>Save</Button>
         </CardActions>
         <CardMenu>
           <Icon name="face" />
