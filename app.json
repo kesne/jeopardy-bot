@@ -6,12 +6,12 @@
   "keywords": ["node", "slack", "jeopardy", "bot", "trebek"],
   "success_url": "/welcome",
   "env": {
-    "API_TOKEN": {
-      "description": "The Slack API key.",
+    "ADMIN_USERNAME": {
+      "description": "The username for the admin panel (defaults to 'jeopardy').",
       "required": false
     },
-    "OUTGOING_WEBHOOK_TOKEN": {
-      "description": "The token of the Slack outgoing webhook. Used to verify incoming requests.",
+    "ADMIN_PASSWORD": {
+      "description": "The password for the admin panel (defaults to 'bot')",
       "required": false
     }
   },

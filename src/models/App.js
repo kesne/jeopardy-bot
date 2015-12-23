@@ -1,9 +1,13 @@
 import { Schema, model } from 'mongoose';
 
 export const schema = new Schema({
-  admin: {
-    type: 'String',
+
+  // The owner of the slack bot:
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: 'Contestant',
   },
+
   username: {
     type: 'String',
     default: 'jeopardybot',
@@ -12,6 +16,7 @@ export const schema = new Schema({
     type: 'String',
     default: ':jbot:',
   },
+  // TODO: Figure this out:
   // icon_url: {
   //   type: String
   // },

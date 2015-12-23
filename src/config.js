@@ -2,9 +2,10 @@
  * BOT CONFIGURATION:
  */
 
-export const ADMIN_USERNAME = process.env.JBOT_USERNAME || 'jeopardy';
-export const ADMIN_PASSWORD = process.env.JBOT_PASSWORD || 'bot';
+export const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'jeopardy';
+export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'bot';
 
+// TODO Localhost as default, better documented Imgur deploys, deprecate S3.
 export const AWS_KEY = process.env.AWS_KEY || '';
 export const AWS_SECRET_KEY = process.env.AWS_SECRET_KEY || '';
 
