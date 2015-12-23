@@ -35,7 +35,7 @@
     "express-remove-route": "^0.1.1",
     "express-restify-mongoose": "^2.3.1",
     "form-data": "^0.2.0",
-    "history": "^1.13.1",
+    "history": "1.13.x",
     "html-entities": "^1.2.0",
     "imagemin": "^3.2.0",
     "images": "^2.1.8",
