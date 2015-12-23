@@ -23,7 +23,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Re-usable authentication for admin pages:
 const adminAuth = basicAuth(config.ADMIN_USERNAME, config.ADMIN_PASSWORD);
 
-app.use(api(adminAuth));
+// Add API endpoints for admin panel:
+app.use('/api', api(adminAuth));
 
 app.engine('dust', adaro.dust({
   cache: false,
