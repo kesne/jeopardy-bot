@@ -147,7 +147,7 @@ schema.methods.liveClue = function() {
 };
 
 schema.methods.isDailyDouble = function() {
-  if (!this.studio.features.dailyDoubles.enabled) {
+  if (!this.studio.features.dailyDoubles) {
     return false;
   }
   const clue = this.getClue();
@@ -197,7 +197,11 @@ schema.methods.endChallenge = async function(forceWin = false) {
     const contestant = await this.model('Contestant').findOne({
       slackid,
     });
-    const { value } = this.questions.find(q => q.id === question);
+    const fullQuestion = this.questions.find(q => q.id === question);
+    let value = fullQuestion.value;
+    if (fullQuestion.dailyDouble && this.dailyDouble.wager && this.studio.features.dailyDoubles) {
+      value = this.dailyDouble.wager;
+    }
     await contestant.correct({
       // Award twice the value, one to make up for the loss, and one for the new points:
       value: value * 2,
@@ -313,7 +317,7 @@ schema.methods.getCategory = function() {
 
 schema.methods.isBoardControlled = function() {
   return (
-    this.studio.features.boardControl.enabled &&
+    this.studio.features.boardControl &&
     this.lastContestant &&
     this.questionEnd &&
     moment().isBefore(moment(this.questionEnd).add(

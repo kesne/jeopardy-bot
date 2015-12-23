@@ -13,6 +13,13 @@ export const schema = new Schema({
     required: true,
   },
 
+  // The type of studio:
+  type: {
+    type: String,
+    enum: ['channel', 'private', 'dm'],
+    default: 'channel',
+  },
+
   // Studios can be disabled to turn the bot off in a channel:
   enabled: {
     type: Boolean,
@@ -69,10 +76,8 @@ export const schema = new Schema({
   // Feature flags:
   features: {
     challenges: {
-      enabled: {
-        type: Boolean,
-        default: true,
-      },
+      type: Boolean,
+      default: true,
     },
 
     // autoChallenges: {
@@ -83,31 +88,23 @@ export const schema = new Schema({
     // },
 
     boardControl: {
-      enabled: {
-        type: Boolean,
-        default: true,
-      },
+      type: Boolean,
+      default: true,
     },
 
     dailyDoubles: {
-      enabled: {
-        type: Boolean,
-        default: true,
-      },
+      type: Boolean,
+      default: true,
     },
 
     endGame: {
-      enabled: {
-        type: Boolean,
-        default: true,
-      },
+      type: Boolean,
+      default: true,
     },
 
     stats: {
-      enabled: {
-        type: Boolean,
-        default: true,
-      },
+      type: Boolean,
+      default: true,
     },
 
     // autoDoubleJeopardy: {
@@ -165,31 +162,6 @@ export const schema = new Schema({
     virtuals: true,
   },
 });
-
-schema.virtual('features.challenges.name').get(() => 'Challenges');
-schema.virtual('features.challenges.description').get(() =>
-  'Allows challenges to be called on questions that were incorrectly judged.'
-);
-
-schema.virtual('features.boardControl.name').get(() => 'Board Control');
-schema.virtual('features.boardControl.description').get(() =>
-  'Restricts category selection to the contestant that last answered correctly.'
-);
-
-schema.virtual('features.dailyDoubles.name').get(() => 'Daily Doubles');
-schema.virtual('features.dailyDoubles.description').get(() =>
-  'Enables daily double wagers for certain questions.'
-);
-
-schema.virtual('features.endGame.name').get(() => 'Manual Game End');
-schema.virtual('features.endGame.description').get(() =>
-  'Allows the game to be ended with the "end game" message'
-);
-
-schema.virtual('features.stats.name').get(() => 'Stats');
-schema.virtual('features.stats.description').get(() =>
-  'Allows contestants to check the stats of themselves and other players.'
-);
 
 schema.statics.get = async function({ id, name }) {
   let doc = await this.findOne({ id });
