@@ -5,18 +5,18 @@ const MAX_PLAYERS = 10;
 
 @NoLock
 @Trigger(
-  /(leaderboards?)/,
-  /loserboards?/
+  /(leaderboards?|loserboards?)( \d{1,2})?/
 )
 export default class LeaderLosers extends Command {
-  async response([leaders]) {
+  async response([leaderloser, num = MAX_PLAYERS]) {
+    const leaders = leaderloser.includes('leader');
     const contestants = await this.models.Contestant.find({
       'stats.money': {
         [leaders ? '$gt' : '$lt']: 0,
       },
     }).sort({
       'stats.money': leaders ? -1 : 1,
-    }).limit(MAX_PLAYERS);
+    }).limit(num);
 
     if (contestants.length === 0) {
       this.say(`There are no ${leaders ? 'leaders' : 'losers'} yet. Get out there and play some games!`);
