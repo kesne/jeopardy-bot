@@ -11,6 +11,10 @@ export const AWS_SECRET_KEY = process.env.AWS_SECRET_KEY || '';
 
 export let AWS = false;
 if (AWS_KEY) {
+  console.warn(
+    'Support for AWS uploads will likely be removed in future versions of Jeopardy Bot.\n' +
+    'Please use either the `local` or `imgur` option.'
+  );
   AWS = true;
 }
 

@@ -26,6 +26,12 @@ export const schema = new Schema({
     required: true,
     default: 'response',
   },
+  imageMode: {
+    type: 'String',
+    enum: ['local', 'imgur', 's3'],
+    required: true,
+    default: 'local',
+  },
   api_token: {
     type: 'String',
   },
