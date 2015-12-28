@@ -84,8 +84,6 @@ export async function generateBoard(game) {
   // We force a resize here because otherwise retina devices show a 2x image:
   const categoriesImage = images(categoriesImageFile).size(1200);
 
-  categoriesImage.save('categories.png');
-
   let board = startingBoard;
   board.draw(categoriesImage, 0, 0);
   for (let col = 0; col < COLUMN_LOCATIONS.length; col++) {
