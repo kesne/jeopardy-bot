@@ -12,7 +12,7 @@
     "watch:browserify": "watchify lib/admin/index.js --outfile lib/admin/index.bundle.js -d",
     "admin": "npm run admin:browserify",
     "admin:browserify": "browserify lib/admin/index.js --outfile lib/admin/index.bundle.js",
-    "start": "node lib/index",
+    "start": "xvfb-run node lib/index",
     "dev": "nodemon --exec babel-node src/index",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src"
