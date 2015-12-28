@@ -26,11 +26,16 @@ async function minifyImage(buf) {
 
 async function screenshotToBuffer({ view, data, height = 740, width = 1200 }) {
   winston.profile('image capture');
-  const { data: buf } = await screenshot({
-    url: `http://localhost:${PORT}/renderable/${view}?data=${encodeURIComponent(data)}`,
-    width,
-    height,
-  });
+  try {
+    const { data: buf } = await screenshot({
+      url: `http://localhost:${PORT}/renderable/${view}?data=${encodeURIComponent(data)}`,
+      width,
+      height,
+    });
+  } catch(e) {
+    console.log('Error occurred', e);
+    console.log(e.stack);
+  }
   winston.profile('image capture');
 
   winston.profile('image minification');
