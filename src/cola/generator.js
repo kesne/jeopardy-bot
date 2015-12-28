@@ -26,12 +26,14 @@ async function minifyImage(buf) {
 
 async function screenshotToBuffer({ view, data, height = 740, width = 1200 }) {
   winston.profile('image capture');
+  let buf;
   try {
-    const { data: buf } = await screenshot({
+    const { data: buff } = await screenshot({
       url: `http://localhost:${PORT}/renderable/${view}?data=${encodeURIComponent(data)}`,
       width,
       height,
     });
+    buf = buff;
   } catch(e) {
     console.log('Error occurred', e);
     console.log(e.stack);
