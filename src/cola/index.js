@@ -1,8 +1,4 @@
-import { generateBoard, generateClue } from './generator';
-import { imgurUpload } from './imgur';
-import { captureAllClues, imageForClue, s3Upload } from './s3';
-import { captureAllClues as localCaptureAllClues, imageForClue as localImageForClue } from './local';
-import App from '../models/App';
+import getAdapter from './adapters';
 
 // This is a special image case:
 export { generateDailydouble as dailydoubleImage } from './generator';
