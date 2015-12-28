@@ -3,6 +3,21 @@
 <head>
   <title>JEOPARDY CLUE</title>
   <style type="text/css">
+
+    @font-face {
+      font-family: 'Korinna-Bold';
+      src: url('/assets/fonts/Korinna-Bold.woff') format('woff');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'Korinna-Regular';
+      src: url('/assets/fonts/Korinna-Regular.woff') format('woff');
+      font-weight: normal;
+      font-style: normal;
+    }
+
     html {
       height: 100%;
     }
@@ -22,7 +37,7 @@
       color: white;
       text-shadow: 3px 3px 3px rgba(0, 0, 0, 0.6);
       text-transform: uppercase;
-      font-family: "Korinna", serif;
+      font-family: "Korinna-Bold", serif;
       letter-spacing: 1px;
       font-size: 40px;
       width: 600px;

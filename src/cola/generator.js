@@ -1,9 +1,9 @@
 import images from 'images';
 import { join } from 'path';
-import Pageres from 'pageres';
 import Imagemin from 'imagemin';
 import getStream from 'get-stream';
 import imageminPngQuant from 'imagemin-pngquant';
+import screenshot from 'electron-screenshot-service';
 
 import { PORT } from '../config';
 
@@ -12,7 +12,7 @@ async function minifyImage(buf) {
   return new Promise((resolve, reject) => {
     new Imagemin()
       .src(buf)
-      .use(imageminPngQuant({ quality: '65-80', speed: 7 }))
+      .use(imageminPngQuant({ quality: '75-90', speed: 5 }))
       .run((err, files) => {
         if (err) {
           reject(err);
@@ -23,21 +23,14 @@ async function minifyImage(buf) {
   });
 }
 
-async function screenshotToBuffer({ id, channel_id, view, data, size = '1200x740' }) {
-  const filename = `${channel_id}.${view}.${id}`;
-
+async function screenshotToBuffer({ view, data, height = 740, width = 1200 }) {
   console.time('Image Capture');
-  const streams = await new Pageres()
-    .src(
-      `localhost:${PORT}/renderable/${view}?data=${encodeURIComponent(data)}`,
-      [size],
-      { crop: false, filename }
-    )
-    .run();
+  const { data: buf } = await screenshot({
+    url: `http://localhost:${PORT}/renderable/${view}?data=${encodeURIComponent(data)}`,
+    width,
+    height,
+  });
   console.timeEnd('Image Capture');
-
-  // Extract the one stream we want:
-  const buf = await getStream.buffer(streams[0]);
 
   console.time('Image Minification');
   const image = await minifyImage(buf);
@@ -72,25 +65,25 @@ export async function generateDailydouble() {
   return `${dailyDoubleUrl}?random=${random}`;
 }
 
-export async function generateClue({ game, clue }) {
+export async function generateClue(game, clue) {
   return await screenshotToBuffer({
     view: 'clue',
-    id: `${game.id}_${clue.id}`,
     data: clue.question,
-    channel_id: game.channel_id,
   });
 }
 
-export async function generateBoard({ game }) {
+export async function generateBoard(game) {
   const categoriesImageFile = await screenshotToBuffer({
     view: 'categories',
-    id: `${game.id}_categories`,
-    size: '1200x102',
+    width: 1200,
+    height: 120,
     data: game.categories.map(cat => cat.title).join('@@~~AND~~@@'),
-    channel_id: game.channel_id,
   });
 
-  const categoriesImage = images(categoriesImageFile);
+  // We force a resize here because otherwise retina devices show a 2x image:
+  const categoriesImage = images(categoriesImageFile).size(1200);
+
+  categoriesImage.save('categories.png');
 
   let board = startingBoard;
   board.draw(categoriesImage, 0, 0);

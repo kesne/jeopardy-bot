@@ -55,9 +55,7 @@ class Guess extends Command {
           const contestants = await this.channelContestants();
           this.say(`${ await endgameMessage(this.game, contestants, this.data.channel_id) }`);
         } else {
-          const url = await boardImage({
-            game: this.game,
-          });
+          const url = await boardImage(this.game);
           this.say(`Select a new clue.`, url);
         }
       } else if (e.message.includes('contestant')) {
@@ -98,9 +96,7 @@ class Guess extends Command {
         this.say(`${ await endgameMessage(this.game, contestants, this.data.channel_id) }`);
       } else {
         // Get the new board url:
-        const url = await boardImage({
-          game: this.game,
-        });
+        const url = await boardImage(this.game);
         this.say(`Select a new clue.`, url);
       }
     } else {
@@ -121,9 +117,7 @@ class Guess extends Command {
           this.say(`${ await endgameMessage(this.game, contestants, this.data.channel_id) }`);
         } else {
           // Get the new board url:
-          const url = await boardImage({
-            game: this.game,
-          });
+          const url = await boardImage(this.game);
           this.say(`Select a new clue.`, url);
         }
       }

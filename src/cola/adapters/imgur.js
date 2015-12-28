@@ -3,13 +3,7 @@ import { uploadBase64, setClientId } from 'imgur';
 import { IMGUR_API } from '../../config';
 
 /**
- * ADAPTER CONFIGURATION
- */
-
-export const CAPTURE_ALL_CLUES = false;
-
-/**
- * HELPER FUNCTIONS
+ * HELPER FUNCTIONS:
  */
 
 function promiseTimeout(timeout) {
@@ -37,21 +31,30 @@ async function uploadImage(base64Image, attempt = 1) {
 }
 
 /**
- * ADAPTER API
+ * ADAPTER:
  */
 
-export async function setup() {
-  if (IMGUR_API) {
-    return await setClientId(IMGUR_API);
+export default class ImgurAdapter {
+  // ADAPTER CONFIGURATION:
+  CAPTURE_ALL_CLUES = false;
+
+  constructor() {
+    this.startImgurClient();
   }
-}
 
-export async function board() {
-  const boardBuffer = generateBoard();
-  return await uploadImage(boardBuffer.toString('base64'));
-}
+  async startImgurClient() {
+    if (IMGUR_API) {
+      return await setClientId(IMGUR_API);
+    }
+  }
 
-export async function clue() {
-  const clueBuffer = generateClue();
-  return await uploadImage(clueBuffer.toString('base64'));
+  async board(game) {
+    const boardBuffer = await generateBoard(game);
+    return await uploadImage(boardBuffer.toString('base64'));
+  }
+
+  async clue(game, clue) {
+    const clueBuffer = await generateClue(game, clue);
+    return await uploadImage(clueBuffer.toString('base64'));
+  }
 }

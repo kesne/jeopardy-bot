@@ -26,6 +26,9 @@ const adminAuth = basicAuth(config.ADMIN_USERNAME, config.ADMIN_PASSWORD);
 // Add API endpoints for admin panel:
 app.use('/api', api(adminAuth));
 
+// Add endpoints for the assets:
+app.use('/assets', express.static('assets'));
+
 app.engine('dust', adaro.dust({
   cache: false,
   helpers: [

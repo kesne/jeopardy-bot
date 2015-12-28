@@ -11,6 +11,7 @@ class Settings extends React.Component {
   constructor(props) {
     super(props);
 
+    this.onChangeAdapter = this.onChangeAdapter.bind(this);
     this.onChangeMode = this.onChangeMode.bind(this);
     this.onChangeApiToken = this.onChangeApiToken.bind(this);
     this.onChangeOwner = this.onChangeOwner.bind(this);
@@ -24,6 +25,12 @@ class Settings extends React.Component {
 
   componentWillReceiveProps(props) {
     this.getState(props.app);
+  }
+
+  onChangeAdapter(e) {
+    this.setState({
+      imageMode: e.target.value,
+    });
   }
 
   onChangeMode(e) {
@@ -45,11 +52,12 @@ class Settings extends React.Component {
   }
 
   onClickSave() {
-    const { owner, api_token, mode } = this.state;
+    const { owner, api_token, mode, imageMode } = this.state;
     this.props.onValueChanged({
       owner,
       api_token,
       mode,
+      imageMode,
     });
   }
 
@@ -63,11 +71,12 @@ class Settings extends React.Component {
     });
   }
 
-  getState({ owner, api_token, mode }) {
+  getState({ owner, api_token, mode, imageMode }) {
     this.setState({
       owner,
       api_token,
       mode,
+      imageMode,
     });
   }
 
@@ -78,6 +87,23 @@ class Settings extends React.Component {
       }}>
         <CardTitle>Settings</CardTitle>
         <CardText>
+          <div>
+            <h6 className="no-margin">
+              Image Storage
+              <Tooltip
+                label="The storage that the bot will use for images."
+              >
+                <Icon className="jbot-inline-icon" name="help" />
+              </Tooltip>
+            </h6>
+            <select className="jbot-select" value={this.state.imageMode} onChange={this.onChangeAdapter}>
+              <option value="" disabled>Select an adapter...</option>
+              <option value="imgur">Imgur</option>
+              <option value="local">Local</option>
+              <option value="s3">S3</option>
+            </select>
+          </div>
+
           <div>
             <h6 className="no-margin">
               Mode

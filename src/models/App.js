@@ -30,7 +30,7 @@ export const schema = new Schema({
     type: 'String',
     enum: ['local', 'imgur', 's3'],
     required: true,
-    default: 'local',
+    default: 'imgur',
   },
   api_token: {
     type: 'String',
@@ -83,9 +83,10 @@ schema.pre('save', function(next) {
   next();
 });
 
-// Update the cached reference:
-schema.post('save', doc => {
-  appConfig = doc;
-});
+// Force the cached reference to get updated:
+export function invalidate() {
+  console.log('invalided');
+  appConfig = null;
+}
 
 export default model('App', schema);

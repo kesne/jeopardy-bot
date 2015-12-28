@@ -4,6 +4,13 @@
   <title>JEOPARDY BOARD</title>
   <style type="text/css">
 
+  @font-face {
+    font-family: 'LeagueGothic';
+    src: url('/assets/fonts/LeagueGothic-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+  }
+
   html {
     box-sizing: border-box;
   }
@@ -11,7 +18,6 @@
     background: black;
     margin: 0;
     padding: 0;
-    border-spacing: 7px;
   }
 
   #table {
@@ -21,7 +27,7 @@
   }
   #category_header {
     padding: 10px;
-    width: 192px;
+    width: 162px;
     height: 80px;
     background: #162387;
     border-radius: 3px;
@@ -32,7 +38,7 @@
     overflow: hidden;
   }
   #title {
-    font-family: "League Gothic";
+    font-family: "LeagueGothic", sans-serif;
     letter-spacing: 1px;
     font-size: 30px;
     font-weight: normal;
