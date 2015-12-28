@@ -12,8 +12,8 @@
     "watch:browserify": "watchify lib/admin/index.js --outfile lib/admin/index.bundle.js -d",
     "admin": "npm run admin:browserify",
     "admin:browserify": "browserify lib/admin/index.js --outfile lib/admin/index.bundle.js",
-    "start": "xvfb-run node lib/index",
-    "dev": "nodemon --exec babel-node src/index",
+    "start": "node lib/index",
+    "dev": "nodemon --exec babel-node cvs",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src"
   },
@@ -53,6 +53,7 @@
     "react-router": "^1.0.3",
     "require-dir": "^0.3.0",
     "slack-client": "^1.4.1",
+    "slimerjs": "^0.9.6",
     "string-to-number": "^0.1.1",
     "striptags": "^2.0.3",
     "temp": "^0.8.3",
