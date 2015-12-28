@@ -24,12 +24,49 @@ opentype.load('assets/fonts/LeagueGothic-Regular.woff', function(err, font) {
     // If you just want to draw the text you can also use font.draw(ctx, text, x, y, fontSize).
     // fpath.draw(ctx);
 
-    ctx.font = '27px "League Gothic"';
-    ctx.fillStyle = 'white';
-    ctx.fillText('Awesome!', 50, 100);
+    const MAX_DISPLAY_WIDTH = 180;
+    const LINE_HEIGHT = 27;
+    const text = 'Pop goes the category. Overflows it does. And then you'.toUpperCase();
+    const tokens = text.split(' ');
+    const lines = [tokens];
 
-    const me = ctx.measureText('Awesome!');
-    console.log(me);
+    let validLayout = false;
+    let activeLine = 0;
+
+
+    ctx.font = '27px "League Gothic"';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'white';
+
+    do {
+      let fits = false;
+      const m = ctx.measureText(lines[activeLine]);
+      if (m.width > MAX_DISPLAY_WIDTH) {
+        // Move this word to the beginning of the next line:
+        if (!lines[activeLine + 1]) lines.push([]);
+        lines[activeLine + 1].unshift(lines[activeLine].pop());
+      } else {
+        fits = true;
+        activeLine++;
+      }
+      // We're done:
+      if (activeLine >= lines.length && fits) {
+        validLayout = true;
+      }
+    } while (!validLayout);
+
+    console.log(lines);
+
+    lines.forEach((l, i) => {
+      const line = l.join(' ');
+      if (lines.length === 1) {
+        ctx.fillText(line, 194 / 2, 100);
+      } else if (lines.length === 2) {
+        ctx.fillText(line, 194 / 2, 45 + LINE_HEIGHT * i);
+      } else if (lines.length === 3) {
+        ctx.fillText(line, 194 / 2, 33 + LINE_HEIGHT * i);
+      }
+    });
 
 
     // Saving logic:
