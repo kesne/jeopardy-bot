@@ -5,6 +5,7 @@ import bodyParser from 'body-parser';
 import { join } from 'path';
 import adaro from 'adaro';
 import basicAuth from 'basic-auth-connect';
+import winston from 'winston';
 
 import App from './models/App';
 
@@ -99,7 +100,7 @@ App.schema.post('save', (doc) => {
 // Boot up the jeopardy app:
 app.listen(config.PORT, async () => {
   const a = await App.get();
-  console.log(`Jeopardy Bot listening on port ${config.PORT}`);
+  winston.info(`Jeopardy Bot listening on port ${config.PORT}`);
   // If we're in a mode that needs the webhook, then set it up:
   rebootInstance(a.isBot());
 });

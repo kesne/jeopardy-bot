@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import Command from '../Command';
 import { Trigger, Only, Feature, Provide, currency } from '../utils';
+import winston from 'winston';
 
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 const cx = '013673686761662547163:nw_cf3t8esg';
@@ -39,8 +40,7 @@ export default class Challenge extends Command {
         }
       }
     } catch (e) {
-      console.log('Error with autochallenge occurred.');
-      console.log(e);
+      winston.error('Error with autochallenge occurred.', e);
     }
     return false;
   }
@@ -97,7 +97,7 @@ export default class Challenge extends Command {
           } else if (e.message.includes('votes')) {
             this.say('The challenge failed. Not enough people agreed. Carry on!');
           } else {
-            console.log('Unknown challenge error...', e);
+            winston.error('Unknown challenge error...', e);
           }
         } finally {
           this.unlock();

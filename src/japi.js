@@ -3,6 +3,7 @@ import striptags from 'striptags';
 import { load } from 'cheerio';
 import { AllHtmlEntities } from 'html-entities';
 import unidecode from 'unidecode';
+import winston from 'winston';
 
 const { decode } = new AllHtmlEntities();
 
@@ -109,8 +110,7 @@ export default async function generateGame() {
     try {
       game = await randomEpisode();
     } catch (e) {
-      console.log('Unable to generate game.', game);
-      console.error(e);
+      winston.error('Unable to generate game.', game, e);
     }
   } while (!game);
   return game;

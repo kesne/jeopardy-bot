@@ -1,9 +1,9 @@
 import images from 'images';
 import { join } from 'path';
 import Imagemin from 'imagemin';
-import getStream from 'get-stream';
 import imageminPngQuant from 'imagemin-pngquant';
 import screenshot from 'electron-screenshot-service';
+import winston from 'winston';
 
 import { PORT } from '../config';
 
@@ -24,17 +24,17 @@ async function minifyImage(buf) {
 }
 
 async function screenshotToBuffer({ view, data, height = 740, width = 1200 }) {
-  console.time('Image Capture');
+  winston.profile('image capture');
   const { data: buf } = await screenshot({
     url: `http://localhost:${PORT}/renderable/${view}?data=${encodeURIComponent(data)}`,
     width,
     height,
   });
-  console.timeEnd('Image Capture');
+  winston.profile('image capture');
 
-  console.time('Image Minification');
+  winston.profile('image minification');
   const image = await minifyImage(buf);
-  console.timeEnd('Image Minification');
+  winston.profile('image minification');
 
   return image;
 }
@@ -80,6 +80,7 @@ export async function generateBoard(game) {
     data: game.categories.map(cat => cat.title).join('@@~~AND~~@@'),
   });
 
+  winston.profile('node board generation');
   // We force a resize here because otherwise retina devices show a 2x image:
   const categoriesImage = images(categoriesImageFile).size(1200);
 
@@ -100,6 +101,7 @@ export async function generateBoard(game) {
       );
     }
   }
+  winston.profile('node board generation');
 
   return board.encode('png');
 }

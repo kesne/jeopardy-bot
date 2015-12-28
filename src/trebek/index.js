@@ -3,6 +3,7 @@ import App from '../models/App';
 import { channels, post } from './slack';
 import { lock, unlock } from './locks';
 import { clean } from './utils';
+import winston from 'winston';
 
 const commandObject = requireDir('./commands');
 const commands = Object.keys(commandObject)
@@ -50,8 +51,7 @@ export default async function(input, data = {}, customSay = false) {
     returnValue = command.message;
   } catch (e) {
     // Log all errors, at the risk of being noisy:
-    console.log(e);
-    console.log(e.stack);
+    winston.error(e);
   } finally {
     if (!Command.nolock) {
       await unlock(data.channel_id);

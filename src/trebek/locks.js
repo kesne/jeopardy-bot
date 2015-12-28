@@ -1,10 +1,11 @@
 import lockFile from 'lockfile';
+import winston from 'winston';
 
-export function unlock(channel_id) {
+export function unlock(channelId) {
   return new Promise((resolve, reject) => {
-    lockFile.unlock(`jeopardy-${channel_id}.lock`, err => {
+    lockFile.unlock(`jeopardy-${channelId}.lock`, err => {
       if (err) {
-        console.log('Error unlocking file', err);
+        winston.error('Error unlocking file', err);
         return reject(err);
       }
       resolve();
@@ -12,16 +13,16 @@ export function unlock(channel_id) {
   });
 }
 
-export function lock(channel_id) {
+export function lock(channelId) {
   return new Promise((resolve, reject) => {
-    lockFile.lock(`jeopardy-${channel_id}.lock`, {
+    lockFile.lock(`jeopardy-${channelId}.lock`, {
       // Wait a maximum of 10 seconds:
       wait: 10 * 1000,
     }, err => {
       if (err) {
-        console.log('Error locking file', err);
+        winston.error('Error locking file', err);
         // If we can't get the channel lock, let's bust it (something's probably wrong).
-        unlock(channel_id);
+        unlock(channelId);
         return reject(err);
       }
       resolve();
