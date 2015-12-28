@@ -34,7 +34,7 @@ export async function clueImage({ game }) {
   if (app.imageMode === 's3') {
     return await imageForClue({ game, clue });
   } else if (app.imageMode === 'local') {
-
+    return await localImageForClue({ game, clue });
   }
   const clueLocalUrl = await generateClue({ game, clue });
   return await imgurUpload(clueLocalUrl);

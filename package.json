@@ -35,9 +35,11 @@
     "express-remove-route": "^0.1.1",
     "express-restify-mongoose": "^2.3.1",
     "form-data": "^0.2.0",
+    "get-stream": "^1.1.0",
     "history": "^1.17.0",
     "html-entities": "^1.2.0",
     "imagemin": "^3.2.0",
+    "imagemin-pngquant": "^4.2.0",
     "images": "^2.1.8",
     "imgur": "^0.1.6",
     "lockfile": "^1.0.1",
@@ -55,6 +57,7 @@
     "slack-client": "^1.4.1",
     "string-to-number": "^0.1.1",
     "striptags": "^2.0.3",
+    "temp": "^0.8.3",
     "unidecode": "^0.1.7"
   },
   "engines": {

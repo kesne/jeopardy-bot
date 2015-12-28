@@ -1,10 +1,50 @@
 import images from 'images';
 import { join } from 'path';
-import { tmpdir } from 'os';
+import Pageres from 'pageres';
+import Imagemin from 'imagemin';
+import getStream from 'get-stream';
+import imageminPngQuant from 'imagemin-pngquant';
 
-import capture from './capture';
+import { PORT } from '../config';
 
-const temporaryDirectory = tmpdir();
+// Promise helper method to minify images.
+async function minifyImage(buf) {
+  return new Promise((resolve, reject) => {
+    new Imagemin()
+      .src(buf)
+      .use(imageminPngQuant({ quality: '65-80', speed: 7 }))
+      .run((err, files) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(files[0].contents);
+        }
+      });
+  });
+}
+
+async function screenshotToBuffer({ id, channel_id, view, data, size = '1200x740' }) {
+  const filename = `${channel_id}.${view}.${id}`;
+
+  console.time('Image Capture');
+  const streams = await new Pageres()
+    .src(
+      `localhost:${PORT}/renderable/${view}?data=${encodeURIComponent(data)}`,
+      [size],
+      { crop: false, filename }
+    )
+    .run();
+  console.timeEnd('Image Capture');
+
+  // Extract the one stream we want:
+  const buf = await getStream.buffer(streams[0]);
+
+  console.time('Image Minification');
+  const image = await minifyImage(buf);
+  console.timeEnd('Image Minification');
+
+  return image;
+}
 
 const ASSETS = join(__dirname, '..', '..', 'assets');
 
@@ -26,13 +66,14 @@ const CLUE_HEIGHT = 124;
 const COLUMN_LOCATIONS = [6, 205, 404, 603, 802, 1001];
 
 const dailyDoubleUrl = 'http://i.imgur.com/EqH6Fgw.png';
+
 export async function generateDailydouble() {
   const random = Math.round(Math.random() * 1000000);
   return `${dailyDoubleUrl}?random=${random}`;
 }
 
 export async function generateClue({ game, clue }) {
-  return await capture({
+  return await screenshotToBuffer({
     view: 'clue',
     id: `${game.id}_${clue.id}`,
     data: clue.question,
@@ -40,19 +81,8 @@ export async function generateClue({ game, clue }) {
   });
 }
 
-function saveImage(filename, image) {
-  return new Promise((resolve, reject) => {
-    image.saveAsync(filename, err => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(filename);
-    });
-  });
-}
-
 export async function generateBoard({ game }) {
-  const categoriesImageFile = await capture({
+  const categoriesImageFile = await screenshotToBuffer({
     view: 'categories',
     id: `${game.id}_categories`,
     size: '1200x102',
@@ -78,5 +108,5 @@ export async function generateBoard({ game }) {
     }
   }
 
-  return await saveImage(join(temporaryDirectory, `fullboard.${game.channel_id}.png`), board);
+  return board.encode('png');
 }
