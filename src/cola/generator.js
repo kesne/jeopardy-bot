@@ -1,3 +1,4 @@
+import './electron-fix';
 import images from 'images';
 import { join } from 'path';
 import Imagemin from 'imagemin';
