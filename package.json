@@ -13,7 +13,7 @@
     "admin": "npm run admin:browserify",
     "admin:browserify": "browserify lib/admin/index.js --outfile lib/admin/index.bundle.js",
     "start": "node lib/index",
-    "dev": "nodemon --exec babel-node cvs",
+    "dev": "nodemon --exec babel-node src/index",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src"
   },
