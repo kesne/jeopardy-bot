@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 import express from 'express';
 import bodyParser from 'body-parser';
 import { join } from 'path';
-import adaro from 'adaro';
 import basicAuth from 'basic-auth-connect';
 import winston from 'winston';
 
@@ -30,15 +29,6 @@ app.use('/api', api(adminAuth));
 // Add endpoints for the assets:
 app.use('/assets', express.static('assets'));
 
-app.engine('dust', adaro.dust({
-  cache: false,
-  helpers: [
-    'dustjs-helpers',
-  ],
-}));
-app.set('view engine', 'dust');
-app.set('views', join(__dirname, 'views'));
-
 // TODO: Reactify:
 // Install landing page:
 app.get('/welcome', (req, res) => {
@@ -48,29 +38,7 @@ app.get('/welcome', (req, res) => {
 app.use('/admin', adminAuth);
 app.use('/admin', express.static('lib/admin'));
 app.get('/admin/*', (req, res) => {
-  res.render('admin');
-});
-
-app.get('/renderable/categories', (req, res) => {
-  const datas = decodeURIComponent(req.query.data).split('@@~~AND~~@@');
-  res.render('categories', {
-    datas,
-  });
-});
-
-const clueExtra = /^\(([^)]+)\)\s*\.?/;
-app.get('/renderable/clue', (req, res) => {
-  let extra;
-  let data = req.query.data;
-  const extraRegexResult = clueExtra.exec(data);
-  if (extraRegexResult) {
-    data = data.substring(extraRegexResult[0].length);
-    extra = extraRegexResult[1];
-  }
-  res.render('clue', {
-    data,
-    extra,
-  });
+  res.sendFile(join(__dirname, 'admin', 'index.html'));
 });
 
 // Holds the instance of the bot or webhook:
