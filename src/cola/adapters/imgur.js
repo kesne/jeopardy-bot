@@ -42,6 +42,8 @@ export default class ImgurAdapter {
     this.startImgurClient();
   }
 
+  destroy() {}
+
   async startImgurClient() {
     if (IMGUR_API) {
       return await setClientId(IMGUR_API);

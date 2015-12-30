@@ -1,6 +1,6 @@
 import App from '../../models/App';
 import ImgurAdapter from './imgur';
-// import * as LocalAdapter from './local';
+import LocalAdapter from './local';
 // import * as S3Adapter from './s3';
 
 let adapterInstance;
@@ -9,6 +9,9 @@ let adapterInstance;
 function getAdapterInstance(Adapter) {
   if (adapterInstance instanceof Adapter) {
     return adapterInstance;
+  } else if (adapterInstance) {
+    // Optional cleanup method:
+    adapterInstance.destroy();
   }
   adapterInstance = new Adapter();
   return adapterInstance;
@@ -20,8 +23,9 @@ export default async function getAdapter() {
   if (app.imageMode === 'imgur') {
     return getAdapterInstance(ImgurAdapter);
   }
-  // } else if (app.imageMode === 'local') {
-  //   return localAdapter;
+  if (app.imageMode === 'local') {
+    return getAdapterInstance(LocalAdapter);
+  }
   // } else if (app.s3Adapter === 's3') {
   //   return s3Adapter;
   // }

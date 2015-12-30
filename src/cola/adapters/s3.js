@@ -8,4 +8,8 @@ export default class S3Adapter extends LocalAdapter {
   constructor() {
     super(s3fs);
   }
+
+  startCleaning() {
+
+  }
 }

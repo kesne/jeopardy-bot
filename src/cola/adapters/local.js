@@ -1,31 +1,86 @@
+// TODO: The public IP should be configurable in the admin console, instead of relying on public ip.
+// This really only works on standalone linux distributions currently.
+
 import { generateBoard, generateClue } from '../generator';
-import fs from 'fs';
+import { join } from 'path';
+import { v4 } from 'public-ip';
+import findRemoveSync from 'find-remove';
+import { writeFile } from 'fs';
+
+import { PORT } from '../../config';
 
 /**
  * HELPER FUNCTIONS:
  */
 
-
 /**
  * ADAPTER:
  */
+
+const localPath = join(__dirname, '..', '..', '..', 'assets', 'local');
+const threeDays = 60 * 60 * 24 * 3;
+const sixHours = 1000 * 60 * 60 * 6;
+
+function clean() {
+  findRemoveSync(localPath, {
+    age: {
+      seconds: threeDays,
+    },
+    extensions: '.png',
+  });
+}
 
 export default class LocalAdapter {
   // ADAPTER CONFIGURATION:
   CAPTURE_ALL_CLUES = true;
 
-  constructor(filesystem = fs) {
-    this.fs = filesystem;
+  constructor() {
+    this.getHost();
+    this.startCleaning();
+  }
+
+  destroy() {
+    clean();
+    this.stopCleaning();
+  }
+
+  startCleaning() {
+    setInterval(clean, sixHours);
+  }
+
+  stopCleaning() {
+    clearInterval(clean);
+  }
+
+  getHost() {
+    v4((err, ip) => {
+      if (err) throw err;
+      this.host = `http://${ip}:${PORT}`;
+    });
+  }
+
+  saveImage(fileName, buf) {
+    return new Promise((resolve, reject) => {
+      writeFile(join(localPath, fileName), buf, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(`${this.host}/assets/local/${fileName}`);
+        }
+      });
+    });
   }
 
   async board(game) {
+    const fileName = `${game.channel_id}-BOARD-${game.id}.png`;
     const boardBuffer = await generateBoard(game);
-    return await uploadImage(boardBuffer.toString('base64'));
+    return await this.saveImage(fileName, boardBuffer);
   }
 
   async clue(game, clue) {
+    const fileName = `${game.channel_id}-CLUE-${game.id}-${clue.id}.png`;
     const clueBuffer = await generateClue(game, clue);
-    return await uploadImage(clueBuffer.toString('base64'));
+    return await this.saveImage(fileName, clueBuffer);
   }
 }
 
