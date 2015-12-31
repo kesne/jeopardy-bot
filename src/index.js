@@ -11,12 +11,12 @@ import App from './models/App';
 import api from './api';
 import SlackBot from './slackbot';
 import Webhook from './webhook';
-import * as config from './config';
+import { ADMIN_USERNAME, ADMIN_PASSWORD, MONGO, PORT } from './config';
 
 // Set log level
 winston.level = process.env.NODE_ENV === 'production' ? 'info' : 'debug';
 
-mongoose.connect(config.MONGO);
+mongoose.connect(MONGO);
 
 const app = express();
 
@@ -24,7 +24,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Re-usable authentication for admin pages:
-const adminAuth = basicAuth(config.ADMIN_USERNAME, config.ADMIN_PASSWORD);
+const adminAuth = basicAuth(ADMIN_USERNAME, ADMIN_PASSWORD);
 
 // Add API endpoints for admin panel:
 app.use('/api', api(adminAuth));
@@ -63,9 +63,9 @@ App.schema.post('save', (doc) => {
 });
 
 // Boot up the jeopardy app:
-app.listen(config.PORT, async () => {
+app.listen(PORT, async () => {
   const a = await App.get();
-  winston.info(`Jeopardy Bot listening on port ${config.PORT}`);
+  winston.info(`Jeopardy Bot listening on port ${PORT}`);
   // If we're in a mode that needs the webhook, then set it up:
   rebootInstance(a.isBot());
 });

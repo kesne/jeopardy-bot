@@ -6,7 +6,7 @@ import { DiceCoefficient as dc, JaroWinklerDistance as jwd } from 'natural';
 
 import generateGame from '../japi';
 import { clean } from '../trebek/utils';
-import * as config from '../config';
+import { VALUES, ACCEPTED_SIMILARITY, JARO_KICKER, JARO_SIMILARITY } from '../config';
 
 export const schema = new Schema({
 
@@ -398,7 +398,7 @@ schema.methods.newClue = async function({ category, value, contestant }) {
     }
   }
 
-  if (!config.VALUES.includes(numberValue)) {
+  if (!VALUES.includes(numberValue)) {
     throw new RangeError('value');
   }
 
@@ -487,11 +487,11 @@ schema.methods.guess = async function({ contestant, guess }) {
 
     // TODO: match modes:
     const similarity = dc(guess, answer);
-    if (similarity >= config.ACCEPTED_SIMILARITY) {
+    if (similarity >= ACCEPTED_SIMILARITY) {
       return true;
-    } else if (similarity >= config.JARO_KICKER) {
+    } else if (similarity >= JARO_KICKER) {
       const jaroSimilarity = jwd(guess, answer);
-      return jaroSimilarity >= config.JARO_SIMILARITY;
+      return jaroSimilarity >= JARO_SIMILARITY;
     }
 
     return false;
