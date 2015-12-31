@@ -105,17 +105,3 @@ export default class LocalAdapter {
     return await this.saveImage(fileName, clueBuffer);
   }
 }
-
-// function saveImage(filename, image) {
-//   return new Promise((resolve, reject) => {
-//     image.saveAsync(filename, err => {
-//       if (err) {
-//         return reject(err)
-//       }
-//       resolve(filename);
-//     });
-//   });
-// }
-//
-//
-//   return await saveImage(join(temporaryDirectory, `fullboard.${game.channel_id}.png`), board);
