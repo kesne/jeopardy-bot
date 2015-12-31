@@ -29,12 +29,6 @@ app.use('/api', api(adminAuth));
 // Add endpoints for the assets:
 app.use('/assets', express.static('assets'));
 
-// TODO: Reactify:
-// Install landing page:
-app.get('/welcome', (req, res) => {
-  res.render('welcome');
-});
-
 app.use('/admin', adminAuth);
 app.use('/admin', express.static('lib/admin'));
 app.get('/admin/*', (req, res) => {

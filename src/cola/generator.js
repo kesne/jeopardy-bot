@@ -3,6 +3,8 @@ import { join } from 'path';
 import { readFileSync } from 'fs';
 import winston from 'winston';
 
+import wrapText from './wraptext';
+
 const CANVAS_WIDTH = 1200;
 const CANVAS_HEIGHT = 740;
 
@@ -39,36 +41,6 @@ export async function generateDailydouble() {
  * CANVAS GENERATION:
  */
 
-
-// TODO: Arbitrary split for non-fitting words. Attempt to split on the dash
-// (tokenize with dash + custom reducer).
-function wrapText(ctx, text, maxWidth) {
-  const tokens = text.trim().toUpperCase().split(/(-)|\s/).filter(n => n);
-  const lines = [tokens];
-
-  let activeLine = 0;
-  let validLayout = false;
-
-  do {
-    let fits = false;
-    const m = ctx.measureText(lines[activeLine]);
-    if (m.width > maxWidth) {
-      // Move this word to the beginning of the next line:
-      if (!lines[activeLine + 1]) lines.push([]);
-      lines[activeLine + 1].unshift(lines[activeLine].pop());
-    } else {
-      fits = true;
-      activeLine++;
-    }
-    // We're done:
-    if (activeLine >= lines.length && fits) {
-      validLayout = true;
-    }
-  } while (!validLayout);
-
-  return lines;
-}
-
 function drawLines(ctx, lines, offsetX, lineMidpoint, lineHeight) {
   const midpoint = lineMidpoint - ((lineHeight * lines.length) / 2);
   lines.forEach((lineArray, lineIndex) => {
@@ -83,9 +55,9 @@ export function generateClue(game, clue) {
     const canvas = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
     const ctx = canvas.getContext('2d');
 
-    const MIDPOINT = (CANVAS_HEIGHT / 2) + 37;
-    const LINE_HEIGHT = 50;
-    const MAX_WIDTH = 650;
+    const midpoint = (CANVAS_HEIGHT / 2) + 37;
+    const lineHeight = 50;
+    const maxWidth = 650;
 
     // Blue background:
     ctx.rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -102,10 +74,10 @@ export function generateClue(game, clue) {
     ctx.shadowOffsetY = 3;
 
     // Generate lines:
-    const lines = wrapText(ctx, clue.question, MAX_WIDTH);
+    const lines = wrapText(ctx, clue.question, maxWidth);
 
     // Draw the lines:
-    drawLines(ctx, lines, CANVAS_WIDTH / 2, MIDPOINT, LINE_HEIGHT);
+    drawLines(ctx, lines, CANVAS_WIDTH / 2, midpoint, lineHeight);
 
     canvas.toBuffer((err, buf) => {
       if (err) {
@@ -161,17 +133,16 @@ export function generateBoard(game) {
     ctx.shadowOffsetX = 2;
     ctx.shadowOffsetY = 2;
 
-    const MAX_WIDTH = 180;
-    const LINE_HEIGHT = 27;
+    const maxWidth = 180;
+    const lineHeight = 27;
 
-    // TODO: Generate the full category row:
     game.categories.forEach((category, i) => {
-      const lines = wrapText(ctx, category.title, MAX_WIDTH);
+      const lines = wrapText(ctx, category.title, maxWidth);
 
       // Draw the lines:
       const linePos = (194 / 2) + COLUMN_LOCATIONS[i];
       const lineMidpoint = 78;
-      drawLines(ctx, lines, linePos, lineMidpoint, LINE_HEIGHT);
+      drawLines(ctx, lines, linePos, lineMidpoint, lineHeight);
     });
 
     canvas.toBuffer((err, buf) => {

@@ -5,7 +5,8 @@ import { generateBoard, generateClue } from '../generator';
 import { join } from 'path';
 import { v4 } from 'public-ip';
 import findRemoveSync from 'find-remove';
-import { writeFile } from 'fs';
+import { writeFile, stat } from 'fs';
+import winston from 'winston';
 
 import { PORT } from '../../config';
 
@@ -71,6 +72,20 @@ export default class LocalAdapter {
     });
   }
 
+  // Allows captureAllClues to work:
+  getClue(fileName) {
+    winston.debug('clue returned from cache');
+    return new Promise((resolve) => {
+      stat(join(localPath, fileName), (err) => {
+        if (err) {
+          resolve(false);
+        } else {
+          resolve(true);
+        }
+      });
+    });
+  }
+
   async board(game) {
     const fileName = `${game.channel_id}-BOARD-${game.id}.png`;
     const boardBuffer = await generateBoard(game);
@@ -79,6 +94,13 @@ export default class LocalAdapter {
 
   async clue(game, clue) {
     const fileName = `${game.channel_id}-CLUE-${game.id}-${clue.id}.png`;
+
+    // Handle captureAllClues:
+    const cachedClue = await this.getClue(fileName);
+    if (cachedClue) {
+      return cachedClue;
+    }
+
     const clueBuffer = await generateClue(game, clue);
     return await this.saveImage(fileName, clueBuffer);
   }
