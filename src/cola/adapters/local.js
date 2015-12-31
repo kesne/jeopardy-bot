@@ -46,11 +46,11 @@ export default class LocalAdapter {
   }
 
   startCleaning() {
-    setInterval(clean, sixHours);
+    this.interval = setInterval(clean, sixHours);
   }
 
   stopCleaning() {
-    clearInterval(clean);
+    clearInterval(this.interval);
   }
 
   getHost() {

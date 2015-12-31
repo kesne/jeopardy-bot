@@ -29,7 +29,7 @@ export const schema = new Schema({
   },
   imageMode: {
     type: 'String',
-    enum: ['local', 'imgur', 's3'],
+    enum: ['local', 'imgur'/* , 's3' */],
     required: true,
     default: 'imgur',
   },

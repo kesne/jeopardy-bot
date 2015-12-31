@@ -100,7 +100,7 @@ class Settings extends React.Component {
               <option value="" disabled>Select an adapter...</option>
               <option value="imgur">Imgur</option>
               <option value="local">Local</option>
-              <option value="s3">S3</option>
+              {/* <option value="s3">S3</option> */}
             </select>
           </div>
 
