@@ -13,6 +13,9 @@ import SlackBot from './slackbot';
 import Webhook from './webhook';
 import * as config from './config';
 
+// Set log level
+winston.level = process.env.NODE_ENV === 'production' ? 'info' : 'debug';
+
 mongoose.connect(config.MONGO);
 
 const app = express();

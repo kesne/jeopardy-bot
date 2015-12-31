@@ -79,7 +79,7 @@ export default class LocalAdapter {
         if (err) {
           resolve(false);
         } else {
-          winston.debug('clue returned from cache');
+          winston.debug('clue returned from cache', `${this.host}/assets/local/${fileName}`);
           resolve(`${this.host}/assets/local/${fileName}`);
         }
       });
