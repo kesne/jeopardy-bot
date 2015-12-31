@@ -3,17 +3,20 @@ import mongoose from 'mongoose';
 import express from 'express';
 import bodyParser from 'body-parser';
 import { join } from 'path';
-import adaro from 'adaro';
 import basicAuth from 'basic-auth-connect';
+import winston from 'winston';
 
 import App from './models/App';
 
 import api from './api';
 import SlackBot from './slackbot';
 import Webhook from './webhook';
-import * as config from './config';
+import { ADMIN_USERNAME, ADMIN_PASSWORD, MONGO, PORT } from './config';
 
-mongoose.connect(config.MONGO);
+// Set log level
+winston.level = process.env.NODE_ENV === 'production' ? 'info' : 'debug';
+
+mongoose.connect(MONGO);
 
 const app = express();
 
@@ -21,52 +24,18 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Re-usable authentication for admin pages:
-const adminAuth = basicAuth(config.ADMIN_USERNAME, config.ADMIN_PASSWORD);
+const adminAuth = basicAuth(ADMIN_USERNAME, ADMIN_PASSWORD);
 
 // Add API endpoints for admin panel:
 app.use('/api', api(adminAuth));
 
-app.engine('dust', adaro.dust({
-  cache: false,
-  helpers: [
-    'dustjs-helpers',
-  ],
-}));
-app.set('view engine', 'dust');
-app.set('views', join(__dirname, 'views'));
-
-// TODO: Reactify:
-// Install landing page:
-app.get('/welcome', (req, res) => {
-  res.render('welcome');
-});
+// Add endpoints for the assets:
+app.use('/assets', express.static('assets'));
 
 app.use('/admin', adminAuth);
 app.use('/admin', express.static('lib/admin'));
 app.get('/admin/*', (req, res) => {
-  res.render('admin');
-});
-
-app.get('/renderable/categories', (req, res) => {
-  const datas = decodeURIComponent(req.query.data).split('@@~~AND~~@@');
-  res.render('categories', {
-    datas,
-  });
-});
-
-const clueExtra = /^\(([^)]+)\)\s*\.?/;
-app.get('/renderable/clue', (req, res) => {
-  let extra;
-  let data = req.query.data;
-  const extraRegexResult = clueExtra.exec(data);
-  if (extraRegexResult) {
-    data = data.substring(extraRegexResult[0].length);
-    extra = extraRegexResult[1];
-  }
-  res.render('clue', {
-    data,
-    extra,
-  });
+  res.sendFile(join(__dirname, 'admin', 'index.html'));
 });
 
 // Holds the instance of the bot or webhook:
@@ -94,9 +63,9 @@ App.schema.post('save', (doc) => {
 });
 
 // Boot up the jeopardy app:
-app.listen(config.PORT, async () => {
+app.listen(PORT, async () => {
   const a = await App.get();
-  console.log(`Jeopardy Bot listening on port ${config.PORT}`);
+  winston.info(`Jeopardy Bot listening on port ${PORT}`);
   // If we're in a mode that needs the webhook, then set it up:
   rebootInstance(a.isBot());
 });

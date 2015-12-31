@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+import winston from 'winston';
 
 export const schema = new Schema({
 
@@ -25,6 +26,12 @@ export const schema = new Schema({
     enum: ['bot', 'hybrid', 'response'],
     required: true,
     default: 'response',
+  },
+  imageMode: {
+    type: 'String',
+    enum: ['local', 'imgur'/* , 's3' */],
+    required: true,
+    default: 'imgur',
   },
   api_token: {
     type: 'String',
@@ -72,14 +79,14 @@ schema.pre('save', function(next) {
   // Invalid mode:
   if (!this.api_token && (this.mode === 'bot' || this.mode === 'hybrid')) {
     this.mode = 'reponse';
-    console.log(new Error('Mode requries an API token.'));
+    winston.error('Mode requries an API token.');
   }
   next();
 });
 
-// Update the cached reference:
-schema.post('save', doc => {
-  appConfig = doc;
-});
+// Force the cached reference to get updated:
+export function invalidate() {
+  appConfig = null;
+}
 
 export default model('App', schema);

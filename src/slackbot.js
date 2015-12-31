@@ -1,6 +1,7 @@
 import Slack from 'slack-client';
 import trebek from './trebek';
 import App from './models/App';
+import winston from 'winston';
 
 const autoReconnect = true;
 const autoMarkMessagesAsRead = true;
@@ -43,14 +44,14 @@ export default class SlackBot {
   }
 
   onClose() {
-    console.log('Slack websocket closed...');
+    winston.info('Slack websocket closed...');
     if (this.slack.autoReconnect && !this.slack.reconnecting) {
       this.slack.reconnect();
     }
   }
 
   onOpen() {
-    console.log(`JeopardyBot connected to ${this.slack.team.name} as @${this.slack.self.name}`);
+    winston.info(`JeopardyBot connected to ${this.slack.team.name} as @${this.slack.self.name}`);
   }
 
   onMessage(incoming) {
@@ -107,6 +108,6 @@ export default class SlackBot {
   }
 
   onError(err) {
-    console.log('got error', err);
+    winston.error('slack error', err);
   }
 }

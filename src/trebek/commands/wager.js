@@ -42,9 +42,7 @@ class Wager extends Command {
 
     // Parallelize for better performance:
     const [url] = await Promise.all([
-      clueImage({
-        game: this.game,
-      }),
+      clueImage(this.game),
       this.game.save(),
     ]);
 

@@ -1,30 +1,32 @@
-import { generateBoard, generateClue } from './generator';
-import { imgurUpload } from './imgur';
-import { captureAllClues, imageForClue, s3Upload } from './s3';
-import * as config from '../config';
+import { parallelLimit } from 'async';
+import getAdapter from './adapters';
+
+export async function boardImage(game) {
+  const adapter = await getAdapter();
+  return await adapter.board(game);
+}
+
+export async function clueImage(game, incomingClue) {
+  const adapter = await getAdapter();
+  const clue = incomingClue || game.getClue();
+  return await adapter.clue(game, clue);
+}
+
+export async function allClueImages(game) {
+  const adapter = await getAdapter();
+  if (adapter.CAPTURE_ALL_CLUES) {
+    // On next tick, start capturing all of the clues:
+    setTimeout(() => {
+      // Generate clues, 6 at a time:
+      parallelLimit(game.questions.map(clue => {
+        return async (callback) => {
+          await clueImage(game, clue);
+          callback();
+        };
+      }), 6);
+    }, 0);
+  }
+}
 
 // This is a special image case:
 export { generateDailydouble as dailydoubleImage } from './generator';
-
-export function captureCluesForGame({ game }) {
-  if (config.AWS) {
-    captureAllClues(game);
-  }
-}
-
-export async function boardImage({ game }) {
-  const boardLocalUrl = await generateBoard({ game });
-  if (config.AWS) {
-    return await s3Upload(boardLocalUrl);
-  }
-  return await imgurUpload(boardLocalUrl);
-}
-
-export async function clueImage({ game }) {
-  const clue = game.getClue();
-  if (config.AWS) {
-    return await imageForClue({ game, clue });
-  }
-  const clueLocalUrl = await generateClue({ game, clue });
-  return await imgurUpload(clueLocalUrl);
-}

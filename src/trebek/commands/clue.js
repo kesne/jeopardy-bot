@@ -2,6 +2,7 @@ import Command from '../Command';
 import { Trigger, Only, Provide, currency } from '../utils';
 import endgameMessage from './shared/endgame';
 import { boardImage, dailydoubleImage, clueImage } from '../../cola';
+import winston from 'winston';
 
 @Trigger(
   /(?:ill take |give me |choose )?(.*) for \$?(\d{3,4})(?: alex| trebek)?/,
@@ -60,7 +61,7 @@ class Clue extends Command {
       } else if (e.message.includes('board control')) {
         this.say(`Wait to select a category, board control is active.`);
       } else {
-        console.log('Unexpected category selection error.', e);
+        winston.info('Unexpected category selection error.', e);
       }
       // Just ignore it:
       return;
@@ -82,9 +83,7 @@ class Clue extends Command {
                `(max of ${currency(Math.max(channelScore, clue.value))}, min of $5)`);
       // TODO: Wager timeouts
     } else {
-      const url = await clueImage({
-        game: this.game,
-      });
+      const url = await clueImage(this.game);
 
       // Mark that we're sending the clue now:
       await this.game.clueSent();
@@ -114,7 +113,7 @@ class Clue extends Command {
                 const contestants = await this.channelContestants();
                 this.sayOptional(await endgameMessage(game, contestants, this.data.channel_id));
               } else {
-                const boardUrl = await boardImage({ game });
+                const boardUrl = await boardImage(game);
                 this.sayOptional('Select a new clue.', boardUrl);
               }
             }

@@ -3,6 +3,7 @@ import Command from '../Command';
 import { Trigger, Only, Provide, currency } from '../utils';
 import endgameMessage from './shared/endgame';
 import { boardImage } from '../../cola';
+import winston from 'winston';
 
 @Trigger(
   /(?:whats?|wheres?|whos?|whens?) (?:(?:is|are|was|were|the|an?) ){1,2}(.*)/,
@@ -55,9 +56,7 @@ class Guess extends Command {
           const contestants = await this.channelContestants();
           this.say(`${ await endgameMessage(this.game, contestants, this.data.channel_id) }`);
         } else {
-          const url = await boardImage({
-            game: this.game,
-          });
+          const url = await boardImage(this.game);
           this.say(`Select a new clue.`, url);
         }
       } else if (e.message.includes('contestant')) {
@@ -66,7 +65,7 @@ class Guess extends Command {
         this.say('You need to make a wager before you guess.');
       }
 
-      console.log('Error occured', e);
+      winston.error('Guess error occured', e);
 
       // Just ignore guesses if they're outside of the game context:
       return;
@@ -98,9 +97,7 @@ class Guess extends Command {
         this.say(`${ await endgameMessage(this.game, contestants, this.data.channel_id) }`);
       } else {
         // Get the new board url:
-        const url = await boardImage({
-          game: this.game,
-        });
+        const url = await boardImage(this.game);
         this.say(`Select a new clue.`, url);
       }
     } else {
@@ -121,9 +118,7 @@ class Guess extends Command {
           this.say(`${ await endgameMessage(this.game, contestants, this.data.channel_id) }`);
         } else {
           // Get the new board url:
-          const url = await boardImage({
-            game: this.game,
-          });
+          const url = await boardImage(this.game);
           this.say(`Select a new clue.`, url);
         }
       }

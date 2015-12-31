@@ -3,7 +3,7 @@ import restify from 'express-restify-mongoose';
 
 import { broadcast } from './trebek';
 
-import App from './models/App';
+import App, { invalidate } from './models/App';
 import Studio from './models/Studio';
 import Contestant from './models/Contestant';
 
@@ -13,7 +13,13 @@ export default (adminAuth) => {
   router.use(adminAuth);
 
   // Auto-generated routes:
-  restify.serve(router, App, { prefix: '', lowercase: true });
+  restify.serve(router, App, {
+    prefix: '',
+    lowercase: true,
+    postUpdate() {
+      invalidate();
+    },
+  });
   restify.serve(router, Studio, { prefix: '', lowercase: true, idProperty: 'id' });
   restify.serve(router, Contestant, { prefix: '', lowercase: true, idProperty: 'slackid' });
 

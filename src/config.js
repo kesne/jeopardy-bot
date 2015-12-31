@@ -1,3 +1,5 @@
+import winston from 'winston';
+
 /*
  * BOT CONFIGURATION:
  */
@@ -5,12 +7,17 @@
 export const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'jeopardy';
 export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'bot';
 
-// TODO Localhost as default, better documented Imgur deploys, deprecate S3.
+export const IMGUR_API = process.env.IMGUR_API || '';
+
 export const AWS_KEY = process.env.AWS_KEY || '';
-export const AWS_SECRET_KEY = process.env.AWS_SECRET_KEY || '';
+// export const AWS_SECRET_KEY = process.env.AWS_SECRET_KEY || '';
 
 export let AWS = false;
 if (AWS_KEY) {
+  winston.error(
+    'Support for S3 uploads was removed in the latest release.\n' +
+    'Please use either the `local` or `imgur` option.'
+  );
   AWS = true;
 }
 
