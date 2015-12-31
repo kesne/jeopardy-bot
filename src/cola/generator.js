@@ -50,7 +50,7 @@ function drawLines(ctx, lines, offsetX, lineMidpoint, lineHeight) {
 }
 
 export function generateClue(game, clue) {
-  winston.profile('render');
+  winston.profile(`render clue ${clue.id}`);
   return new Promise((resolve, reject) => {
     const canvas = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
     const ctx = canvas.getContext('2d');
@@ -85,13 +85,13 @@ export function generateClue(game, clue) {
       } else {
         resolve(buf);
       }
-      winston.profile('render');
+      winston.profile(`render clue ${clue.id}`);
     });
   });
 }
 
 export function generateBoard(game) {
-  winston.profile('render');
+  winston.profile(`render board ${game.id}`);
   return new Promise((resolve, reject) => {
     const canvas = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
     const ctx = canvas.getContext('2d');
@@ -151,7 +151,7 @@ export function generateBoard(game) {
       } else {
         resolve(buf);
       }
-      winston.profile('render');
+      winston.profile(`render board ${game.id}`);
     });
   });
 }
