@@ -74,13 +74,13 @@ export default class LocalAdapter {
 
   // Allows captureAllClues to work:
   getClue(fileName) {
-    winston.debug('clue returned from cache');
     return new Promise((resolve) => {
       stat(join(localPath, fileName), (err) => {
         if (err) {
           resolve(false);
         } else {
-          resolve(true);
+          winston.debug('clue returned from cache');
+          resolve(`${this.host}/assets/local/${fileName}`);
         }
       });
     });
