@@ -30,6 +30,10 @@ const VALID_PROVIDERS = [
   'contestant',
 ];
 
+const VALID_WHENS = [
+  'channel_join',
+];
+
 export function Trigger(...messages) {
   return function(Constructor) {
     const triggers = messages.map(message => {
@@ -47,6 +51,15 @@ Trigger.preservePunctuation = function(Constructor) {
   // TODO...
   Constructor.preservePunctuation = true;
 };
+
+export function When(...whens) {
+  if (!whens.some(w => VALID_WHENS.includes(w))) {
+    throw new Error('Invalid when.');
+  }
+  return function(Constructor) {
+    Constructor.whens = whens;
+  };
+}
 
 export function Provide(...providers) {
   if (!providers.some(p => VALID_PROVIDERS.includes(p))) {

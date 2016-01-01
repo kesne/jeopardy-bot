@@ -7,12 +7,19 @@ import { post } from './slack';
 
 export default class Command {
   constructor(input, data) {
-    const { valid, matches } = this.processTriggers(input);
+    // Verify that all of our "whens" are met:
+    if (this.hasWhens()) {
+      const valid = this.processWhens(data.subtype);
+      this.valid = valid;
+    } else {
+      const { valid, matches } = this.processTriggers(input);
+      this.valid = valid;
+      this.matches = matches;
+    }
 
     // Load data into our instance:
-    this.valid = valid;
     this.data = data;
-    this.matches = matches;
+
     // Inject the models:
     this.models = {
       Game,
@@ -71,6 +78,18 @@ export default class Command {
   }
   unlock() {
     return unlock(this.data.channel_id);
+  }
+
+  hasWhens() {
+    return !!this.constructor.whens;
+  }
+
+  processWhens(subtype) {
+    const whens = this.constructor.whens;
+    if (!whens) {
+      return true;
+    }
+    return whens.some(when => subtype === when);
   }
 
   processTriggers(input) {

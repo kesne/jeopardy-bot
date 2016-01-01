@@ -107,6 +107,11 @@ export const schema = new Schema({
       default: true,
     },
 
+    greetings: {
+      type: Boolean,
+      default: true,
+    },
+
     // autoDoubleJeopardy: {
     //   name: 'Automatic Double Jeopardy',
     //   description: 'Automatically starts a double jeopardy round after the normal jeopardy round ends.',
