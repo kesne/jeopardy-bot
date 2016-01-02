@@ -129,7 +129,7 @@ export const schema = new Schema({
       type: Boolean,
       default: false,
     },
-    category_id: {
+    categoryId: {
       type: Number,
       required: true,
     },
@@ -312,7 +312,7 @@ schema.methods.getClue = function() {
 
 schema.methods.getCategory = function() {
   const clue = this.getClue();
-  return this.categories.find(cat => cat.id === clue.category_id);
+  return this.categories.find(cat => cat.id === clue.categoryId);
 };
 
 schema.methods.isBoardControlled = function() {
@@ -353,7 +353,7 @@ schema.methods.newClue = async function({ category, value, contestant }) {
     selectedCategory = this.lastCategory;
   } if (category === '--random--') {
     const unansweredQuestions = this.questions.filter(x => !x.answered);
-    selectedCategory = unansweredQuestions[Math.floor(Math.random() * unansweredQuestions.length)].category_id;
+    selectedCategory = unansweredQuestions[Math.floor(Math.random() * unansweredQuestions.length)].categoryId;
   } else {
     // Easier to match cleaned versions of our input:
     const cleanCategory = clean(category);
@@ -391,7 +391,7 @@ schema.methods.newClue = async function({ category, value, contestant }) {
   if (numberValue === -1) {
     // These questions are internally value-sorted lowest-to-highest.
     const lowestValueClue = this.questions.find(question => {
-      return (question.category_id === selectedCategory && !question.answered);
+      return (question.categoryId === selectedCategory && !question.answered);
     });
     if (lowestValueClue) {
       numberValue = lowestValueClue.value;
@@ -403,7 +403,7 @@ schema.methods.newClue = async function({ category, value, contestant }) {
   }
 
   const question = this.questions.find(q => {
-    return (q.category_id === selectedCategory && q.value === numberValue);
+    return (q.categoryId === selectedCategory && q.value === numberValue);
   });
 
   if (question.answered) {

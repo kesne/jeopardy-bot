@@ -7,7 +7,7 @@ import { boardImage, allClueImages } from '../../cola';
 @Provide('game')
 class NewGame extends Command {
   async response() {
-    this.sayOptional('Starting a new game for you...');
+    this.say('Starting a new game for you...');
 
     // Start the game:
     const game = await this.models.Game.start({

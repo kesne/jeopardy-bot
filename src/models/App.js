@@ -21,22 +21,21 @@ export const schema = new Schema({
   // icon_url: {
   //   type: String
   // },
-  mode: {
+
+  platform: {
     type: 'String',
-    enum: ['bot', 'hybrid', 'response'],
+    enum: ['slack'],
     required: true,
-    default: 'response',
+    default: 'slack',
   },
+
   imageMode: {
     type: 'String',
     enum: ['local', 'imgur'/* , 's3' */],
     required: true,
     default: 'imgur',
   },
-  api_token: {
-    type: 'String',
-  },
-  verify_token: {
+  apiToken: {
     type: 'String',
   },
 
@@ -49,14 +48,6 @@ export const schema = new Schema({
     },
   },
 });
-
-schema.methods.isBot = function() {
-  return this.mode === 'bot';
-};
-
-schema.methods.hasApi = function() {
-  return Boolean(this.api_token);
-};
 
 schema.statics.findOrCreate = async function() {
   let doc = await this.findOne();
@@ -73,16 +64,6 @@ schema.statics.get = async function() {
   }
   return appConfig;
 };
-
-// Additional schema validation:
-schema.pre('save', function(next) {
-  // Invalid mode:
-  if (!this.api_token && (this.mode === 'bot' || this.mode === 'hybrid')) {
-    this.mode = 'reponse';
-    winston.error('Mode requries an API token.');
-  }
-  next();
-});
 
 // Force the cached reference to get updated:
 export function invalidate() {

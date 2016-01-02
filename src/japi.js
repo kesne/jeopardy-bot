@@ -48,8 +48,8 @@ async function loadEpisode(url) {
     const $clue = $(clue);
     const $clueText = $clue.find('.clue_text');
 
-    let [, category_id, num] = clueRegex.exec($clueText.attr('id'));
-    category_id = parseInt(category_id, 10);
+    let [, categoryId, num] = clueRegex.exec($clueText.attr('id'));
+    categoryId = parseInt(categoryId, 10);
     num = parseInt(num, 10);
 
     // Generate the value based on the number:
@@ -68,7 +68,7 @@ async function loadEpisode(url) {
 
     clues.push({
       id,
-      category_id,
+      categoryId,
       question,
       answer,
       value,

@@ -1,11 +1,14 @@
 import { Router } from 'express';
 import restify from 'express-restify-mongoose';
-
-import { broadcast } from './trebek';
-
 import App, { invalidate } from './models/App';
 import Studio from './models/Studio';
 import Contestant from './models/Contestant';
+
+let bot;
+
+export function provideBot(instance) {
+  bot = instance;
+}
 
 export default (adminAuth) => {
   // Set up REST routes to manipulate models:
@@ -25,13 +28,7 @@ export default (adminAuth) => {
 
   // Manual non-model-backed routes:
   router.post('/v1/broadcasts/', (req, res) => {
-    if (req.body.message) {
-      if (req.body.studio) {
-        broadcast(req.body.message, req.body.studio);
-      } else {
-        broadcast(req.body.message);
-      }
-    }
+    bot.broadcast(req.body.message, req.body.studio);
     res.end();
   });
 

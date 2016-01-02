@@ -3,11 +3,7 @@ import trebek from './trebek';
 import App from './models/App';
 import winston from 'winston';
 
-const autoReconnect = true;
-const autoMarkMessagesAsRead = true;
-
 export default class SlackBot {
-
   constructor() {
     this.start();
   }
@@ -19,9 +15,17 @@ export default class SlackBot {
     }
   }
 
+  broadcast(message, studio) {
+    Object.values(this.slack.channels).filter((channel) => {
+      return studio ? channel.id === studio : channel.is_member;
+    }).forEach(channel => {
+      channel.send(message);
+    });
+  }
+
   async start() {
     const app = await App.get();
-    this.slack = new Slack(app.api_token, autoReconnect, autoMarkMessagesAsRead);
+    this.slack = new Slack(app.apiToken, true, true);
 
     this.slack.on('open', this.onOpen.bind(this));
     this.slack.on('message', this.onMessage.bind(this));
@@ -55,18 +59,18 @@ export default class SlackBot {
   }
 
   onMessage(incoming) {
-    const { text, channel: channel_id, user: user_id, ts: timestamp, subtype } = incoming;
+    const { text, channel: channelId, user: userId, ts: timestamp, subtype } = incoming;
 
     // Ignore messages from myself:
-    if (user_id === this.slack.self.id) {
+    if (userId === this.slack.self.id) {
       return;
     }
 
-    const channel = this.slack.getChannelGroupOrDMByID(channel_id);
-    const channel_name = channel.name;
+    const channel = this.slack.getChannelGroupOrDMByID(channelId);
+    const channelName = channel.name;
 
     // Handle deleted and invalid messages:
-    if (!text || !channel_id) {
+    if (!text || !channelId) {
       return;
     }
 
@@ -76,15 +80,9 @@ export default class SlackBot {
       return;
     }
 
-    const { name: user_name } = this.slack.getUserByID(user_id);
-    trebek(text, {
-      subtype,
-      channel_name,
-      channel_id,
-      timestamp,
-      user_id,
-      user_name,
-    }, (message, url = '') => {
+    const { name: userName } = this.slack.getUserByID(userId);
+
+    const say = (message, url = '') => {
       if (!url) {
         channel.send(message);
       } else {
@@ -99,8 +97,16 @@ export default class SlackBot {
           }],
         });
       }
-      return Promise.resolve();
-    });
+    };
+
+    trebek(text, {
+      subtype,
+      channel_name: channelName,
+      channel_id: channelId,
+      timestamp,
+      user_id: userId,
+      user_name: userName,
+    }, say);
   }
 
   onError(err) {

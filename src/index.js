@@ -6,11 +6,8 @@ import { join } from 'path';
 import basicAuth from 'basic-auth-connect';
 import winston from 'winston';
 
-import App from './models/App';
-
-import api from './api';
+import api, { provideBot } from './api';
 import SlackBot from './slackbot';
-import Webhook from './webhook';
 import { ADMIN_USERNAME, ADMIN_PASSWORD, MONGO, PORT } from './config';
 
 // Set log level
@@ -38,34 +35,11 @@ app.get('/admin/*', (req, res) => {
   res.sendFile(join(__dirname, 'admin', 'index.html'));
 });
 
-// Holds the instance of the bot or webhook:
-let liveInstance;
-
-function rebootInstance(bot = false) {
-  // Same mode:
-  if ((liveInstance instanceof SlackBot && bot) || (liveInstance instanceof Webhook && !bot)) {
-    return;
-  }
-  // If we're already running, let's tear down first:
-  if (liveInstance) {
-    liveInstance.destroy();
-  }
-  // Boot the new instance:
-  if (bot) {
-    liveInstance = new SlackBot();
-  } else {
-    liveInstance = new Webhook(app);
-  }
-}
-
-App.schema.post('save', (doc) => {
-  rebootInstance(doc.isBot());
-});
+// Boot up the slackbot:
+const bot = new SlackBot();
+provideBot(bot);
 
 // Boot up the jeopardy app:
-app.listen(PORT, async () => {
-  const a = await App.get();
+app.listen(PORT, () => {
   winston.info(`Jeopardy Bot listening on port ${PORT}`);
-  // If we're in a mode that needs the webhook, then set it up:
-  rebootInstance(a.isBot());
 });

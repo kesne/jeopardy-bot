@@ -12,7 +12,6 @@ class Settings extends React.Component {
     super(props);
 
     this.onChangeAdapter = this.onChangeAdapter.bind(this);
-    this.onChangeMode = this.onChangeMode.bind(this);
     this.onChangeApiToken = this.onChangeApiToken.bind(this);
     this.onChangeOwner = this.onChangeOwner.bind(this);
     this.onClickSave = this.onClickSave.bind(this);
@@ -33,15 +32,9 @@ class Settings extends React.Component {
     });
   }
 
-  onChangeMode(e) {
-    this.setState({
-      mode: e.target.value,
-    });
-  }
-
   onChangeApiToken(e) {
     this.setState({
-      api_token: e.target.value,
+      apiToken: e.target.value,
     });
   }
 
@@ -52,11 +45,10 @@ class Settings extends React.Component {
   }
 
   onClickSave() {
-    const { owner, api_token, mode, imageMode } = this.state;
+    const { owner, apiToken, imageMode } = this.state;
     this.props.onValueChanged({
       owner,
-      api_token,
-      mode,
+      apiToken,
       imageMode,
     });
   }
@@ -71,11 +63,10 @@ class Settings extends React.Component {
     });
   }
 
-  getState({ owner, api_token, mode, imageMode }) {
+  getState({ owner, apiToken, imageMode }) {
     this.setState({
       owner,
-      api_token,
-      mode,
+      apiToken,
       imageMode,
     });
   }
@@ -106,38 +97,19 @@ class Settings extends React.Component {
 
           <div>
             <h6 className="no-margin">
-              Mode
+              API Token
               <Tooltip
-                label="Change the bot mode based on the configurated slack integration."
+                label="The Slack API Token, used to send responses back to Slack."
               >
                 <Icon className="jbot-inline-icon" name="help" />
               </Tooltip>
             </h6>
-            <select className="jbot-select" value={this.state.mode} onChange={this.onChangeMode}>
-              <option value="" disabled>Select a mode...</option>
-              <option value="bot">Bot</option>
-              <option value="hybrid">Hybrid</option>
-              <option value="response">Response</option>
-            </select>
+            <Textfield
+              onChange={this.onChangeApiToken}
+              value={this.state.apiToken}
+              label="API Token..."
+            />
           </div>
-
-          {this.state.mode !== 'response' ? (
-            <div>
-              <h6 className="no-margin">
-                API Token
-                <Tooltip
-                  label="The Slack API Token, used to send responses back to Slack."
-                >
-                  <Icon className="jbot-inline-icon" name="help" />
-                </Tooltip>
-              </h6>
-              <Textfield
-                onChange={this.onChangeApiToken}
-                value={this.state.api_token}
-                label="API Token..."
-              />
-            </div>
-          ) : null}
 
           <div>
             <h6 className="no-margin">
