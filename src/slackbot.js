@@ -65,24 +65,20 @@ export default class SlackBot {
     const channel = this.slack.getChannelGroupOrDMByID(channel_id);
     const channel_name = channel.name;
 
-    if (subtype === 'channel_join') {
-      const { name: user_name } = this.slack.getUserByID(user_id);
-      channel.send(`Welcome to #${channel.name}, <@${user_id}|${user_name}>! To learn how to play, just type "help".`);
-      return;
-    }
-
     // Handle deleted and invalid messages:
-    if (!text || !channel_id || subtype) {
+    if (!text || !channel_id) {
       return;
     }
 
     // TODO: Allow commands to specify their run location.
     if (!channel.is_channel) {
-      channel.send('Sorry, but you can only use jeopardybot in open channels right now.');
+      channel.send(`I'm sorry, but you can only use jeopardybot in open channels right now.`);
       return;
     }
+
     const { name: user_name } = this.slack.getUserByID(user_id);
     trebek(text, {
+      subtype,
       channel_name,
       channel_id,
       timestamp,

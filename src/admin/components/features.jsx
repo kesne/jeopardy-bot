@@ -28,6 +28,11 @@ const FEATURE_LIST = [
     feature: 'stats',
     description: 'Allows contestants to check the stats of themselves and other players.',
   },
+  {
+    name: 'Room Greetings',
+    feature: 'greetings',
+    description: 'Welcomes users joining Jeopardy channels with a simple message.',
+  },
 ];
 
 class Features extends React.Component {
