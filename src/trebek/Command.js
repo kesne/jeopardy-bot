@@ -11,6 +11,7 @@ export default class Command {
     if (this.hasWhens()) {
       const valid = this.processWhens(data.subtype);
       this.valid = valid;
+      this.matches = [];
     } else {
       const { valid, matches } = this.processTriggers(input);
       this.valid = valid;
