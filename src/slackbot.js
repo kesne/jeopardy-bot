@@ -15,6 +15,14 @@ export default class SlackBot {
     }
   }
 
+  broadcast(message, studio) {
+    Object.values(this.slack.channels).filter((channel) => {
+      return studio ? channel.id === studio : channel.is_member;
+    }).forEach(channel => {
+      channel.send(message);
+    });
+  }
+
   async start() {
     const app = await App.get();
     this.slack = new Slack(app.apiToken, true, true);

@@ -30,7 +30,6 @@
     "cheerio": "^0.19.0",
     "dehumanize-date": "^2.1.0",
     "express": "^4.13.3",
-    "express-remove-route": "^0.1.1",
     "express-restify-mongoose": "^2.3.1",
     "find-remove": "^0.2.8",
     "form-data": "^0.2.0",
