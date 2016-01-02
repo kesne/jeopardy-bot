@@ -41,7 +41,7 @@ class Settings extends React.Component {
 
   onChangeApiToken(e) {
     this.setState({
-      api_token: e.target.value,
+      apiToken: e.target.value,
     });
   }
 
@@ -52,10 +52,10 @@ class Settings extends React.Component {
   }
 
   onClickSave() {
-    const { owner, api_token, mode, imageMode } = this.state;
+    const { owner, apiToken, mode, imageMode } = this.state;
     this.props.onValueChanged({
       owner,
-      api_token,
+      apiToken,
       mode,
       imageMode,
     });
@@ -71,10 +71,10 @@ class Settings extends React.Component {
     });
   }
 
-  getState({ owner, api_token, mode, imageMode }) {
+  getState({ owner, apiToken, mode, imageMode }) {
     this.setState({
       owner,
-      api_token,
+      apiToken,
       mode,
       imageMode,
     });
@@ -133,7 +133,7 @@ class Settings extends React.Component {
               </h6>
               <Textfield
                 onChange={this.onChangeApiToken}
-                value={this.state.api_token}
+                value={this.state.apiToken}
                 label="API Token..."
               />
             </div>

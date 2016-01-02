@@ -33,7 +33,7 @@ export const schema = new Schema({
     required: true,
     default: 'imgur',
   },
-  api_token: {
+  apiToken: {
     type: 'String',
   },
   verify_token: {
@@ -55,7 +55,7 @@ schema.methods.isBot = function() {
 };
 
 schema.methods.hasApi = function() {
-  return Boolean(this.api_token);
+  return Boolean(this.apiToken);
 };
 
 schema.statics.findOrCreate = async function() {
@@ -77,7 +77,7 @@ schema.statics.get = async function() {
 // Additional schema validation:
 schema.pre('save', function(next) {
   // Invalid mode:
-  if (!this.api_token && (this.mode === 'bot' || this.mode === 'hybrid')) {
+  if (!this.apiToken && (this.mode === 'bot' || this.mode === 'hybrid')) {
     this.mode = 'reponse';
     winston.error('Mode requries an API token.');
   }

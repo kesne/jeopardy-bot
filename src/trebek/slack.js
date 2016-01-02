@@ -6,7 +6,7 @@ export async function channels() {
   const app = await App.get();
 
   const form = new FormData();
-  form.append('token', app.api_token);
+  form.append('token', app.apiToken);
   form.append('username', app.username);
 
   const data = await fetch('https://slack.com/api/channels.list', {
@@ -21,7 +21,7 @@ export async function post(channel, message, url) {
   const app = await App.get();
 
   const form = new FormData();
-  form.append('token', app.api_token);
+  form.append('token', app.apiToken);
   form.append('username', app.username);
   // TODO: Icon emoji?
   form.append('text', message);

@@ -21,7 +21,7 @@ export default class SlackBot {
 
   async start() {
     const app = await App.get();
-    this.slack = new Slack(app.api_token, autoReconnect, autoMarkMessagesAsRead);
+    this.slack = new Slack(app.apiToken, autoReconnect, autoMarkMessagesAsRead);
 
     this.slack.on('open', this.onOpen.bind(this));
     this.slack.on('message', this.onMessage.bind(this));
@@ -55,18 +55,18 @@ export default class SlackBot {
   }
 
   onMessage(incoming) {
-    const { text, channel: channel_id, user: user_id, ts: timestamp, subtype } = incoming;
+    const { text, channel: channelId, user: userId, ts: timestamp, subtype } = incoming;
 
     // Ignore messages from myself:
-    if (user_id === this.slack.self.id) {
+    if (userId === this.slack.self.id) {
       return;
     }
 
-    const channel = this.slack.getChannelGroupOrDMByID(channel_id);
-    const channel_name = channel.name;
+    const channel = this.slack.getChannelGroupOrDMByID(channelId);
+    const channelName = channel.name;
 
     // Handle deleted and invalid messages:
-    if (!text || !channel_id) {
+    if (!text || !channelId) {
       return;
     }
 
@@ -76,14 +76,14 @@ export default class SlackBot {
       return;
     }
 
-    const { name: user_name } = this.slack.getUserByID(user_id);
+    const { name: userName } = this.slack.getUserByID(userId);
     trebek(text, {
       subtype,
-      channel_name,
-      channel_id,
+      channel_name: channelName,
+      channel_id: channelId,
       timestamp,
-      user_id,
-      user_name,
+      user_id: userId,
+      user_name: userName,
     }, (message, url = '') => {
       if (!url) {
         channel.send(message);

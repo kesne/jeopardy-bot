@@ -54,10 +54,7 @@ _Note: If you configure a trigger word, all of the phrases will be prefixed by t
 
 ## Configuring
 
-Use the upcoming web UI...
-
-- `API_TOKEN` - The API token for "hybrid" mode to send enhanced messages.
-- `OUTGING_WEBHOOK_TOKEN` - The token from the outgoing webhook, which is used to verify incoming requests.
+Use the web UI.
 
 ### Configuring MongoDB
 

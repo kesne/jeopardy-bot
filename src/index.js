@@ -10,7 +10,6 @@ import App from './models/App';
 
 import api from './api';
 import SlackBot from './slackbot';
-import Webhook from './webhook';
 import { ADMIN_USERNAME, ADMIN_PASSWORD, MONGO, PORT } from './config';
 
 // Set log level
@@ -38,12 +37,12 @@ app.get('/admin/*', (req, res) => {
   res.sendFile(join(__dirname, 'admin', 'index.html'));
 });
 
-// Holds the instance of the bot or webhook:
+// Holds the instance of the bot:
 let liveInstance;
 
 function rebootInstance(bot = false) {
   // Same mode:
-  if ((liveInstance instanceof SlackBot && bot) || (liveInstance instanceof Webhook && !bot)) {
+  if ((liveInstance instanceof SlackBot && bot)) {
     return;
   }
   // If we're already running, let's tear down first:
@@ -54,13 +53,9 @@ function rebootInstance(bot = false) {
   if (bot) {
     liveInstance = new SlackBot();
   } else {
-    liveInstance = new Webhook(app);
+    winston.error('TODO Only one mode');
   }
 }
-
-App.schema.post('save', (doc) => {
-  rebootInstance(doc.isBot());
-});
 
 // Boot up the jeopardy app:
 app.listen(PORT, async () => {
