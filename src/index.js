@@ -53,7 +53,7 @@ function rebootInstance(bot = false) {
   if (bot) {
     liveInstance = new SlackBot();
   } else {
-    winston.error('TODO Only one mode');
+    winston.error('TODO: Only one mode');
   }
 }
 

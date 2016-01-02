@@ -70,7 +70,7 @@ class Clue extends Command {
     const clue = this.game.getClue();
 
     // Give the user a little more feedback when we can:
-    this.sayOptional(`OK, \`${this.game.getCategory().title}\` for ${currency(clue.value)}...`);
+    this.say(`OK, \`${this.game.getCategory().title}\` for ${currency(clue.value)}...`);
 
     // You found a daily double!
     if (this.studio.features.dailyDoubles && this.game.isDailyDouble()) {
@@ -107,14 +107,14 @@ class Clue extends Command {
               // We timed out, so mark this question as done.
               await game.answer();
 
-              this.sayOptional(`Time's up! The correct answer was \`${currentClue.answer}\`.`);
+              this.say(`Time's up! The correct answer was \`${currentClue.answer}\`.`);
 
               if (game.isComplete()) {
                 const contestants = await this.channelContestants();
-                this.sayOptional(await endgameMessage(game, contestants, this.data.channel_id));
+                this.say(await endgameMessage(game, contestants, this.data.channel_id));
               } else {
                 const boardUrl = await boardImage(game);
-                this.sayOptional('Select a new clue.', boardUrl);
+                this.say('Select a new clue.', boardUrl);
               }
             }
           } finally {

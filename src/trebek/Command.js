@@ -3,7 +3,6 @@ import Studio from '../models/Studio';
 import Contestant from '../models/Contestant';
 import Game from '../models/Game';
 import { lock, unlock } from './locks';
-import { post } from './slack';
 
 export default class Command {
   constructor(input, data) {
@@ -28,7 +27,7 @@ export default class Command {
     };
   }
 
-  async start(customSay) {
+  async start() {
     // Load in our providers now:
     await this.installProviders();
 
@@ -43,11 +42,6 @@ export default class Command {
     // Check to make sure we have the correct features enabled:
     this.checkFeatures();
 
-    // Inject custom say commands:
-    if (customSay) {
-      this.say = customSay;
-    }
-
     // Start our message string, which will be sent back to slack:
     this.message = '';
 
@@ -55,22 +49,13 @@ export default class Command {
     return await this.response(...this.matches);
   }
 
-  async say(message, url = '') {
-    if (this.app.hasApi()) {
-      await this.postToSlack(message, url);
-    } else {
-      this.message += `${message} ${url} \n`;
-    }
+  useSay(say) {
+    // Inject custom say commands:
+    this.say = say;
   }
 
-  sayOptional(...args) {
-    if (this.app.hasApi()) {
-      return this.say(...args);
-    }
-  }
-
-  async postToSlack(message, url) {
-    await post(message, url);
+  say() {
+    throw new Error('Say should be provided with the "useSay" method.');
   }
 
   // Locking helpers

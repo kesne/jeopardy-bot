@@ -3,11 +3,7 @@ import trebek from './trebek';
 import App from './models/App';
 import winston from 'winston';
 
-const autoReconnect = true;
-const autoMarkMessagesAsRead = true;
-
 export default class SlackBot {
-
   constructor() {
     this.start();
   }
@@ -21,7 +17,7 @@ export default class SlackBot {
 
   async start() {
     const app = await App.get();
-    this.slack = new Slack(app.apiToken, autoReconnect, autoMarkMessagesAsRead);
+    this.slack = new Slack(app.apiToken, true, true);
 
     this.slack.on('open', this.onOpen.bind(this));
     this.slack.on('message', this.onMessage.bind(this));
@@ -77,14 +73,8 @@ export default class SlackBot {
     }
 
     const { name: userName } = this.slack.getUserByID(userId);
-    trebek(text, {
-      subtype,
-      channel_name: channelName,
-      channel_id: channelId,
-      timestamp,
-      user_id: userId,
-      user_name: userName,
-    }, (message, url = '') => {
+
+    const say = (message, url = '') => {
       if (!url) {
         channel.send(message);
       } else {
@@ -99,8 +89,16 @@ export default class SlackBot {
           }],
         });
       }
-      return Promise.resolve();
-    });
+    };
+
+    trebek(text, {
+      subtype,
+      channel_name: channelName,
+      channel_id: channelId,
+      timestamp,
+      user_id: userId,
+      user_name: userName,
+    }, say);
   }
 
   onError(err) {
