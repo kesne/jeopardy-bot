@@ -90,38 +90,36 @@ class Clue extends Command {
       this.say(`Here's your clue.`, url);
 
       // Additional feedback after we timeout (plus five seconds for some flexibility):
-      if (this.app.hasApi()) {
-        setTimeout(async () => {
-          // Grab the lock so we block incoming requests:
-          await this.lock();
-          // Try to be safe and unlock even when we fail:
-          try {
-            // We need to refresh the document because it could be outdated:
-            const game = await this.models.Game.forChannel({
-              channel_id: this.game.channel_id,
-            });
-            if (game.isTimedOut()) {
-              // Get the current clue:
-              const currentClue = game.getClue();
+      setTimeout(async () => {
+        // Grab the lock so we block incoming requests:
+        await this.lock();
+        // Try to be safe and unlock even when we fail:
+        try {
+          // We need to refresh the document because it could be outdated:
+          const game = await this.models.Game.forChannel({
+            channel_id: this.game.channel_id,
+          });
+          if (game.isTimedOut()) {
+            // Get the current clue:
+            const currentClue = game.getClue();
 
-              // We timed out, so mark this question as done.
-              await game.answer();
+            // We timed out, so mark this question as done.
+            await game.answer();
 
-              this.say(`Time's up! The correct answer was \`${currentClue.answer}\`.`);
+            this.say(`Time's up! The correct answer was \`${currentClue.answer}\`.`);
 
-              if (game.isComplete()) {
-                const contestants = await this.channelContestants();
-                this.say(await endgameMessage(game, contestants, this.data.channel_id));
-              } else {
-                const boardUrl = await boardImage(game);
-                this.say('Select a new clue.', boardUrl);
-              }
+            if (game.isComplete()) {
+              const contestants = await this.channelContestants();
+              this.say(await endgameMessage(game, contestants, this.data.channel_id));
+            } else {
+              const boardUrl = await boardImage(game);
+              this.say('Select a new clue.', boardUrl);
             }
-          } finally {
-            this.unlock();
           }
-        }, (this.studio.values.timeout * 1000) + 100);
-      }
+        } finally {
+          this.unlock();
+        }
+      }, (this.studio.values.timeout * 1000) + 100);
     }
   }
 }
