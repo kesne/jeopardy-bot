@@ -16,7 +16,7 @@ function formatUptime(inputUptime) {
     unit = unit + 's';
   }
 
-  uptime = uptime + ' ' + unit;
+  uptime = uptime.toFixed(3) + ' ' + unit;
   return uptime;
 }
 
