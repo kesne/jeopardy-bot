@@ -65,7 +65,7 @@ export function generateClue(game, clue) {
     ctx.fill();
 
     // Set up fonts:
-    ctx.font = 'bold 40px "Korinna"';
+    ctx.font = '40px "Korinna"';
     ctx.textAlign = 'center';
     ctx.fillStyle = 'white';
     ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
