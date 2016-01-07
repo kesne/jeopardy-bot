@@ -3,3 +3,4 @@ node_modules/
 lib/
 npm-debug.log
 assets/local/*.png
+*.lock

@@ -19,6 +19,7 @@ import winston from 'winston';
   'channelContestants'
 )
 class Clue extends Command {
+  // TODO: Put --same--, --same-lowest--, and --random-- into a constants file.
   async response([inputCategory, inputValue], [sameLowest], [gimme, gimmeValue, gimmeCategory]) {
     let category = inputCategory;
     let value = inputValue;
@@ -47,23 +48,43 @@ class Clue extends Command {
       category = '--same--';
     }
 
-    try {
-      await this.game.newClue({
-        contestant: this.contestant,
-        category,
-        value,
-      });
-    } catch (e) {
-      if (e.message.includes('value')) {
-        this.say(`I'm sorry, I can't give you a clue for that value.`);
-      } else if (e.message.includes('category')) {
-        this.say(`I'm sorry, I don't know what category that is. Try being more specific.`);
-      } else if (e.message.includes('board control')) {
-        this.say(`Wait to select a category, board control is active.`);
-      } else {
-        winston.info('Unexpected category selection error.', e);
+    const getClue = async () => {
+      try {
+        await this.game.newClue({
+          contestant: this.contestant,
+          category,
+          value,
+        });
+
+        // We successfully got a clue:
+        return true;
+      } catch (e) {
+        if (category === '--same-lowest--' && e.message.includes('value')) {
+          this.say(`There are no clues left in that category. Giving you a random category instead...`);
+          category = '--random--';
+          value = -1;
+          return await getClue();
+        }
+
+        if (e.message.includes('value')) {
+          this.say(`I'm sorry, I can't give you a clue for that value.`);
+        } else if (e.message.includes('category')) {
+          this.say(`I'm sorry, I don't know what category that is. Try being more specific.`);
+        } else if (e.message.includes('board control')) {
+          this.say(`Wait to select a category, board control is active.`);
+        } else {
+          winston.info('Unexpected category selection error.', e);
+        }
+
+        // Don't continue:
+        return false;
       }
-      // Just ignore it:
+    };
+
+    const retrievedClue = await getClue();
+
+    // If we didn't get a clue, bail out:
+    if (!retrievedClue) {
       return;
     }
 
