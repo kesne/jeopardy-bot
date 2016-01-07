@@ -5,7 +5,7 @@ import { boardImage, dailydoubleImage, clueImage } from '../../cola';
 import winston from 'winston';
 
 @Trigger(
-  /(?:ill take |give me |choose )?(.*) for \$?(\d{3,4})(?: alex| trebek)?/,
+  /(?:ill take |give me |choose )?(.*?) (?:for )?\$?(\d{3,4})(?: alex| trebek)?/,
   /(same)/,
   /(gimme)(?: for \$?(\d{3,4}))?(?: (.+?))?/
 )
