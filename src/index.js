@@ -20,6 +20,11 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Slash command
+app.get('/slash', (req, res) => {
+  res.end(`I'm awake! You should be able to play games.`);
+});
+
 // Re-usable authentication for admin pages:
 const adminAuth = basicAuth(ADMIN_USERNAME, ADMIN_PASSWORD);
 
