@@ -1,6 +1,7 @@
 import Command from '../Command';
 import { Trigger, Only, Provide, currency } from '../utils';
 import endgameMessage from './shared/endgame';
+import newClueMessage from './shared/newclue';
 import { boardImage, dailydoubleImage, clueImage } from '../../cola';
 import winston from 'winston';
 
@@ -134,7 +135,7 @@ class Clue extends Command {
               this.say(await endgameMessage(game, contestants, this.data.channel_id));
             } else {
               const boardUrl = await boardImage(game);
-              this.say('Select a new clue.', boardUrl);
+              this.say(newClueMessage(game), boardUrl);
             }
           }
         } finally {

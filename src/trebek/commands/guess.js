@@ -2,6 +2,7 @@ import moment from 'moment';
 import Command from '../Command';
 import { Trigger, Only, Provide, currency } from '../utils';
 import endgameMessage from './shared/endgame';
+import newClueMessage from './shared/newclue';
 import { boardImage } from '../../cola';
 import winston from 'winston';
 
@@ -47,18 +48,7 @@ class Guess extends Command {
     } catch (e) {
       // Timeout:
       if (e.message.includes('timeout')) {
-        // We timed out, so mark this question as done.
-        await this.game.answer();
-
-        await this.say(`Time's up, ${this.contestant.name}! Remember, you have ${this.studio.values.timeout} seconds to answer. The correct answer is \`${clue.answer}\`.`);
-
-        if (this.game.isComplete()) {
-          const contestants = await this.channelContestants();
-          this.say(`${ await endgameMessage(this.game, contestants, this.data.channel_id) }`);
-        } else {
-          const url = await boardImage(this.game);
-          this.say(`Select a new clue.`, url);
-        }
+        // Ignore this message because we're always in bot mode now, and the timeout handles this.
       } else if (e.message.includes('contestant')) {
         this.say(`You had your chance, ${this.contestant.name}. Let someone else answer.`);
       } else if (e.message.includes('wager')) {
@@ -98,7 +88,7 @@ class Guess extends Command {
       } else {
         // Get the new board url:
         const url = await boardImage(this.game);
-        this.say(`Select a new clue.`, url);
+        this.say(newClueMessage(this.game), url);
       }
     } else {
       await this.contestant.incorrect({
@@ -119,7 +109,7 @@ class Guess extends Command {
         } else {
           // Get the new board url:
           const url = await boardImage(this.game);
-          this.say(`Select a new clue.`, url);
+          this.say(newClueMessage(this.game), url);
         }
       }
     }
