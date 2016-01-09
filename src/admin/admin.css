@@ -71,3 +71,22 @@
 .no-margin {
   margin: 0;
 }
+
+.setup-back {
+  margin: auto;
+}
+
+.setup-card {
+  width: 512px;
+  margin: auto;
+}
+
+.setup-progress {
+  margin: 15px auto;
+}
+
+.card-contrast {
+  background: #46B6AC;
+  color: #fff;
+  height: 100px;
+}

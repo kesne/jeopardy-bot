@@ -1,11 +1,12 @@
 import React, { PropTypes } from 'react';
 import { render } from 'react-dom';
 import { Header, Layout, Drawer, Navigation, Content, Menu, MenuItem, Icon, IconButton } from 'react-mdl';
-import { Router, Route, Link, IndexRoute } from 'react-router';
+import { Router, Route, Link, IndexRoute, Redirect } from 'react-router';
 import { createHistory, useBasename } from 'history';
 
 import Home from './home';
 import Studio from './studio';
+import Setup from './setup';
 
 // Run our app under the /base URL.
 const history = useBasename(createHistory)({
@@ -96,12 +97,13 @@ App.propTypes = {
 
 render((
   <Router history={history}>
+    <Route path="/setup" component={Setup} />
     <Route path="/" component={App}>
       <IndexRoute component={Home}/>
       <Route path="studio/:studio" component={Studio} />
 
-      {/* Catch all route: */}
-      <Route path="*" component={Home} />
+      {/* Catch all redirect: */}
+      <Redirect from="*" to="/" />
     </Route>
   </Router>
 ), document.getElementById('react-app'));
