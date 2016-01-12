@@ -1,6 +1,6 @@
 # JeopardyBot
 
-A slack bot that lets you play full Jeopardy! games. Easy to deploy, and highly configurable to your team's style of play.
+A Slack bot that lets you play full Jeopardy! games. Easy to deploy, and highly configurable to your team's style of play.
 
 ## Deploying on Heroku
 

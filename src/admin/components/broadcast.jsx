@@ -64,7 +64,7 @@ class Broadcast extends React.Component {
         <CardTitle>Send Broadcast</CardTitle>
         <CardText>
           {this.props.all ?
-            `Send a message to all public and private slack channels the bot is currently in.
+            `Send a message to all public and private Slack channels the bot is currently in.
             This will not send any private messages.` :
             'Send a message to this studio as the bot.'
           }
