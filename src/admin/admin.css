@@ -50,6 +50,9 @@
   background-image: none;
   border: 1px solid #ccc;
 }
+.jbot-setting-switch {
+  margin: 20px 0;
+}
 
 .jbot-broadcast-sent {
   padding: 10px;
@@ -72,8 +75,21 @@
   margin: 0;
 }
 
+.setup-slack-button {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.setup-back-container {
+  width: 512px;
+  margin: 20px auto;
+}
 .setup-back {
-  margin: auto;
+  float: right;
+}
+
+p:last-child {
+  margin: 0;
 }
 
 .setup-card {
@@ -84,9 +100,27 @@
 .setup-progress {
   margin: 15px auto;
 }
+.setup-spinner {
+  margin: 20px auto;
+  display: block;
+}
 
 .card-contrast {
   background: #46B6AC;
   color: #fff;
+}
+
+.card-contrast--tall {
   height: 100px;
+}
+
+.connection-status {
+  text-align: center;
+}
+.icon--large {
+  font-size: 10em;
+}
+
+.header-row-sans-menu {
+  padding: 0 16px;
 }

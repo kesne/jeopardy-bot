@@ -54,7 +54,7 @@ export const schema = new Schema({
   },
 });
 
-schema.virtual('nonMentionedName').get(function() {
+schema.virtual('nonMentionedName').get(function () {
   return `${this.name.charAt(0)}.${this.name.substring(1)}`;
 });
 
@@ -75,7 +75,7 @@ schema.statics.get = async function({ user_id: slackid, user_name: name }) {
   return user;
 };
 
-schema.methods.channelScore = function(channel_id) {
+schema.methods.channelScore = function (channel_id) {
   const score = this.scores.find(s => {
     return s.channel_id === channel_id;
   });
@@ -91,7 +91,7 @@ schema.methods.channelScore = function(channel_id) {
   return score;
 };
 
-schema.methods.removeChannelScore = function(channel_id) {
+schema.methods.removeChannelScore = function (channel_id) {
   return this.scores.some((score, index) => {
     if (score.channel_id === channel_id) {
       // Remove the score:
@@ -101,19 +101,19 @@ schema.methods.removeChannelScore = function(channel_id) {
   });
 };
 
-schema.methods.correct = function({ value, channel_id }) {
+schema.methods.correct = function ({ value, channel_id }) {
   const score = this.channelScore(channel_id);
   score.value += value;
   return this.save();
 };
 
-schema.methods.incorrect = function({ value, channel_id }) {
+schema.methods.incorrect = function ({ value, channel_id }) {
   const score = this.channelScore(channel_id);
   score.value -= value;
   return this.save();
 };
 
-schema.methods.endGame = function({ channel_id, won, lost }) {
+schema.methods.endGame = function ({ channel_id, won, lost }) {
   const { value } = this.channelScore(channel_id);
   this.stats.money += value;
   if (won) {

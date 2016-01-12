@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 import {
   Layout,
   Header,
@@ -11,8 +11,11 @@ import {
   Button,
 } from 'react-mdl';
 
-import First from './components/steps/first';
-import Second from './components/steps/second';
+import Welcome from './components/steps/1-welcome';
+import SetupSlack from './components/steps/2-setupslack';
+import ConnectBot from './components/steps/3-connectbot';
+import TestAPI from './components/steps/4-testapi';
+import Complete from './components/steps/5-complete';
 
 const propTypes = {
 
@@ -30,13 +33,15 @@ class Setup extends React.Component {
     this.onBack = this.onBack.bind(this);
 
     this.state = {
+      token: '',
       step: 0,
     };
   }
 
-  onNext() {
+  onNext(state) {
     this.setState({
       step: this.state.step + 1,
+      ...state,
     });
   }
 
@@ -46,13 +51,40 @@ class Setup extends React.Component {
     });
   }
 
+  renderBack() {
+    return (
+      <Button onClick={this.onBack} className="setup-back" raised accent ripple>
+        Go Back
+      </Button>
+    );
+  }
+
+// {/*token="xoxb-17442029383-0t6awBBW3GIR3cPcJQmdSwXM"*/}
   renderStep() {
     switch (this.state.step) {
       default:
       case 0:
-        return <First onNext={this.onNext} />;
+        return <Welcome onNext={this.onNext} />;
       case 1:
-        return <Second onNext={this.onNext} />;
+        return <SetupSlack onNext={this.onNext} BackButton={this.renderBack()} />;
+      case 2:
+        return (
+          <ConnectBot
+            onNext={this.onNext}
+            BackButton={this.renderBack()}
+            token={this.state.token}
+          />
+        );
+      case 3:
+        return (
+          <TestAPI
+            onNext={this.onNext}
+            BackButton={this.renderBack()}
+            token={this.state.token}
+          />
+        );
+      case 4:
+        return <Complete token={this.state.token} />;
     }
   }
 
@@ -60,16 +92,18 @@ class Setup extends React.Component {
     return (
       <Layout fixedHeader>
         <Header>
-          <HeaderRow title="JeopardyBot Setup" />
+          <HeaderRow title="JeopardyBot Setup" className="header-row-sans-menu" />
         </Header>
         <Content>
           <div className="page-content">
-            <ProgressBar progress={this.state.step * 20} buffer={90} className="setup-progress" />
+            {/* The buffer at 90 makes it animated which is kind of pretty. */}
+            <ProgressBar
+              progress={this.state.step * 25}
+              buffer={this.state.step === 4 ? 100 : 90}
+              className="setup-progress"
+            />
             {this.renderStep()}
           </div>
-          <Button onClick={this.onBack} className="setup-back">
-            Back
-          </Button>
         </Content>
         <Footer size="mini">
           <FooterSection type="left" logo="JeopardyBot">

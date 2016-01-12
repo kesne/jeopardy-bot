@@ -13,13 +13,16 @@ const propTypes = {
 
 const defaultProps = {};
 
-const First = ({ onNext }) => {
+const Welcome = ({ onNext }) => {
   return (
     <Card shadow={0} className="setup-card">
-      <CardTitle className="card-contrast">Welcome</CardTitle>
+      <CardTitle className="card-contrast card-contrast--tall">Welcome</CardTitle>
       <CardText>
-        Welcome to your new Jeopardy Slack Bot!
-        It looks like you haven't set things up yet, so let's start by setting up your application.
+        <p>
+          <strong>Welcome to your new Jeopardy Slack Bot! </strong>
+          It looks like you haven't been here before,
+          so let's get start by setting up your application.
+        </p>
       </CardText>
       <CardActions border>
         <Button colored onClick={onNext}>Get Started</Button>
@@ -28,7 +31,7 @@ const First = ({ onNext }) => {
   );
 };
 
-First.propTypes = propTypes;
-First.defaultProps = defaultProps;
+Welcome.propTypes = propTypes;
+Welcome.defaultProps = defaultProps;
 
-export default First;
+export default Welcome;

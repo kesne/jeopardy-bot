@@ -6,6 +6,8 @@ import { join } from 'path';
 import basicAuth from 'basic-auth-connect';
 import winston from 'winston';
 
+import App from './models/App';
+
 import api, { provideBot } from './api';
 import SlackBot from './slackbot';
 import { ADMIN_USERNAME, ADMIN_PASSWORD, MONGO, PORT } from './config';
@@ -25,8 +27,16 @@ app.all('/slash', (req, res) => {
   res.end(`I'm awake! You should be able to play games.`);
 });
 
-// Re-usable authentication for admin pages:
-const adminAuth = basicAuth(ADMIN_USERNAME, ADMIN_PASSWORD);
+const adminBasicAuth = basicAuth(ADMIN_USERNAME, ADMIN_PASSWORD);
+// Re-usable authentication for admin pages (engages when there's an apiToken):
+const adminAuth = async (...args) => {
+  const [, , next] = args;
+  const a = await App.get();
+  if (a.apiToken) {
+    return adminBasicAuth(...args);
+  }
+  next();
+};
 
 // Add API endpoints for admin panel:
 app.use('/api', api(adminAuth));
@@ -40,6 +50,7 @@ app.get('/admin/*', (req, res) => {
   res.sendFile(join(__dirname, 'admin', 'index.html'));
 });
 
+// TODO: refactor into BotManager:
 // Boot up the slackbot:
 const bot = new SlackBot();
 provideBot(bot);

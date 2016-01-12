@@ -1,8 +1,20 @@
 import React, { PropTypes } from 'react';
-import { Button, Card, CardText, CardTitle, CardMenu, CardActions, Icon, Tooltip, Textfield } from 'react-mdl';
+import {
+  Button,
+  Card,
+  CardText,
+  CardTitle,
+  CardMenu,
+  CardActions,
+  Icon,
+  Tooltip,
+  Textfield,
+  Switch,
+} from 'react-mdl';
 
 const propTypes = {
   app: PropTypes.object.isRequired,
+  onValueChanged: PropTypes.func.isRequired,
 };
 
 const defaultProps = {};
@@ -15,6 +27,7 @@ class Settings extends React.Component {
     this.onChangeApiToken = this.onChangeApiToken.bind(this);
     this.onChangeOwner = this.onChangeOwner.bind(this);
     this.onClickSave = this.onClickSave.bind(this);
+    this.onChangeEnabledByDefault = this.onChangeEnabledByDefault.bind(this);
 
     this.getContestants();
     this.state = {
@@ -44,12 +57,19 @@ class Settings extends React.Component {
     });
   }
 
+  onChangeEnabledByDefault(e) {
+    this.setState({
+      studiosEnabledByDefault: e.target.checked,
+    });
+  }
+
   onClickSave() {
-    const { owner, apiToken, imageMode } = this.state;
+    const { owner, apiToken, imageMode, studiosEnabledByDefault } = this.state;
     this.props.onValueChanged({
       owner,
       apiToken,
       imageMode,
+      studiosEnabledByDefault,
     });
   }
 
@@ -63,19 +83,23 @@ class Settings extends React.Component {
     });
   }
 
-  getState({ owner, apiToken, imageMode }) {
+  getState({ owner, apiToken, imageMode, studiosEnabledByDefault }) {
     this.setState({
       owner,
       apiToken,
       imageMode,
+      studiosEnabledByDefault,
     });
   }
 
   render() {
     return (
-      <Card shadow={0} style={{
-        width: '100%',
-      }}>
+      <Card
+        shadow={0}
+        style={{
+          width: '100%',
+        }}
+      >
         <CardTitle>Settings</CardTitle>
         <CardText>
           <div>
@@ -87,7 +111,11 @@ class Settings extends React.Component {
                 <Icon className="jbot-inline-icon" name="help" />
               </Tooltip>
             </h6>
-            <select className="jbot-select" value={this.state.imageMode} onChange={this.onChangeAdapter}>
+            <select
+              className="jbot-select"
+              value={this.state.imageMode}
+              onChange={this.onChangeAdapter}
+            >
               <option value="" disabled>Select an adapter...</option>
               <option value="imgur">Imgur</option>
               <option value="local">Local</option>
@@ -115,7 +143,7 @@ class Settings extends React.Component {
             <h6 className="no-margin">
               Jeopardy Owner
               <Tooltip
-                label="The contestant that is responsible for the Jeopardy Bot."
+                label="The contestant that is responsible for the bot."
               >
                 <Icon className="jbot-inline-icon" name="help" />
               </Tooltip>
@@ -128,6 +156,25 @@ class Settings extends React.Component {
                 </option>
               ))}
             </select>
+          </div>
+
+          <div>
+            <h6 className="no-margin">
+              Studios Enabled By Default
+              <Tooltip
+                label="Determines if JeopardyBot is enabled or disabled when invited to new rooms."
+              >
+                <Icon className="jbot-inline-icon" name="help" />
+              </Tooltip>
+            </h6>
+            <Switch
+              className="jbot-setting-switch"
+              checked={this.state.studiosEnabledByDefault}
+              onChange={this.onChangeEnabledByDefault}
+              ripple
+            >
+              Enabled by Default
+            </Switch>
           </div>
         </CardText>
         <CardActions border>

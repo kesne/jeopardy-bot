@@ -13,7 +13,7 @@
     "admin": "npm run admin:browserify",
     "admin:browserify": "browserify lib/admin/index.js --outfile lib/admin/index.bundle.js",
     "start": "node lib/index",
-    "dev": "nodemon --exec babel-node src/index",
+    "dev": "nodemon --ignore lib/ --exec babel-node src/index",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src"
   },
@@ -37,7 +37,6 @@
     "html-entities": "^1.2.0",
     "imgur": "^0.1.6",
     "lockfile": "^1.0.1",
-    "megawizard": "^0.2.2",
     "moment": "^2.10.6",
     "mongoose": "^4.1.9",
     "natural": "^0.2.1",

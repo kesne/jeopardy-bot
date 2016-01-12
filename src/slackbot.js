@@ -2,6 +2,7 @@ import Slack from 'slack-client';
 import trebek from './trebek';
 import App from './models/App';
 import winston from 'winston';
+import fetch from 'node-fetch';
 
 export default class SlackBot {
   constructor() {
@@ -13,6 +14,16 @@ export default class SlackBot {
       this.slack.autoReconnect = false;
       this.slack.disconnect();
     }
+  }
+
+  authTest({ token }) {
+    return fetch('https://slack.com/api/auth.test', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `token=${token}`,
+    }).then(res => res.json());
   }
 
   broadcast(message, studio) {
@@ -92,7 +103,6 @@ export default class SlackBot {
           attachments: [{
             fallback: 'Jeopardy Bot',
             image_url: url,
-            icon_emoji: ':jbot:',
             color: '#F4AC79',
           }],
         });
