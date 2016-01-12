@@ -4,7 +4,7 @@
   "repository": "https://github.com/kesne/jeopardy-bot",
   "logo": "http://i.imgur.com/fyUzznF.png",
   "keywords": ["node", "slack", "jeopardy", "bot", "trebek"],
-  "success_url": "/welcome",
+  "success_url": "/admin/",
   "env": {
     "ADMIN_USERNAME": {
       "description": "The username for the admin panel (defaults to 'jeopardy').",
