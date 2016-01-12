@@ -4,11 +4,11 @@ A Slack bot that lets you play full Jeopardy! games. Easy to deploy, and highly 
 
 ## Deploying on Heroku
 
-Deploying on Heroku is extremely simple and most automated. Just click the deploy button below.
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+Deploying JeopardyBot on Heroku is extremely simple. Simply click the deploy button below.
 
 Once your instance is deployed, the JeopardyBot admin panel will open, and walk you through the setup process for Slack.
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 ## How to Play
 
