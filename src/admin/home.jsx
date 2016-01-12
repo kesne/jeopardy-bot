@@ -1,7 +1,6 @@
 import React from 'react';
 import { Grid, Cell } from 'react-mdl';
 import Settings from './components/settings';
-import Configuration from './components/configuration';
 import Broadcast from './components/broadcast';
 
 export default class Home extends React.Component {
@@ -21,21 +20,21 @@ export default class Home extends React.Component {
   }
 
   getApp() {
-    fetch(`/api/v1/apps/`, {
+    fetch(`/api/v1/apps/${window.GlobalAppId}`, {
       credentials: 'include',
     }).then(res => {
       return res.json();
-    }).then(([app]) => {
+    }).then((app) => {
       this.setState({ app });
     });
   }
 
   updateApp(updates) {
-    return fetch(`/api/v1/apps/${this.state.app._id}`, {
+    return fetch(`/api/v1/apps/${window.GlobalAppId}`, {
       credentials: 'include',
       method: 'PATCH',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(updates),
@@ -53,9 +52,6 @@ export default class Home extends React.Component {
           <Settings app={this.state.app} onValueChanged={this.onValueChanged} />
         </Cell>
         <Cell col={6}>
-          <Configuration app={this.state.app} onValueChanged={this.onValueChanged} />
-        </Cell>
-        <Cell col={12}>
           <Broadcast all />
         </Cell>
       </Grid>

@@ -32,5 +32,9 @@ export default (adminAuth) => {
     res.end();
   });
 
+  router.post('/v1/authtest', async (req, res) => {
+    res.json(await bot.authTest(req.body));
+  });
+
   return router;
 };

@@ -23,7 +23,8 @@ export const schema = new Schema({
   // Studios can be disabled to turn the bot off in a channel:
   enabled: {
     type: Boolean,
-    default: false,
+    default: true,
+    required: true,
   },
 
   values: {
@@ -171,7 +172,12 @@ export const schema = new Schema({
 schema.statics.get = async function({ id, name }) {
   let doc = await this.findOne({ id });
   if (!doc) {
-    doc = await this.create({ id, name });
+    const app = await this.model('App').get();
+    doc = await this.create({
+      id,
+      name,
+      enabled: app.studiosEnabledByDefault,
+    });
   }
   // The channel has been renamed:
   if (doc.name !== name) {

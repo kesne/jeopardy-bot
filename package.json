@@ -13,7 +13,7 @@
     "admin": "npm run admin:browserify",
     "admin:browserify": "browserify lib/admin/index.js --outfile lib/admin/index.bundle.js",
     "start": "node lib/index",
-    "dev": "nodemon --exec babel-node src/index",
+    "dev": "nodemon --ignore lib/ --exec babel-node src/index",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src"
   },
@@ -60,9 +60,9 @@
   "devDependencies": {
     "babel-eslint": "^4.1.6",
     "eslint": "^1.6.0",
-    "eslint-config-airbnb": "^1.0.2",
+    "eslint-config-airbnb": "^3.1.0",
     "eslint-plugin-babel": "^3.0.0",
-    "eslint-plugin-react": "^3.11.1",
+    "eslint-plugin-react": "^3.14.0",
     "nodemon": "^1.7.1",
     "watchify": "^3.6.1"
   }

@@ -1,5 +1,14 @@
 import React, { PropTypes } from 'react';
-import { Button, Card, CardText, CardTitle, CardMenu, CardActions, Icon, Textfield } from 'react-mdl';
+import {
+  Button,
+  Card,
+  CardText,
+  CardTitle,
+  CardMenu,
+  CardActions,
+  Icon,
+  Textfield,
+} from 'react-mdl';
 
 class Broadcast extends React.Component {
   constructor(props) {
@@ -24,7 +33,7 @@ class Broadcast extends React.Component {
         credentials: 'include',
         method: 'POST',
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({

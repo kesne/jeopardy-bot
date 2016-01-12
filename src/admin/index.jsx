@@ -1,11 +1,22 @@
 import React, { PropTypes } from 'react';
 import { render } from 'react-dom';
-import { Header, Layout, Drawer, Navigation, Content, Menu, MenuItem, Icon, IconButton } from 'react-mdl';
-import { Router, Route, Link, IndexRoute } from 'react-router';
+import {
+  Header,
+  Layout,
+  Drawer,
+  Navigation,
+  Content,
+  Menu,
+  MenuItem,
+  Icon,
+  IconButton,
+} from 'react-mdl';
+import { Router, Route, Link, IndexRoute, Redirect } from 'react-router';
 import { createHistory, useBasename } from 'history';
 
 import Home from './home';
 import Studio from './studio';
+import Setup from './setup';
 
 // Run our app under the /base URL.
 const history = useBasename(createHistory)({
@@ -29,10 +40,6 @@ class App extends React.Component {
     window.location = 'https://github.com/kesne/jeopardy-bot';
   }
 
-  onClickSetup() {
-    // TODO:
-  }
-
   onStudioDeleted() {
     this.getStudios();
   }
@@ -54,7 +61,6 @@ class App extends React.Component {
         <div style={{ position: 'relative' }}>
           <IconButton name="more_vert" id="jbot-menu-lower-right" ripple />
           <Menu target="jbot-menu-lower-right" align="right">
-            <MenuItem>Setup</MenuItem>
             <MenuItem onClick={this.onClickGithub}>Github</MenuItem>
           </Menu>
         </div>
@@ -94,14 +100,33 @@ App.propTypes = {
   children: PropTypes.any.isRequired,
 };
 
+// Verifies that the setup has been completed:
+function verifySetup(nextState, replaceState, callback) {
+  const onSetup = nextState.location.pathname.includes('/setup');
+  fetch('/api/v1/apps/', {
+    credentials: 'include',
+  }).then(res => {
+    return res.json();
+  }).then(([app]) => {
+    window.GlobalAppId = app._id;
+    if (!app.apiToken && !onSetup) {
+      replaceState(null, '/setup');
+    } else if (app.apiToken && onSetup) {
+      replaceState(null, '/');
+    }
+    callback();
+  });
+}
+
 render((
   <Router history={history}>
-    <Route path="/" component={App}>
+    <Route path="/setup" onEnter={verifySetup} component={Setup} />
+    <Route path="/" onEnter={verifySetup} component={App}>
       <IndexRoute component={Home}/>
       <Route path="studio/:studio" component={Studio} />
 
-      {/* Catch all route: */}
-      <Route path="*" component={Home} />
+      {/* Catch all redirect: */}
+      <Redirect from="*" to="/" />
     </Route>
   </Router>
 ), document.getElementById('react-app'));

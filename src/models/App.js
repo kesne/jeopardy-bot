@@ -1,5 +1,4 @@
 import { Schema, model } from 'mongoose';
-import winston from 'winston';
 
 export const schema = new Schema({
 
@@ -8,19 +7,6 @@ export const schema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Contestant',
   },
-
-  username: {
-    type: 'String',
-    default: 'jeopardybot',
-  },
-  icon_emoji: {
-    type: 'String',
-    default: ':jbot:',
-  },
-  // TODO: Figure this out:
-  // icon_url: {
-  //   type: String
-  // },
 
   platform: {
     type: 'String',
@@ -35,8 +21,15 @@ export const schema = new Schema({
     required: true,
     default: 'imgur',
   },
+
   apiToken: {
     type: 'String',
+  },
+
+  studiosEnabledByDefault: {
+    type: 'Boolean',
+    required: true,
+    default: true,
   },
 
   aws: {
