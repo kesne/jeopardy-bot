@@ -54,8 +54,17 @@ export default class Command {
     this.say = say;
   }
 
+  useReact(react) {
+    // Inject custom reaction command:
+    this.react = react;
+  }
+
+  react() {
+    throw new Error('React method should be provided with the "useReact" function.');
+  }
+
   say() {
-    throw new Error('Say should be provided with the "useSay" method.');
+    throw new Error('Say method should be provided with the "useSay" function.');
   }
 
   // Locking helpers

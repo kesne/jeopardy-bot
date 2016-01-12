@@ -8,7 +8,7 @@ const commands = Object.keys(commandObject)
   .map(key => commandObject[key])
   .filter(n => typeof n === 'function');
 
-export default async function(input, data = {}, say) {
+export default async function(input, data = {}, say, react) {
   const cleanInput = clean(input);
 
   let Command;
@@ -29,6 +29,7 @@ export default async function(input, data = {}, say) {
 
   // Use a custom say command:
   command.useSay(say);
+  command.useReact(react);
 
   // Some commands don't need locks, so don't waste our time with them:
   if (!Command.nolock) {

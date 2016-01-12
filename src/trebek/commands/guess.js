@@ -81,6 +81,7 @@ class Guess extends Command {
       ]);
 
       await this.say(`That is correct, ${this.contestant.name}. The answer was \`${clue.answer}\`.\nYour score is now ${currency(this.contestant.channelScore(this.data.channel_id).value)}.`);
+      this.react('white_check_mark');
 
       if (this.game.isComplete()) {
         const contestants = await this.channelContestants();
@@ -95,7 +96,10 @@ class Guess extends Command {
         value,
         channel_id: this.data.channel_id,
       });
+
       await this.say(`That is incorrect, ${this.contestant.name}. Your score is now ${currency(this.contestant.channelScore(this.data.channel_id).value)}.`);
+      this.react('x');
+
       // If the clue is a daily double, the game progresses
       if (this.game.isDailyDouble()) {
         await Promise.all([

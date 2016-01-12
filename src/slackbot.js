@@ -95,18 +95,25 @@ export default class SlackBot {
 
     const say = (message, url = '') => {
       if (!url) {
-        channel.send(message);
-      } else {
-        channel.postMessage({
-          text: message,
-          as_user: true,
-          attachments: [{
-            fallback: 'JeopardyBot',
-            image_url: url,
-            color: '#F4AC79',
-          }],
-        });
+        return channel.send(message);
       }
+      return channel.postMessage({
+        text: message,
+        as_user: true,
+        attachments: [{
+          fallback: 'JeopardyBot',
+          image_url: url,
+          color: '#F4AC79',
+        }],
+      });
+    };
+
+    const react = (reaction, ts = timestamp) => {
+      this.slack._apiCall('reactions.add', {
+        name: reaction,
+        channel: channelId,
+        timestamp: ts,
+      }, () => {});
     };
 
     trebek(text, {
@@ -116,7 +123,7 @@ export default class SlackBot {
       timestamp,
       user_id: userId,
       user_name: userName,
-    }, say);
+    }, say, react);
   }
 
   onError(err) {
