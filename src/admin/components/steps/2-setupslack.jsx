@@ -38,7 +38,7 @@ const SetupSlack = ({ onNext, BackButton }) => {
           </Button>
         </div>
         <p>
-          After it's been created, you can add more details, and give it great profile picture.
+          After it's been created, you can add more details, and give it a great profile picture.
           Keep the integration page open for the next step.
         </p>
       </CardText>
