@@ -2,6 +2,8 @@
 
 A Slack bot that lets you play full Jeopardy! games. Easy to deploy, and highly configurable to your team's style of play.
 
+<img width="383" alt="JeopardyBot Screenshot" src="https://cloud.githubusercontent.com/assets/498479/12258692/53cc6cfe-b8c5-11e5-9b14-5b642f3abb80.png">
+
 ## Deploying on Heroku
 
 Deploying JeopardyBot on Heroku is extremely simple. Simply click the deploy button below.
