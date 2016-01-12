@@ -1,6 +1,6 @@
 # Styleguide
 
-Jeopardy Bot is written against the [Airbnb JavaScript Styleguide](https://github.com/airbnb/javascript).
+JeopardyBot is written against the [Airbnb JavaScript Styleguide](https://github.com/airbnb/javascript).
 
 The only rule modifications are the following:
 

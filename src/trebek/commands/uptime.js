@@ -26,7 +26,7 @@ export default class Poke extends Command {
   response() {
     const uptime = formatUptime(process.uptime());
     this.say(
-      `:robot_face: I am a bot named <@${this.app.username}>. I have been running for ${uptime}.`
+      `:robot_face: I am a humble JeopardyBot. I have been running for ${uptime}.`
     );
   }
 }

@@ -101,7 +101,7 @@ export default class SlackBot {
           text: message,
           as_user: true,
           attachments: [{
-            fallback: 'Jeopardy Bot',
+            fallback: 'JeopardyBot',
             image_url: url,
             color: '#F4AC79',
           }],
