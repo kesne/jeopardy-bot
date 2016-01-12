@@ -9,18 +9,6 @@ export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'bot';
 
 export const IMGUR_API = process.env.IMGUR_API || '';
 
-export const AWS_KEY = process.env.AWS_KEY || '';
-// export const AWS_SECRET_KEY = process.env.AWS_SECRET_KEY || '';
-
-export let AWS = false;
-if (AWS_KEY) {
-  winston.error(
-    'Support for S3 uploads was removed in the latest release.\n' +
-    'Please use either the `local` or `imgur` option.'
-  );
-  AWS = true;
-}
-
 // The URL for the mongo database:
 export const MONGO = process.env.MONGO_URL || process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://localhost/jeopardy';
 
