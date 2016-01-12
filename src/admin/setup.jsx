@@ -17,14 +17,6 @@ import ConnectBot from './components/steps/3-connectbot';
 import TestAPI from './components/steps/4-testapi';
 import Complete from './components/steps/5-complete';
 
-const propTypes = {
-
-};
-
-const defaultProps = {
-
-};
-
 class Setup extends React.Component {
   constructor(props) {
     super(props);
@@ -59,7 +51,6 @@ class Setup extends React.Component {
     );
   }
 
-// {/*token="xoxb-17442029383-0t6awBBW3GIR3cPcJQmdSwXM"*/}
   renderStep() {
     switch (this.state.step) {
       default:
@@ -117,8 +108,5 @@ class Setup extends React.Component {
     );
   }
 }
-
-Setup.propTypes = propTypes;
-Setup.defaultProps = defaultProps;
 
 export default Setup;
