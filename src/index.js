@@ -57,5 +57,5 @@ provideBot(bot);
 
 // Boot up the jeopardy app:
 app.listen(PORT, () => {
-  winston.info(`Jeopardy Bot listening on port ${PORT}`);
+  winston.info(`JeopardyBot listening on port ${PORT}`);
 });

@@ -1,4 +1,4 @@
-# Jeopardy Bot
+# JeopardyBot
 
 A slack bot that lets you play full Jeopardy! games. Easy to deploy, and highly configurable to your team's style of play.
 
@@ -19,8 +19,7 @@ Deploying on Heroku is extremely simple. There are currently two supported [mode
 
 The following steps are not required for the bot to function, but will enhance your experience using it.
 
-- **Bot Icon** - The simplest way to configure the bot icon is to set up a `:jbot:`.  emoji, which will be automatically used. You can [click here](https://my.slack.com/customize/emoji) to add a new emoji. You may also configure the bot image in the Slack configuration settings.
-- **Imgur API** - Jeopardy Bot uses Imgur to upload photos for the game. While technically optional, you should set API token to prevent rate limiting. You can get an API key by [clicking here](https://api.imgur.com/oauth2/addclient).
+- **Imgur API** - JeopardyBot uses Imgur to upload photos for the game. While technically optional, you should set API token to prevent rate limiting. You can get an API key by [clicking here](https://api.imgur.com/oauth2/addclient).
 
 ## Usage
 
@@ -58,7 +57,7 @@ Use the web UI.
 
 ### Configuring MongoDB
 
-There are three different environment variables that you can use to set the URL for MongoDB. Jeopardy Bot will check the environment variables `MONGO_URL`, `MONGOHQ_URL`, and `MONGOLAB_URI` (in that order), before finally defaulting to `mongodb://localhost/jeopardy`.
+There are three different environment variables that you can use to set the URL for MongoDB. JeopardyBot will check the environment variables `MONGO_URL`, `MONGOHQ_URL`, and `MONGOLAB_URI` (in that order), before finally defaulting to `mongodb://localhost/jeopardy`.
 
 
 ---
@@ -69,7 +68,7 @@ This slack bot can be configured in two different modes: "response" and "hybrid"
 
 ### Response
 
-Response mode is the easiest way to get Jeopardy Bot up and running in your team. In response mode, the bot acts purely as an outgoing webhook. This allows your integration to be hosted on platforms such as Heroku, which will shut down your application after periods of inactivity.
+Response mode is the easiest way to get JeopardyBot up and running in your team. In response mode, the bot acts purely as an outgoing webhook. This allows your integration to be hosted on platforms such as Heroku, which will shut down your application after periods of inactivity.
 
 ### Hybrid
 
