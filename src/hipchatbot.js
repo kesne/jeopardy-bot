@@ -25,12 +25,8 @@ export default class HipchatBot {
     const user_name = req.body.item.message.from.mention_name;
 
     const say = (message, url = '') => {
-      if (!url) {
-        this.hipchatter.notify(channel_name, { message: message, token: this.app.apiToken }, this.onError.bind(this));
-      } else {
-        const msg = message + '<br />' + '<img src="'+url+'" width="420" height="259" /><br />';
-        this.hipchatter.notify(channel_name, { message: msg, token: this.app.apiToken }, this.onError.bind(this));
-      }
+      if (url) { message += '<br />' + '<img src="'+url+'" width="420" height="259" /><br />'; }
+      this.hipchatter.notify(channel_name, { message: message, token: this.app.apiToken }, this.onError.bind(this));
     };
 
     trebek(text, {
