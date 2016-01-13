@@ -54,13 +54,22 @@ export default class Command {
     this.say = say;
   }
 
-  useReact(react) {
+  useAddReaction(addReaction) {
     // Inject custom reaction command:
-    this.react = react;
+    this.addReaction = addReaction;
   }
 
-  react() {
-    throw new Error('React method should be provided with the "useReact" function.');
+  useGetReations(getReactions) {
+    // Inject custom getReactions command:
+    this.getReactions = getReactions;
+  }
+
+  getReactions() {
+    throw new Error('Getreactions method should be provided with the "useGetReations" function.');
+  }
+
+  addReaction() {
+    throw new Error('AddReaction method should be provided with the "useAddReaction" function.');
   }
 
   say() {

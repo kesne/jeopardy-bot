@@ -94,26 +94,51 @@ export default class SlackBot {
     const { name: userName } = this.slack.getUserByID(userId);
 
     const say = (message, url = '') => {
-      if (!url) {
-        return channel.send(message);
-      }
-      return channel.postMessage({
-        text: message,
-        as_user: true,
-        attachments: [{
-          fallback: 'JeopardyBot',
-          image_url: url,
-          color: '#F4AC79',
-        }],
+      return new Promise((resolve) => {
+        let msg;
+        if (!url) {
+          msg = channel.send(message);
+        } else {
+          msg = channel.postMessage({
+            text: message,
+            as_user: true,
+            attachments: [{
+              fallback: 'JeopardyBot',
+              image_url: url,
+              color: '#F4AC79',
+            }],
+          });
+        }
+        // Actually wait for messages to send:
+        const oMS = msg._onMessageSent.bind(msg);
+        msg._onMessageSent = (...args) => {
+          oMS(...args);
+          resolve(msg.ts);
+        };
       });
     };
 
-    const react = (reaction, ts = timestamp) => {
-      this.slack._apiCall('reactions.add', {
-        name: reaction,
-        channel: channelId,
-        timestamp: ts,
-      }, () => {});
+    const addReaction = (reaction, ts = timestamp) => {
+      return new Promise((resolve) => {
+        this.slack._apiCall('reactions.add', {
+          name: reaction,
+          channel: channelId,
+          timestamp: ts,
+        }, () => {
+          resolve();
+        });
+      });
+    };
+
+    const getReactions = (ts = timestamp) => {
+      return new Promise((resolve) => {
+        this.slack._apiCall('reactions.get', {
+          channel: channelId,
+          timestamp: ts,
+        }, ({ message }) => {
+          resolve(message.reactions);
+        });
+      });
     };
 
     trebek(text, {
@@ -123,7 +148,7 @@ export default class SlackBot {
       timestamp,
       user_id: userId,
       user_name: userName,
-    }, say, react);
+    }, say, addReaction, getReactions);
   }
 
   onError(err) {

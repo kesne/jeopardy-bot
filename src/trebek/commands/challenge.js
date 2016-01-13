@@ -78,9 +78,14 @@ export default class Challenge extends Command {
         return;
       }
 
-      const contestantString = contestants.map(contestant => `<@${contestant.slackid}|${contestant.name}>`).join(', ');
+      const contestantString = contestants.map(contestant => `<@${contestant.slackid}>`).join(', ');
       await this.say(`I'm not sure, let's see what the room thinks.\nI thought the correct answer was \`${answer}\`, and the guess was \`${guess}\`.`);
-      await this.say(`${contestantString}, do you think they were right? Respond with just "y" or "n" to vote.`);
+      // Alternative text: Respond with just "y" or "n" to vote.
+      const message = await this.say(`${contestantString}, do you think they were right? Vote with the reactions! :+1: if they were right, :-1: if they were not.`);
+
+      // Slack calls these +1 / -1 when you call the reaction.get method:
+      await this.addReaction('thumbsup', message);
+      await this.addReaction('thumbsdown', message);
 
       setTimeout(async () => {
         await this.lock();
@@ -88,6 +93,23 @@ export default class Challenge extends Command {
         const game = await this.models.Game.forChannel({
           channel_id: this.game.channel_id,
         });
+
+        // Allow votes from emoji
+        const reactions = await this.getReactions(message);
+        if (reactions && reactions.length) {
+          reactions.forEach(({ name, count: totalCount }) => {
+            // Remove the vote that JeopardyBot gave:
+            const count = totalCount - 1;
+            if (count) {
+              if (name === '+1') {
+                game.challenge.votes.push(...Array(count).fill({ correct: true }));
+              } else if (name === '-1') {
+                game.challenge.votes.push(...Array(count).fill({ correct: false }));
+              }
+            }
+          });
+        }
+
         try {
           const { channelScore } = await game.endChallenge();
           this.say(`Congrats, ${this.contestant.name}, your challenge has succeeded. Your score is now ${currency(channelScore.value)}.`);
