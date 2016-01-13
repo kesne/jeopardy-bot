@@ -10,7 +10,8 @@ import App from './models/App';
 
 import api, { provideBot } from './api';
 import SlackBot from './slackbot';
-import { ADMIN_USERNAME, ADMIN_PASSWORD, MONGO, PORT } from './config';
+import HipchatBot from './hipchatbot';
+import { ADMIN_USERNAME, ADMIN_PASSWORD, MONGO, PORT, PLATFORM } from './config';
 
 // Set log level
 winston.level = process.env.NODE_ENV === 'production' ? 'info' : 'debug';
@@ -51,8 +52,15 @@ app.get('/admin/*', (req, res) => {
 });
 
 // TODO: refactor into BotManager:
-// Boot up the slackbot:
-const bot = new SlackBot();
+let bot;
+
+// Boot up the bot:
+if (PLATFORM === 'hipchat') {
+  bot = new HipchatBot(app);
+} else {
+  bot = new SlackBot();
+}
+
 provideBot(bot);
 
 // Boot up the jeopardy app:

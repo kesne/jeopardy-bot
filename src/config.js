@@ -4,6 +4,8 @@ import winston from 'winston';
  * BOT CONFIGURATION:
  */
 
+export const PLATFORM = process.env.PLATFORM || 'slack';
+
 export const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'jeopardy';
 export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'bot';
 
