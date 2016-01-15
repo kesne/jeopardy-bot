@@ -22,9 +22,7 @@ export default class HipchatBot {
     const subtype = req.body.event;
     const channel_name = req.body.item.room.name;
     const channel_id = (req.body.item.room.id).toString();
-    // const timestamp = req.body.item.message.date;
-    // @todo: Convert returned timestamp into unixTimestamp
-    const timestamp = Date.now();
+    const timestamp = Date.parse(req.body.item.message.date) / 1000;
     const user_id = req.body.item.message.from.id;
     const user_name = req.body.item.message.from.mention_name;
 
