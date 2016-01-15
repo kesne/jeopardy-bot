@@ -40,6 +40,10 @@ export const schema = new Schema({
       type: 'String',
     },
   },
+
+  webhookId: {
+    type: 'Number'
+  },
 });
 
 schema.statics.findOrCreate = async function() {
