@@ -13,6 +13,7 @@
     "admin": "npm run admin:browserify",
     "admin:browserify": "browserify lib/admin/index.js --outfile lib/admin/index.bundle.js",
     "start": "node lib/index",
+    "start:heroku": "node --optimize_for_size --max_old_space_size=460 --gc_interval=100 lib/index",
     "dev": "nodemon --ignore lib/ --exec babel-node src/index",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src"
