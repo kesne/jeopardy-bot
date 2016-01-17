@@ -19,7 +19,7 @@ const PROMISE_TIMEOUT = 200;
 async function uploadImage(base64Image, attempt = 1) {
   // Allow 3 retires to upload images to imgur:
   if (attempt > MAX_RETRIES) {
-    throw new Error('Error uploading image. Max number');
+    throw new Error('Error uploading image. Max number of retries hit.');
   }
   try {
     const { data: { link } } = await uploadBase64(base64Image);

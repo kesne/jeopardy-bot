@@ -16,8 +16,8 @@ export function unlock(channelId) {
 export function lock(channelId) {
   return new Promise((resolve, reject) => {
     lockFile.lock(`jeopardy-${channelId}.lock`, {
-      // Wait a maximum of 10 seconds:
-      wait: 10 * 1000,
+      // Wait a maximum of 6 seconds:
+      wait: 6 * 1000,
     }, err => {
       if (err) {
         winston.error('Error locking file', err);
