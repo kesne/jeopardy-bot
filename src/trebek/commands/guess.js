@@ -51,8 +51,10 @@ class Guess extends Command {
         // Ignore this message because we're always in bot mode now, and the timeout handles this.
       } else if (e.message.includes('contestant')) {
         this.say(`You had your chance, ${this.contestant.name}. Let someone else answer.`);
-        const reaction = Math.random() > 0.5 ? 'no_good' : 'no_mouth';
-        this.addReaction(reaction);
+        if (this.studio.features.guessReactions) {
+          const reaction = Math.random() > 0.5 ? 'no_good' : 'no_mouth';
+          this.addReaction(reaction);
+        }
       } else if (e.message.includes('wager')) {
         this.say('You need to make a wager before you guess.');
       }
@@ -83,7 +85,10 @@ class Guess extends Command {
       ]);
 
       await this.say(`That is correct, ${this.contestant.name}. The answer was \`${clue.answer}\`.\nYour score is now ${currency(this.contestant.channelScore(this.data.channel_id).value)}.`);
-      this.addReaction('white_check_mark');
+
+      if (this.studio.features.guessReactions) {
+        this.addReaction('white_check_mark');
+      }
 
       if (this.game.isComplete()) {
         const contestants = await this.channelContestants();
@@ -100,7 +105,10 @@ class Guess extends Command {
       });
 
       await this.say(`That is incorrect, ${this.contestant.name}. Your score is now ${currency(this.contestant.channelScore(this.data.channel_id).value)}.`);
-      this.addReaction('x');
+
+      if (this.studio.features.guessReactions) {
+        this.addReaction('x');
+      }
 
       // If the clue is a daily double, the game progresses
       if (this.game.isDailyDouble()) {

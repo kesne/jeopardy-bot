@@ -113,9 +113,19 @@ export const schema = new Schema({
       default: true,
     },
 
+    guessReactions: {
+      type: Boolean,
+      default: true,
+    },
+
+    // challengeVoteReactions: {
+    //   type: Boolean,
+    //   default: true,
+    // },
+
     // autoDoubleJeopardy: {
     //   name: 'Automatic Double Jeopardy',
-    //   description: 'Automatically starts a double jeopardy round after the normal jeopardy round ends.',
+    //   'Automatically starts a double jeopardy round after the normal jeopardy round ends.',
     //   enabled: {
     //     type: Boolean,
     //     default: false
