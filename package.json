@@ -64,7 +64,6 @@
     "eslint-config-airbnb": "^3.1.0",
     "eslint-plugin-babel": "^3.0.0",
     "eslint-plugin-react": "^3.14.0",
-    "git-hooks": "^1.0.2",
     "nodemon": "^1.7.1",
     "watchify": "^3.6.1"
   }
