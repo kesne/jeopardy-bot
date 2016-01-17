@@ -58,16 +58,21 @@ class Broadcast extends React.Component {
 
   render() {
     return (
-      <Card shadow={0} style={{
-        width: '100%',
-      }}>
+      <Card
+        shadow={0}
+        style={{
+          width: '100%',
+        }}
+      >
         <CardTitle>Send Broadcast</CardTitle>
         <CardText>
-          {this.props.all ?
-            `Send a message to all public and private Slack channels the bot is currently in.
-            This will not send any private messages.` :
-            'Send a message to this studio as the bot.'
-          }
+          <p>
+            {this.props.all ?
+              `Send a message to all public and private Slack channels the bot is currently in.
+              This will not send any private messages.` :
+              'Send a message to this studio as the bot.'
+            }
+          </p>
           <Textfield
             onChange={this.onChangeMessage}
             value={this.state.message}

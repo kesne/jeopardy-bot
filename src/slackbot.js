@@ -1,8 +1,9 @@
-import Slack from 'slack-client';
+import { RtmClient, WebClient } from 'slack-client';
+import { MemoryDataStore } from 'slack-client/lib/data-store';
+
 import trebek from './trebek';
 import App from './models/App';
 import winston from 'winston';
-import fetch from 'node-fetch';
 
 export default class SlackBot {
   constructor() {
@@ -17,67 +18,60 @@ export default class SlackBot {
   }
 
   authTest({ token }) {
-    return fetch('https://slack.com/api/auth.test', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: `token=${token}`,
-    }).then(res => res.json());
+    return new Promise((resolve) => {
+      const web = new WebClient(token);
+      web.auth.test((err, res) => {
+        resolve(res);
+      });
+    });
   }
 
   broadcast(message, studio) {
     Object.values(this.slack.channels).filter((channel) => {
-      return studio ? channel.id === studio : channel.is_member;
+      return studio ? channel.id === studio : channel.isMember;
     }).forEach(channel => {
-      channel.send(message);
+      this.web.chat.postMessage(channel.id, message, {
+        as_user: true,
+        parse: 'full',
+      });
     });
   }
 
   async start() {
     const app = await App.get();
-    this.slack = new Slack(app.apiToken, true, true);
 
-    this.slack.on('open', this.onOpen.bind(this));
-    this.slack.on('message', this.onMessage.bind(this));
-    this.slack.on('error', this.onError.bind(this));
+    this.slack = new MemoryDataStore();
 
-    // Slack's internal websocket reconnect isn't reliable:
-    this.slack.on('close', this.onClose.bind(this));
-    this.slack.on('loggedIn', this.onLoggedIn.bind(this));
-    const slackReconnect = this.slack.reconnect;
-    this.slack.reconnect = () => {
-      this.slack.reconnecting = true;
-      slackReconnect.call(this.slack);
-    };
+    this.rtm = new RtmClient(app.apiToken, {
+      logLevel: 'info',
+    });
+    this.web = new WebClient(app.apiToken);
 
-    this.slack.login();
-  }
+    this.rtm.on('open', this.onOpen.bind(this));
+    this.rtm.on('message', this.onMessage.bind(this));
+    this.rtm.on('error', this.onError.bind(this));
 
-  onLoggedIn() {
-    this.slack.reconnecting = false;
-  }
 
-  onClose() {
-    winston.info('Slack websocket closed...');
-    if (this.slack.autoReconnect && !this.slack.reconnecting) {
-      this.slack.reconnect();
-    }
+    this.rtm.registerDataStore(this.slack);
+    this.rtm.start();
   }
 
   onOpen() {
-    winston.info(`JeopardyBot connected to ${this.slack.team.name} as @${this.slack.self.name}`);
+    // TODO: Team info:
+    this.web.auth.test((err, info) => {
+      winston.info(`JeopardyBot connected to "${info.team}" as @${info.user}`);
+    });
   }
 
   onMessage(incoming) {
     const { text, channel: channelId, user: userId, ts: timestamp, subtype } = incoming;
 
     // Ignore messages from myself:
-    if (userId === this.slack.self.id) {
+    if (userId === this.rtm.activeUserId) {
       return;
     }
 
-    const channel = this.slack.getChannelGroupOrDMByID(channelId);
+    const channel = this.slack.getChannelGroupOrDMById(channelId);
     const channelName = channel.name;
 
     // Handle deleted and invalid messages:
@@ -86,42 +80,55 @@ export default class SlackBot {
     }
 
     // TODO: Allow commands to specify their run location.
-    if (!channel.is_channel) {
-      channel.send(`I'm sorry, but you can only use jeopardybot in open channels right now.`);
+    if (!channel.isChannel) {
+      this.rtm.send({
+        type: 'message',
+        channel: channelId,
+        text: `I'm sorry, but you can only use jeopardybot in open channels right now.`,
+      });
       return;
     }
 
-    const { name: userName } = this.slack.getUserByID(userId);
+    const { name: userName } = this.slack.getUserById(userId);
 
-    const say = (message, url = '') => {
-      return new Promise((resolve) => {
-        let msg;
-        if (!url) {
-          msg = channel.send(message);
-        } else {
-          msg = channel.postMessage({
-            text: message,
+    // If a command needs a timestamp (i.e. to add a reaction), then pass true.
+    const say = (message, url = '', needTimestamp) => {
+      return new Promise((resolve, reject) => {
+        if (url || needTimestamp) {
+          const opts = {
             as_user: true,
-            attachments: [{
-              fallback: 'JeopardyBot',
-              image_url: url,
-              color: '#F4AC79',
-            }],
+          };
+
+          if (url) {
+            opts.attachments = JSON.stringify([
+              {
+                fallback: 'JeopardyBot Image',
+                image_url: url,
+                color: '#F4AC79',
+              },
+            ]);
+          }
+
+          this.web.chat.postMessage(channelId, message, opts, (err, msg) => {
+            if (err) return reject(err);
+            resolve(msg);
+          });
+        } else {
+          this.rtm.send({
+            id: 1,
+            type: 'message',
+            channel: channelId,
+            text: message,
+          }, () => {
+            resolve();
           });
         }
-        // Actually wait for messages to send:
-        const oMS = msg._onMessageSent.bind(msg);
-        msg._onMessageSent = (...args) => {
-          oMS(...args);
-          resolve(msg.ts);
-        };
       });
     };
 
     const addReaction = (reaction, ts = timestamp) => {
       return new Promise((resolve) => {
-        this.slack._apiCall('reactions.add', {
-          name: reaction,
+        this.web.reactions.add(reaction, {
           channel: channelId,
           timestamp: ts,
         }, () => {
@@ -132,10 +139,10 @@ export default class SlackBot {
 
     const getReactions = (ts = timestamp) => {
       return new Promise((resolve) => {
-        this.slack._apiCall('reactions.get', {
+        this.web.reactions.get({
           channel: channelId,
           timestamp: ts,
-        }, ({ message }) => {
+        }, (err, { message }) => {
           resolve(message.reactions);
         });
       });

@@ -81,11 +81,11 @@ export default class Challenge extends Command {
       const contestantString = contestants.map(contestant => `<@${contestant.slackid}>`).join(', ');
       await this.say(`I'm not sure, let's see what the room thinks.\nI thought the correct answer was \`${answer}\`, and the guess was \`${guess}\`.`);
       // Alternative text: Respond with just "y" or "n" to vote.
-      const message = await this.say(`${contestantString}, do you think they were right? Vote with the reactions! :+1: if they were right, :-1: if they were not.`);
+      const message = await this.say(`${contestantString}, do you think they were right? Vote with the reactions! :+1: if they were right, :-1: if they were not.`, null, true);
 
       // Slack calls these +1 / -1 when you call the reaction.get method:
-      await this.addReaction('thumbsup', message);
-      await this.addReaction('thumbsdown', message);
+      await this.addReaction('thumbsup', message.ts);
+      await this.addReaction('thumbsdown', message.ts);
 
       setTimeout(async () => {
         await this.lock();
@@ -95,7 +95,7 @@ export default class Challenge extends Command {
         });
 
         // Allow votes from emoji
-        const reactions = await this.getReactions(message);
+        const reactions = await this.getReactions(message.ts);
         if (reactions && reactions.length) {
           reactions.forEach(({ name, count: totalCount }) => {
             // Remove the vote that JeopardyBot gave:
