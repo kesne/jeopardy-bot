@@ -6,7 +6,8 @@
   "private": true,
   "scripts": {
     "postinstall": "npm run build",
-    "fonts:linux": "cp -R .fonts/ /usr/share/fonts/fontfiles && sudo fc-cache -fv",
+    "fonts:linux": "cp ./.fonts/*.ttf /usr/share/fonts/fontfiles && sudo fc-cache -fv",
+    "fonts:osx": "cp ./.fonts/*.ttf /Library/Fonts/",
     "build": "babel src --out-dir lib --copy-files && npm run admin",
     "watch": "npm run watch:build & npm run watch:browserify",
     "watch:build": "babel --watch src --out-dir lib --copy-files",
