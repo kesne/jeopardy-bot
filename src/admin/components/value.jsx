@@ -16,15 +16,18 @@ class Feature extends React.Component {
 
   render() {
     return (
-      <Card shadow={0} style={{
-        width: '100%',
-        minHeight: 140,
-      }}>
+      <Card
+        shadow={0}
+        style={{
+          width: '100%',
+          minHeight: 140,
+        }}
+      >
         <CardTitle>{this.props.name}</CardTitle>
         <CardText>
-          <div>
+          <p>
             {this.props.description}
-          </div>
+          </p>
           <Textfield
             onChange={this.onValueChange}
             value={this.props.currentValue}

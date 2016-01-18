@@ -52,7 +52,9 @@ class Guess extends Command {
       } else if (e.message.includes('contestant')) {
         this.say(`You had your chance, ${this.contestant.name}. Let someone else answer.`);
         if (this.studio.features.guessReactions) {
-          const reaction = Math.random() > 0.5 ? 'no_good' : 'no_mouth';
+          const possibleEmojis = ['speak_no_evil', 'no_good', 'no_mouth'];
+          const randIndex = Math.floor(Math.random() * possibleEmojis.length);
+          const reaction = possibleEmojis[randIndex];
           this.addReaction(reaction);
         }
       } else if (e.message.includes('wager')) {

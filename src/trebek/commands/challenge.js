@@ -80,12 +80,20 @@ export default class Challenge extends Command {
 
       const contestantString = contestants.map(contestant => `<@${contestant.slackid}>`).join(', ');
       await this.say(`I'm not sure, let's see what the room thinks.\nI thought the correct answer was \`${answer}\`, and the guess was \`${guess}\`.`);
-      // Alternative text: Respond with just "y" or "n" to vote.
-      const message = await this.say(`${contestantString}, do you think they were right? Vote with the reactions! :+1: if they were right, :-1: if they were not.`);
 
-      // Slack calls these +1 / -1 when you call the reaction.get method:
-      await this.addReaction('thumbsup', message);
-      await this.addReaction('thumbsdown', message);
+      let messageText = `${contestantString}, do you think they were right?`;
+      if (this.studio.features.challengeReactionVoting) {
+        messageText += ' Vote with the reactions! :+1: if they were right, :-1: if they were not.';
+      } else {
+        messageText += ' Respond with just "y" or "n" to vote.';
+      }
+      const message = await this.say(messageText);
+
+      if (this.studio.features.challengeReactionVoting) {
+        // Slack calls these +1 / -1 when you call the reaction.get method:
+        await this.addReaction('thumbsup', message);
+        await this.addReaction('thumbsdown', message);
+      }
 
       setTimeout(async () => {
         await this.lock();
@@ -94,20 +102,22 @@ export default class Challenge extends Command {
           channel_id: this.game.channel_id,
         });
 
-        // Allow votes from emoji
-        const reactions = await this.getReactions(message);
-        if (reactions && reactions.length) {
-          reactions.forEach(({ name, count: totalCount }) => {
-            // Remove the vote that JeopardyBot gave:
-            const count = totalCount - 1;
-            if (count) {
-              if (name === '+1') {
-                game.challenge.votes.push(...Array(count).fill({ correct: true }));
-              } else if (name === '-1') {
-                game.challenge.votes.push(...Array(count).fill({ correct: false }));
+        if (this.studio.features.challengeReactionVoting) {
+          // Allow votes from emoji
+          const reactions = await this.getReactions(message);
+          if (reactions && reactions.length) {
+            reactions.forEach(({ name, count: totalCount }) => {
+              // Remove the vote that JeopardyBot gave:
+              const count = totalCount - 1;
+              if (count) {
+                if (name === '+1') {
+                  game.challenge.votes.push(...Array(count).fill({ correct: true }));
+                } else if (name === '-1') {
+                  game.challenge.votes.push(...Array(count).fill({ correct: false }));
+                }
               }
-            }
-          });
+            });
+          }
         }
 
         try {

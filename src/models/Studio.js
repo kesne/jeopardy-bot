@@ -118,10 +118,10 @@ export const schema = new Schema({
       default: true,
     },
 
-    // challengeVoteReactions: {
-    //   type: Boolean,
-    //   default: true,
-    // },
+    challengeReactionVoting: {
+      type: Boolean,
+      default: true,
+    },
 
     // autoDoubleJeopardy: {
     //   name: 'Automatic Double Jeopardy',

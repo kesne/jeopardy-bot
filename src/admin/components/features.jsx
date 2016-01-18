@@ -38,6 +38,11 @@ const FEATURE_LIST = [
     feature: 'guessReactions',
     description: 'Add reactions to guesses to indicate if the contestant was correct or not.',
   },
+  {
+    name: 'Challenge Reaction Voting',
+    feature: 'challengeReactionVoting',
+    description: 'Vote on challenges with thumbs-up and thumbs-down emojis.',
+  },
 ];
 
 class Features extends React.Component {
