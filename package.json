@@ -6,6 +6,7 @@
   "private": true,
   "scripts": {
     "postinstall": "npm run build",
+    "fonts:linux": "cp -R .fonts/ /usr/share/fonts/fontfiles && sudo fc-cache -fv",
     "build": "babel src --out-dir lib --copy-files && npm run admin",
     "watch": "npm run watch:build & npm run watch:browserify",
     "watch:build": "babel --watch src --out-dir lib --copy-files",
