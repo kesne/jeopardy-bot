@@ -18,14 +18,23 @@ export default class HipchatBot {
   }
 
   onMessage(req) {
-    const text = req.body.item.message.message;
-    const subtype = req.body.event;
-    const channel_name = req.body.item.room.name;
+    const { 
+      event: subtype,
+      item: { 
+        room: { name: channel_name, }, 
+        message: { 
+          message: text, 
+          from: { 
+            id: user_id, 
+            mention_name: user_name,
+          },
+        },
+      },
+    } = req.body;
+
     const channel_id = (req.body.item.room.id).toString();
     const timestamp = Date.parse(req.body.item.message.date) / 1000;
-    const user_id = req.body.item.message.from.id;
-    const user_name = req.body.item.message.from.mention_name;
-
+    
     const say = (message, url = '') => {
       if (url) { message += '<br />' + '<img src="'+url+'" width="420" height="259" /><br />'; }
       this.hipchatter.notify(channel_name, { message: message, token: this.app.apiToken }, this.onError.bind(this));
