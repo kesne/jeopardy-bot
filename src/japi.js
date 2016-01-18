@@ -94,6 +94,8 @@ async function randomEpisode() {
   const links = $('td:first-child > a');
   const episodeLink = links.eq(Math.ceil(Math.random() * links.length)).attr('href');
 
+  winston.info('Attempting to generate a new board from episode link', episodeLink);
+
   const { episode, roundOne } = await loadEpisode(episodeLink);
 
   return {
