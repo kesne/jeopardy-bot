@@ -7,8 +7,8 @@
   "rules": {
     "new-cap": 0,
     "babel/new-cap": 2,
-    "object-curly-spacing": [2, "always"],
     "camelcase": 1,
-    "func-names": 0
+    "func-names": 0,
+    "no-param-reassign": [2, {"props": false}]
   }
 }

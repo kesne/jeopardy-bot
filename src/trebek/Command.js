@@ -164,28 +164,39 @@ export default class Command {
 
   checkRequirements() {
     const requirements = this.constructor.requirements || [];
-    for (const requirement of requirements) {
-      if (!this.checkRequirement(requirement)) {
+    for (const requirementDescriptor of requirements) {
+      let requirementName = requirementDescriptor;
+      let requirementErrorMessage = null;
+      if (Array.isArray(requirementDescriptor)) {
+        requirementName = requirementDescriptor[0];
+        requirementErrorMessage = requirementDescriptor[1];
+      }
+      if (!this.checkRequirement(requirementName)) {
+        if (requirementErrorMessage) {
+          this.say(requirementErrorMessage);
+        }
         throw new Error('Unmet requirement.');
       }
     }
   }
 
   checkRequirement(requirement) {
-    if (requirement === 'gameactive') {
-      return this.game && !this.game.isComplete();
-    }
-    if (requirement === 'gameinactive') {
-      return !this.game || this.game.isComplete();
-    }
-    if (requirement === 'mydailydouble') {
-      return (this.game.isDailyDouble() && this.game.dailyDouble.contestant === this.contestant.slackid && !this.game.dailyDouble.wager);
-    }
-    if (requirement === 'clue') {
-      return this.game.activeQuestion;
-    }
-    if (requirement === 'noclue') {
-      return !this.game.activeQuestion;
+    switch (requirement) {
+      case 'gameactive':
+        return this.game && !this.game.isComplete();
+      case 'gameinactive':
+        return !this.game || this.game.isComplete();
+      case 'mydailydouble':
+        const isDailyDouble = this.game.isDailyDouble();
+        const myDailyDouble = this.game.dailyDouble.contestant === this.contestant.slackid;
+        const hasWager = !!this.game.dailyDouble.wager;
+        return (isDailyDouble && myDailyDouble && !hasWager);
+      case 'clue':
+        return this.game.activeQuestion;
+      case 'noclue':
+        return !this.game.activeQuestion;
+      default:
+        return true;
     }
   }
 

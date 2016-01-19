@@ -35,7 +35,7 @@ const VALID_WHENS = [
 ];
 
 export function Trigger(...messages) {
-  return function(Constructor) {
+  return function (Constructor) {
     const triggers = messages.map(message => {
       let fullMessage = message;
       if (message instanceof RegExp) {
@@ -47,7 +47,7 @@ export function Trigger(...messages) {
   };
 }
 
-Trigger.preservePunctuation = function(Constructor) {
+Trigger.preservePunctuation = function (Constructor) {
   // TODO...
   Constructor.preservePunctuation = true;
 };
@@ -56,7 +56,7 @@ export function When(...whens) {
   if (!whens.some(w => VALID_WHENS.includes(w))) {
     throw new Error('Invalid when.');
   }
-  return function(Constructor) {
+  return function (Constructor) {
     Constructor.whens = whens;
   };
 }
@@ -65,22 +65,24 @@ export function Provide(...providers) {
   if (!providers.some(p => VALID_PROVIDERS.includes(p))) {
     throw new Error('Invalid provider.');
   }
-  return function(Constructor) {
+  return function (Constructor) {
     Constructor.providers = providers;
   };
 }
 
 export function Only(...requirements) {
-  if (!requirements.some(r => VALID_REQUIREMENTS.includes(r))) {
+  if (!requirements.some(r => {
+    return Array.isArray(r) ? VALID_REQUIREMENTS.includes(r[0]) : VALID_REQUIREMENTS.includes(r);
+  })) {
     throw new Error('Invalid requirement.');
   }
-  return function(Constructor) {
+  return function (Constructor) {
     Constructor.requirements = requirements;
   };
 }
 
 export function Feature(...features) {
-  return function(Constructor) {
+  return function (Constructor) {
     Constructor.features = features;
   };
 }

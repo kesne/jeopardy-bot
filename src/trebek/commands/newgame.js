@@ -3,7 +3,9 @@ import { Trigger, Only, Provide } from '../utils';
 import { boardImage, allClueImages } from '../../cola';
 
 @Trigger('new game')
-@Only('gameinactive')
+@Only(
+  ['gameinactive', 'There is already a game in progress!']
+)
 @Provide('game')
 class NewGame extends Command {
   async response() {
