@@ -10,7 +10,7 @@ export const schema = new Schema({
 
   platform: {
     type: 'String',
-    enum: ['slack'],
+    enum: ['slack', 'hipchat'],
     required: true,
     default: 'slack',
   },

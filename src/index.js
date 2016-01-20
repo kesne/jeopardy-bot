@@ -11,7 +11,7 @@ import App from './models/App';
 import api, { provideBot } from './api';
 import SlackBot from './slackbot';
 import HipchatBot from './hipchatbot';
-import { ADMIN_USERNAME, ADMIN_PASSWORD, MONGO, PORT, PLATFORM } from './config';
+import { ADMIN_USERNAME, ADMIN_PASSWORD, MONGO, PORT } from './config';
 
 // Set log level
 winston.level = process.env.NODE_ENV === 'production' ? 'info' : 'debug';
@@ -51,17 +51,17 @@ app.get('/admin/*', (req, res) => {
   res.sendFile(join(__dirname, 'admin', 'index.html'));
 });
 
-// TODO: refactor into BotManager:
-let bot;
-
-// Boot up the bot:
-if (PLATFORM === 'hipchat') {
-  bot = new HipchatBot(app);
-} else {
-  bot = new SlackBot();
-}
-
-provideBot(bot);
+// Load the proper bot class based on platform config.
+// TODO: refactor into BotManager
+App.get().then(a => {
+  let bot;
+  if (a.platform === 'hipchat') {
+    bot = new HipchatBot(app, a);
+  } else if (a.platform === 'slack') {
+    bot = new SlackBot(a);
+  }
+  provideBot(bot);
+});
 
 // Boot up the jeopardy app:
 app.listen(PORT, () => {

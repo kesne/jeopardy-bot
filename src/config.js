@@ -4,7 +4,6 @@ import winston from 'winston';
  * BOT CONFIGURATION:
  */
 
-export const PLATFORM = process.env.PLATFORM || 'slack';
 export const HIPCHAT_CALLBACK_URL = process.env.HIPCHAT_CALLBACK_URL || '';
 
 export const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'jeopardy';

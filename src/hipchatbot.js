@@ -1,17 +1,16 @@
 import Hipchatter from 'hipchatter';
 import trebek from './trebek';
 import winston from 'winston';
-import App from './models/App';
 import { HIPCHAT_CALLBACK_URL } from './config';
 
 export default class HipchatBot {
-  constructor(express) {
+  constructor(express, app) {
     this.express = express;
+    this.app = app;
     this.start();
   }
 
   async start() {
-    this.app = await App.get();
     this.hipchatter = new Hipchatter(this.app.apiToken);
     this.registerWebhook();
     this.express.post('/webhook', this.onMessage.bind(this));
