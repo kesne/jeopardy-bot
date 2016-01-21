@@ -12,7 +12,7 @@ Once your instance is deployed, click the "View" button, and the JeopardyBot adm
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
-You can also go to the admin panel directly by navigating to `<appname>.herokuapp.com/admin`.
+You can also go to the admin panel directly by navigating to `<appname>.herokuapp.com/admin`. The username and password should be configured during the heroku deploy process, and default to `jeopardy` and `bot`, respectively. 
 
 ## How to Play
 
