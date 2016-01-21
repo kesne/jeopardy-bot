@@ -110,11 +110,15 @@ export default class SlackBot {
           });
         }
         // Actually wait for messages to send:
-        const oMS = msg._onMessageSent.bind(msg);
-        msg._onMessageSent = (...args) => {
-          oMS(...args);
-          resolve(msg.ts);
-        };
+        if (msg._onMessageSent) {
+          const oMS = msg._onMessageSent.bind(msg);
+          msg._onMessageSent = (...args) => {
+            oMS(...args);
+            resolve(msg.ts);
+          };
+        } else {
+          resolve();
+        }
       });
     };
 
