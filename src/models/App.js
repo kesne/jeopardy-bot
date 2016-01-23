@@ -44,6 +44,23 @@ export const schema = new Schema({
   webhookId: {
     type: 'Number'
   },
+
+  hipchat: {
+    oauthId: {
+      type: String,
+    },
+    oauthSecret: {
+      type: String,
+    },
+    accessToken: {
+      token: {
+        type: String,
+      },
+      expires: {
+        type: Date,
+      },
+    },
+  }
 });
 
 schema.statics.findOrCreate = async function() {
