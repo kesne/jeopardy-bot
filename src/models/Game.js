@@ -159,7 +159,7 @@ schema.methods.isChallengeStarted = function() {
 };
 
 schema.methods.startChallenge = async function({ contestant }) {
-  const lastGuess = this.challenge.guesses.find(guess => guess.contestant === contestant.slackid);
+  const lastGuess = this.challenge.guesses.find(guess => guess.contestant === contestant.id);
   if (!this.liveClue() && !this.challenge.active && this.challenge.question && lastGuess) {
     this.challenge.active = lastGuess.contestant;
     this.challenge.started = Date.now();
@@ -173,7 +173,7 @@ schema.methods.startChallenge = async function({ contestant }) {
 };
 
 schema.methods.endChallenge = async function(forceWin = false) {
-  const slackid = this.challenge.active;
+  const id = this.challenge.active;
   const votes = this.challenge.votes;
   const question = this.challenge.question;
 
@@ -195,7 +195,7 @@ schema.methods.endChallenge = async function(forceWin = false) {
 
   if (forceWin || (yesVotes / votes.length) >= this.studio.values.challengeAcceptenceThreshold) {
     const contestant = await this.model('Contestant').findOne({
-      slackid,
+      id,
     });
     const fullQuestion = this.questions.find(q => q.id === question);
     let value = fullQuestion.value;
@@ -327,8 +327,8 @@ schema.methods.isBoardControlled = function() {
   );
 };
 
-schema.methods.isContestantBoardControl = function({ slackid }) {
-  return this.lastContestant && this.lastContestant === slackid;
+schema.methods.isContestantBoardControl = function ({ id }) {
+  return this.lastContestant && this.lastContestant === id;
 };
 
 // Get a new clue for a given value and title.
@@ -412,7 +412,7 @@ schema.methods.newClue = async function({ category, value, contestant }) {
 
   // If the question is a daily double, add in the contestant:
   if (question.dailyDouble) {
-    this.dailyDouble.contestant = contestant.slackid;
+    this.dailyDouble.contestant = contestant.id;
   }
 
   // Reset the guesses:
@@ -442,11 +442,11 @@ schema.methods.guess = async function({ contestant, guess }) {
   if (this.isTimedOut()) {
     throw new Error('timeout');
   }
-  if (this.answered(contestant.slackid)) {
+  if (this.answered(contestant.id)) {
     throw new Error('contestant');
   }
   // Daily doubles can only be answered by the user that selected them
-  if (this.isDailyDouble() && this.dailyDouble.contestant !== contestant.slackid) {
+  if (this.isDailyDouble() && this.dailyDouble.contestant !== contestant.id) {
     throw new Error('dailydouble');
   }
   if (this.isDailyDouble() && !this.dailyDouble.wager) {
@@ -454,7 +454,7 @@ schema.methods.guess = async function({ contestant, guess }) {
   }
 
   // This contestant has now guessed:
-  this.contestantAnswers.push(contestant.slackid);
+  this.contestantAnswers.push(contestant.id);
 
   // Get the answers:
   const answers = this.liveClue().answer.split(/\(|\)/).filter(n => n);
@@ -500,7 +500,7 @@ schema.methods.guess = async function({ contestant, guess }) {
     // Add the guess to allow for a challenge:
     this.challenge.guesses.push({
       guess,
-      contestant: contestant.slackid,
+      contestant: contestant.id,
     });
   }
   await this.save();
@@ -517,7 +517,7 @@ schema.methods.answer = function(contestant) {
 
   // Stash the contestant for board control:
   if (contestant) {
-    this.lastContestant = contestant.slackid;
+    this.lastContestant = contestant.id;
   } else {
     this.lastContestant = undefined;
   }

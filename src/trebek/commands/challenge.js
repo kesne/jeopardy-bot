@@ -49,10 +49,10 @@ export default class Challenge extends Command {
     if (!challenge && this.game.isChallengeStarted()) {
       const correct = Boolean(yes);
       // Register the vote if we haven't already voted:
-      const hasVoted = this.game.challenge.votes.some(vote => vote.contestant === this.contestant.slackid);
+      const hasVoted = this.game.challenge.votes.some(vote => vote.contestant === this.contestant.id);
       if (!hasVoted) {
         this.game.challenge.votes.push({
-          contestant: this.contestant.slackid,
+          contestant: this.contestant.id,
           correct,
         });
         await this.game.save();
@@ -78,7 +78,7 @@ export default class Challenge extends Command {
         return;
       }
 
-      const contestantString = contestants.map(contestant => `<@${contestant.slackid}>`).join(', ');
+      const contestantString = contestants.map(contestant => `<@${contestant.id}>`).join(', ');
       await this.say(`I'm not sure, let's see what the room thinks.\nI thought the correct answer was \`${answer}\`, and the guess was \`${guess}\`.`);
 
       let messageText = `${contestantString}, do you think they were right?`;

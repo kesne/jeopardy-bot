@@ -188,7 +188,7 @@ export default class Command {
         return !this.game || this.game.isComplete();
       case 'mydailydouble':
         const isDailyDouble = this.game.isDailyDouble();
-        const myDailyDouble = this.game.dailyDouble.contestant === this.contestant.slackid;
+        const myDailyDouble = this.game.dailyDouble.contestant === this.contestant.id;
         const hasWager = !!this.game.dailyDouble.wager;
         return (isDailyDouble && myDailyDouble && !hasWager);
       case 'clue':
