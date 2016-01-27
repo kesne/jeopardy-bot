@@ -1,11 +1,11 @@
 import Slack from 'slack-client';
 import trebek from './trebek';
+import App from './models/App';
 import winston from 'winston';
 import fetch from 'node-fetch';
 
 export default class SlackBot {
-  constructor(app) {
-    this.app = app;
+  constructor() {
     this.start();
   }
 
@@ -35,7 +35,8 @@ export default class SlackBot {
   }
 
   async start() {
-    this.slack = new Slack(this.app.apiToken, true, true);
+    const app = await App.get();
+    this.slack = new Slack(app.apiToken, true, true);
 
     this.slack.on('open', this.onOpen.bind(this));
     this.slack.on('message', this.onMessage.bind(this));

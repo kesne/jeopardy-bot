@@ -115,7 +115,7 @@ class Settings extends React.Component {
             <h6 className="no-margin">
               Platform
               <Tooltip
-                label="On which platform will this bot be used? Slack and Hipchat are currently supported."
+                label="The chat platform on which the bot will be used."
               >
                 <Icon className="jbot-inline-icon" name="help" />
               </Tooltip>

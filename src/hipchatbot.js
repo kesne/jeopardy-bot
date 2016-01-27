@@ -3,6 +3,7 @@ import trebek from './trebek';
 import winston from 'winston';
 import request from 'request';
 import moment from 'moment';
+import App from './models/App';
 import { HIPCHAT_CALLBACK_URL } from './config';
 
 export default class Hipchatter extends HipchatterBase {
@@ -12,16 +13,17 @@ export default class Hipchatter extends HipchatterBase {
 }
 
 export default class HipchatBot {
-  constructor(express, app) {
+  constructor(express) {
     this.express = express;
-    this.app = app;
-    if (!app.hipchat.oauthId || !app.hipchat.oauthSecret) {
-      throw new Error('Before you can run Jeopardy Bot on Hipchat, you must first install it as an add-on.');
-    }
     this.start();
   }
 
   async start() {
+    this.app = await App.get();
+    if (!this.app.hipchat.oauthId || !this.app.hipchat.oauthSecret) {
+      throw new Error('Before you can run Jeopardy Bot on Hipchat, you must first install it as an add-on.');
+    }
+
     this.express.get('/capabilities', this.buildCapabilitiesDescriptor.bind(this));
     this.express.post('/install', this.install.bind(this));
     await this.validateToken(this.app.hipchat);
