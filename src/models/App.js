@@ -41,10 +41,10 @@ export const schema = new Schema({
     },
   },
 
-  webhookId: {
-    type: 'Number'
-  },
+  // Hipchat webhooks
+  webhooks: [Number],
 
+  // Hipchat auth parameters
   hipchat: {
     oauthId: {
       type: String,

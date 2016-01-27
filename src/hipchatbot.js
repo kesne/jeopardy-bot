@@ -1,19 +1,23 @@
-import Hipchatter from 'hipchatter';
+import HipchatterBase from 'hipchatter';
 import trebek from './trebek';
 import winston from 'winston';
 import request from 'request';
 import moment from 'moment';
 import { HIPCHAT_CALLBACK_URL } from './config';
 
+export default class Hipchatter extends HipchatterBase {
+  get_session(callback) {
+    this.request('get', 'oauth/token/'+this.token, callback);
+  }
+}
+
 export default class HipchatBot {
   constructor(express, app) {
     this.express = express;
     this.app = app;
-
     if (!app.hipchat.oauthId || !app.hipchat.oauthSecret) {
-      throw new Error('Before you can run Jeopardy Bot on Hipchat, you must install the add-on into Hipchat.');
+      throw new Error('Before you can run Jeopardy Bot on Hipchat, you must first install it as an add-on.');
     }
-
     this.start();
   }
 
@@ -22,8 +26,18 @@ export default class HipchatBot {
     this.express.post('/install', this.install.bind(this));
     await this.validateToken(this.app.hipchat);
     this.hipchatter = new Hipchatter(this.app.hipchat.accessToken.token);
-    this.registerWebhook();
+    const roomId = await this.getInstalledRoomId();
+    this.registerWebhook(roomId, 'room_message');
+    // this.registerWebhook(roomId, 'room_enter');
     this.express.post('/webhook', this.onMessage.bind(this));
+  }
+
+  getInstalledRoomId() {
+    return new Promise(resolve => {
+      this.hipchatter.get_session((err, session) => {
+        resolve(session.client.room.id);
+      });
+    });
   }
 
   async validateToken(hipchat) {
@@ -111,6 +125,7 @@ export default class HipchatBot {
   }
 
   onMessage(req) {
+    this.validateToken(this.app.hipchat);
     const { 
       event: subtype,
       item: { 
@@ -143,35 +158,36 @@ export default class HipchatBot {
     }, say);
   }
 
-  registerWebhook() {
-    if (!this.app.webhookId) {
-      this.hipchatter.create_webhook('Jeopardy', { url: HIPCHAT_CALLBACK_URL + '/webhook', event: 'room_message' }, function(err, webhook) {
-        if (err == null) {
-          this.app.webhookId = webhook.id;
-          winston.info('Successfully created webhook id:'+webhook.id+'.');
-          this.app.save();
-        } else {
-          this.onError(err);
-        }
-      }.bind(this));
-
-    } else {
-      this.hipchatter.get_webhook('Jeopardy', this.app.webhookId, function(err, webhook) {
-        if (err !== null) {
-          this.onError(err);
-          this.app.webhookId = null;
-          this.registerWebhook();
-        } else {
-          if (webhook.event !== 'room_message' || webhook.url !== (HIPCHAT_CALLBACK_URL + '/webhook')) {
-            winston.error('Existing webhook not valid. Creating a new one...');
-            this.app.webhookId = null;
-            this.registerWebhook();
+  async registerWebhook(roomId, event) {
+    for (let webhookId of this.app.webhooks) {
+      const wh = await new Promise((resolve, reject) => {
+        this.hipchatter.get_webhook(roomId, webhookId, function(err, webhook) {
+          if (err === null && webhook.event === event && webhook.url === HIPCHAT_CALLBACK_URL+'/webhook') {
+            winston.info('Existing '+event+' webhook '+webhook.id+' found and valid.');
+            resolve(true);
+          } else {
+            this.onError(err);
+            resolve(false);
           }
-          winston.info('Existing webhook '+webhook.id+' found and valid.');
-        }
-      }.bind(this));
+        }.bind(this));
+      });
 
+      if (wh) {
+        return;
+      }
     }
+
+    // If we get here we don't yet have a valid webhook, so let's create one
+    winston.error('No valid webhooks found. Creating a new one...');
+    this.hipchatter.create_webhook(roomId, { url: HIPCHAT_CALLBACK_URL+'/webhook', event: event }, function(err, webhook) {
+      if (err === null) {
+        this.app.webhooks.push(webhook.id);
+        winston.info('Successfully created '+event+' webhook with id: '+webhook.id+'.');
+        this.app.save();
+      } else {
+        this.onError(err);
+      }
+    }.bind(this));
   }
 
   onError(err) {

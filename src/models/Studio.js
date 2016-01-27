@@ -27,6 +27,8 @@ export const schema = new Schema({
     required: true,
   },
 
+  webhooks: [Number],
+
   values: {
     // The timeout for clues (in seconds):
     timeout: {
