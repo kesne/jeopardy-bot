@@ -14,14 +14,24 @@ export default class Hipchatter extends HipchatterBase {
 
 export default class HipchatBot {
   constructor(express) {
-    express.get('/capabilities', this.buildCapabilitiesDescriptor.bind(this));
-    express.post('/install', this.install.bind(this));
-    express.post('/webhook', this.onMessage.bind(this));
-    express.delete('/install/*', this.uninstall.bind(this));
+    this.express = express;
+    this.buildCapabilitiesDescriptor = this.buildCapabilitiesDescriptor.bind(this);
+    this.install = this.install.bind(this);
+    this.uninstall = this.uninstall.bind(this);
+    this.onMessage = this.onMessage.bind(this);
+    this.onRoomEnter = this.onRoomEnter.bind(this);
+    this.onError = this.onError.bind(this);
+    this.say = this.say.bind(this);
     this.start();
   }
 
   async start() {
+    this.express.get('/capabilities', this.buildCapabilitiesDescriptor);
+    this.express.post('/install', this.install);
+    this.express.delete('/install/*', this.uninstall);
+    this.express.post('/room_message', this.onMessage);
+    this.express.post('/room_enter', this.onRoomEnter);
+
     this.app = await App.get();
     if (!this.app.hipchat.oauthId || !this.app.hipchat.oauthSecret) {
       throw new Error('Before you can run Jeopardy Bot on Hipchat, you must first install it as an add-on.');
@@ -30,6 +40,7 @@ export default class HipchatBot {
     this.hipchatter = new Hipchatter(this.app.hipchat.accessToken.token);
     const roomId = await this.getInstalledRoomId();
     this.registerWebhook(roomId, 'room_message');
+    this.registerWebhook(roomId, 'room_enter');
   }
 
   getInstalledRoomId() {
@@ -132,11 +143,10 @@ export default class HipchatBot {
   }
 
   onMessage(req) {
-    this.validateToken(this.app.hipchat);
     const { 
       event: subtype,
       item: { 
-        room: { name: channel_name, }, 
+        room: { name: channel_name, },
         message: { 
           message: text, 
           from: { 
@@ -146,14 +156,9 @@ export default class HipchatBot {
         },
       },
     } = req.body;
-
+    this.channelName = req.body.item.room.name;
     const channel_id = (req.body.item.room.id).toString();
     const timestamp = Date.parse(req.body.item.message.date) / 1000;
-    
-    const say = (message, url = '') => {
-      if (url) { message += `<br /><img src="${url}" width="420" height="259" /><br />`; }
-      this.hipchatter.notify(channel_name, { message: message, token: this.app.apiToken }, this.onError.bind(this));
-    };
 
     trebek(text, {
       subtype,
@@ -162,7 +167,44 @@ export default class HipchatBot {
       timestamp,
       user_id,
       user_name,
-    }, say);
+    }, this.say);
+  }
+
+  onRoomEnter(req) {
+    const {
+      event: subtype,
+      item: {
+        room: { name: channel_name, },
+        sender: {
+          id: user_id,
+          mention_name: user_name,
+        },
+      },
+    } = req.body;
+    this.channelName = req.body.item.room.name;
+    const channel_id = (req.body.item.room.id).toString();
+    // The room_enter payload does not include a timestamp
+    const timestamp = moment();
+    // Just to be consistent with the slack api
+    // https://api.slack.com/events/message/channel_join
+    const text = `@${user_name} has joined the channel`;
+
+    trebek(text, {
+      subtype,
+      channel_name,
+      channel_id,
+      timestamp,
+      user_id,
+      user_name,
+    }, this.say);
+  }
+
+  say(message, url = '') {
+    if (url) {
+      message += `<br /><img src="${url}" width="420" height="259" /><br />`;
+    }
+    this.validateToken(this.app.hipchat);
+    this.hipchatter.notify(this.channelName, { message: message, token: this.app.hipchat.accessToken.token }, this.onError);
   }
 
   async registerWebhook(roomId, event) {
@@ -182,7 +224,7 @@ export default class HipchatBot {
     // If we get here we don't yet have a valid webhook, so let's create one
     winston.error('No valid webhooks found. Creating a new one...');
     this.hipchatter.create_webhook(roomId, {
-      url: `${HIPCHAT_CALLBACK_URL}/webhook`,
+      url: `${HIPCHAT_CALLBACK_URL}/${event}`,
       event: event,
     }, (err, webhook) => {
       if (err === null) {
@@ -198,7 +240,7 @@ export default class HipchatBot {
   validateWebhook(roomId, webhookId, event) {
     return new Promise((resolve, reject) => {
       this.hipchatter.get_webhook(roomId, webhookId, (err, webhook) => {
-        if (err === null && webhook.event === event && webhook.url === HIPCHAT_CALLBACK_URL+'/webhook') {
+        if (err === null && webhook.event === event && webhook.url === `${HIPCHAT_CALLBACK_URL}/${event}`) {
           winston.info(`Existing ${event} webhook ${webhook.id} found and valid.`);
           resolve(webhook);
         } else {
