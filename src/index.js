@@ -56,9 +56,9 @@ app.get('/admin/*', (req, res) => {
 App.get().then(a => {
   let bot;
   if (a.platform === 'hipchat') {
-    bot = new HipchatBot(app, a);
+    bot = new HipchatBot(app);
   } else if (a.platform === 'slack') {
-    bot = new SlackBot(a);
+    bot = new SlackBot();
   }
   provideBot(bot);
 });
