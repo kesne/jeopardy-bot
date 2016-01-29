@@ -101,7 +101,7 @@ export default class HipchatBot {
         'hipchat.accessToken.token': this.app.hipchat.accessToken.token,
       },
       $pullAll: {
-        webhooks: this.app.webhooks,
+        webhooks: this.app.hipchat.webhooks,
       },
     }, async (err, result) => {
       if (err === null) {
@@ -166,7 +166,7 @@ export default class HipchatBot {
   }
 
   async registerWebhook(roomId, event) {
-    for (let webhookId of this.app.webhooks) {
+    for (let webhookId of this.app.hipchat.webhooks) {
       let wh;
       try {
         wh = await this.validateWebhook(roomId, webhookId, event);
@@ -186,7 +186,7 @@ export default class HipchatBot {
       event: event,
     }, (err, webhook) => {
       if (err === null) {
-        this.app.webhooks.push(webhook.id);
+        this.app.hipchat.webhooks.push(webhook.id);
         winston.info(`Successfully created ${event} webhook with id: ${webhook.id}.`);
         this.app.save();
       } else {

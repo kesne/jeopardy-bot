@@ -41,11 +41,9 @@ export const schema = new Schema({
     },
   },
 
-  // Hipchat webhooks
-  webhooks: [Number],
-
-  // Hipchat auth parameters
+  // Hipchat parameters
   hipchat: {
+    webhooks: [Number],
     oauthId: {
       type: String,
     },
