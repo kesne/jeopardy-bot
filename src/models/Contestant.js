@@ -2,7 +2,7 @@ import { Schema, model } from 'mongoose';
 
 export const schema = new Schema({
   // Their slack ID:
-  slackid: {
+  id: {
     type: String,
     required: true,
     index: true,
@@ -58,14 +58,14 @@ schema.virtual('nonMentionedName').get(function () {
   return `${this.name.charAt(0)}.${this.name.substring(1)}`;
 });
 
-schema.statics.get = async function({ user_id: slackid, user_name: name }) {
+schema.statics.get = async function({ user_id: id, user_name: name }) {
   let user = await this.findOne({
-    slackid,
+    id,
   });
   if (!user) {
     user = await this.create({
       name,
-      slackid,
+      id,
     });
   } else if (user.name !== name) {
     // Update their slack username because it's changed.

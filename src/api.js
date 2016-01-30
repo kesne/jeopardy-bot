@@ -24,7 +24,7 @@ export default (adminAuth) => {
     },
   });
   restify.serve(router, Studio, { prefix: '', lowercase: true, idProperty: 'id' });
-  restify.serve(router, Contestant, { prefix: '', lowercase: true, idProperty: 'slackid' });
+  restify.serve(router, Contestant, { prefix: '', lowercase: true, idProperty: 'id' });
 
   // Manual non-model-backed routes:
   router.post('/v1/broadcasts/', (req, res) => {

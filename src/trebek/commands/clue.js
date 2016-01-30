@@ -101,7 +101,7 @@ class Clue extends Command {
       // Make sure that the daily double image displays before we do anything else:
       await this.say('Answer: Daily Double', dailyDoubleUrl);
       const channelScore = this.contestant.channelScore(this.data.channel_id).value;
-      this.say(`Your score is ${currency(channelScore)}. What would you like to wager, <@${this.contestant.slackid}>? ` +
+      this.say(`Your score is ${currency(channelScore)}. What would you like to wager, <@${this.contestant.id}>? ` +
                `(max of ${currency(Math.max(channelScore, clue.value))}, min of $5)`);
       // TODO: Wager timeouts
     } else {
