@@ -92,6 +92,10 @@ export default class LocalAdapter {
     }
 
     const clueBuffer = await generateClue(game, clue);
+
+    console.log(this.app);
+
+    winston.debug('clue generated', `${this.app.host}/assets/local/${fileName}`);
     return await this.saveImage(fileName, clueBuffer);
   }
 }
