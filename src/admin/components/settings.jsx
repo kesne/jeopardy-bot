@@ -91,7 +91,7 @@ class Settings extends React.Component {
     });
   }
 
-  getState({ host, owner, apiToken, imageMode, studiosEnabledByDefault }) {
+  getState({ host = window.location.origin, owner, apiToken, imageMode, studiosEnabledByDefault }) {
     this.setState({
       host,
       owner,
@@ -143,7 +143,6 @@ class Settings extends React.Component {
               </h6>
               <Textfield
                 onChange={this.onChangeHost}
-                defaultValue={window.location.origin}
                 value={this.state.host}
                 label="Host location..."
               />
