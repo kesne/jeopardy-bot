@@ -24,6 +24,7 @@ class Settings extends React.Component {
     super(props);
 
     this.onChangeAdapter = this.onChangeAdapter.bind(this);
+    this.onChangeHost = this.onChangeHost.bind(this);
     this.onChangeApiToken = this.onChangeApiToken.bind(this);
     this.onChangeOwner = this.onChangeOwner.bind(this);
     this.onClickSave = this.onClickSave.bind(this);
@@ -42,6 +43,12 @@ class Settings extends React.Component {
   onChangeAdapter(e) {
     this.setState({
       imageMode: e.target.value,
+    });
+  }
+
+  onChangeHost(e) {
+    this.setState({
+      host: e.target.value,
     });
   }
 
@@ -64,8 +71,9 @@ class Settings extends React.Component {
   }
 
   onClickSave() {
-    const { owner, apiToken, imageMode, studiosEnabledByDefault } = this.state;
+    const { host, owner, apiToken, imageMode, studiosEnabledByDefault } = this.state;
     this.props.onValueChanged({
+      host,
       owner,
       apiToken,
       imageMode,
@@ -83,8 +91,9 @@ class Settings extends React.Component {
     });
   }
 
-  getState({ owner, apiToken, imageMode, studiosEnabledByDefault }) {
+  getState({ host, owner, apiToken, imageMode, studiosEnabledByDefault }) {
     this.setState({
+      host,
       owner,
       apiToken,
       imageMode,
@@ -122,6 +131,24 @@ class Settings extends React.Component {
               {/* <option value="s3">S3</option> */}
             </select>
           </div>
+          {this.state.imageMode === 'local' && (
+            <div>
+              <h6 className="no-margin">
+                Bot Host Location
+                <Tooltip
+                  label="The host location of the bot. Used for local images."
+                >
+                  <Icon className="jbot-inline-icon" name="help" />
+                </Tooltip>
+              </h6>
+              <Textfield
+                onChange={this.onChangeHost}
+                defaultValue={window.location.origin}
+                value={this.state.host}
+                label="Host location..."
+              />
+            </div>
+          )}
 
           <div>
             <h6 className="no-margin">

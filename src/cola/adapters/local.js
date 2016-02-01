@@ -1,14 +1,10 @@
-// TODO: The public IP should be configurable in the admin console, instead of relying on public ip.
-// This really only works on standalone linux distributions currently.
-
 import { generateBoard, generateClue } from '../generator';
 import { join } from 'path';
-import { v4 } from 'public-ip';
 import findRemoveSync from 'find-remove';
 import { writeFile, stat } from 'fs';
 import winston from 'winston';
 
-import { PORT } from '../../config';
+import App from '../../models/App';
 
 /**
  * HELPER FUNCTIONS:
@@ -36,7 +32,8 @@ export default class LocalAdapter {
   CAPTURE_ALL_CLUES = true;
 
   constructor() {
-    this.getHost();
+    // Bootstrap the app:
+    App.get().then(app => this.app = app);
     this.startCleaning();
   }
 
@@ -53,20 +50,13 @@ export default class LocalAdapter {
     clearInterval(this.interval);
   }
 
-  getHost() {
-    v4((err, ip) => {
-      if (err) throw err;
-      this.host = `http://${ip}:${PORT}`;
-    });
-  }
-
   saveImage(fileName, buf) {
     return new Promise((resolve, reject) => {
       writeFile(join(localPath, fileName), buf, (err) => {
         if (err) {
           reject(err);
         } else {
-          resolve(`${this.host}/assets/local/${fileName}`);
+          resolve(`${this.app.host}/assets/local/${fileName}`);
         }
       });
     });
@@ -79,8 +69,8 @@ export default class LocalAdapter {
         if (err) {
           resolve(false);
         } else {
-          winston.debug('clue returned from cache', `${this.host}/assets/local/${fileName}`);
-          resolve(`${this.host}/assets/local/${fileName}`);
+          winston.debug('clue returned from cache', `${this.app.host}/assets/local/${fileName}`);
+          resolve(`${this.app.host}/assets/local/${fileName}`);
         }
       });
     });

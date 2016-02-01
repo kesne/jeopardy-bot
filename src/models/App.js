@@ -22,6 +22,10 @@ export const schema = new Schema({
     default: 'imgur',
   },
 
+  host: {
+    type: 'String',
+  },
+
   apiToken: {
     type: 'String',
   },
