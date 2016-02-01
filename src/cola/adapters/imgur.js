@@ -15,7 +15,7 @@ function promiseTimeout(timeout) {
 }
 
 const MAX_RETRIES = 3;
-const PROMISE_TIMEOUT = 200;
+const RETRY_TIMEOUT = 200;
 async function uploadImage(base64Image, attempt = 1) {
   // Allow 3 retires to upload images to imgur:
   if (attempt > MAX_RETRIES) {
@@ -25,7 +25,7 @@ async function uploadImage(base64Image, attempt = 1) {
     const { data: { link } } = await uploadBase64(base64Image);
     return link;
   } catch (e) {
-    await promiseTimeout(PROMISE_TIMEOUT);
+    await promiseTimeout(RETRY_TIMEOUT * attempt);
     return uploadImage(base64Image, attempt + 1);
   }
 }
