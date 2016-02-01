@@ -331,8 +331,14 @@ schema.methods.isContestantBoardControl = function ({ id }) {
   return this.lastContestant && this.lastContestant === id;
 };
 
+// Revert a clue selection due to an error:
+schema.methods.revertClue = async function () {
+  this.activeQuestion = null;
+  return this.save();
+};
+
 // Get a new clue for a given value and title.
-schema.methods.newClue = async function({ category, value, contestant }) {
+schema.methods.newClue = async function ({ category, value, contestant }) {
   if (this.isChallengeStarted()) {
     throw new Error('challenge');
   }

@@ -101,17 +101,27 @@ class Clue extends Command {
       // Make sure that the daily double image displays before we do anything else:
       await this.say('Answer: Daily Double', dailyDoubleUrl);
       const channelScore = this.contestant.channelScore(this.data.channel_id).value;
-      this.say(`Your score is ${currency(channelScore)}. What would you like to wager, <@${this.contestant.id}>? ` +
-               `(max of ${currency(Math.max(channelScore, clue.value))}, min of $5)`);
+      this.say(
+        `Your score is ${currency(channelScore)}. ` +
+        `What would you like to wager, <@${this.contestant.id}>? ` +
+        `(max of ${currency(Math.max(channelScore, clue.value))}, min of $5)`
+      );
       // TODO: Wager timeouts
     } else {
-      const url = await clueImage(this.game);
+      try {
+        const url = await clueImage(this.game);
 
-      // Mark that we're sending the clue now:
-      await this.game.clueSent();
-      this.say(`Here's your clue.`, url);
+        // Mark that we're sending the clue now:
+        await this.game.clueSent();
+        this.say(`Here's your clue.`, url);
+      } catch (e) {
+        // Revert the clue selection:
+        await this.game.revertClue();
+        this.say('We are having some issues creating the clue image. Please try again.');
+        return;
+      }
 
-      // Additional feedback after we timeout (plus five seconds for some flexibility):
+      // Additional feedback after we timeout:
       setTimeout(async () => {
         // Grab the lock so we block incoming requests:
         await this.lock();
