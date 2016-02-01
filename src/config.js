@@ -2,6 +2,8 @@
  * BOT CONFIGURATION:
  */
 
+export const HIPCHAT_CALLBACK_URL = process.env.HIPCHAT_CALLBACK_URL || '';
+
 export const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'jeopardy';
 export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'bot';
 

@@ -10,7 +10,7 @@ export const schema = new Schema({
 
   platform: {
     type: 'String',
-    enum: ['slack'],
+    enum: ['slack', 'hipchat'],
     required: true,
     default: 'slack',
   },
@@ -40,6 +40,25 @@ export const schema = new Schema({
       type: 'String',
     },
   },
+
+  // Hipchat parameters
+  hipchat: {
+    webhooks: [Number],
+    oauthId: {
+      type: String,
+    },
+    oauthSecret: {
+      type: String,
+    },
+    accessToken: {
+      token: {
+        type: String,
+      },
+      expires: {
+        type: Date,
+      },
+    },
+  }
 });
 
 schema.statics.findOrCreate = async function() {

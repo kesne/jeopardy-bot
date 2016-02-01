@@ -23,6 +23,7 @@ class Settings extends React.Component {
   constructor(props) {
     super(props);
 
+    this.onChangePlatform = this.onChangePlatform.bind(this);
     this.onChangeAdapter = this.onChangeAdapter.bind(this);
     this.onChangeApiToken = this.onChangeApiToken.bind(this);
     this.onChangeOwner = this.onChangeOwner.bind(this);
@@ -37,6 +38,12 @@ class Settings extends React.Component {
 
   componentWillReceiveProps(props) {
     this.getState(props.app);
+  }
+
+  onChangePlatform(e) {
+    this.setState({
+      platform: e.target.value,
+    });
   }
 
   onChangeAdapter(e) {
@@ -64,8 +71,9 @@ class Settings extends React.Component {
   }
 
   onClickSave() {
-    const { owner, apiToken, imageMode, studiosEnabledByDefault } = this.state;
+    const { platform, owner, apiToken, imageMode, studiosEnabledByDefault } = this.state;
     this.props.onValueChanged({
+      platform,
       owner,
       apiToken,
       imageMode,
@@ -83,8 +91,9 @@ class Settings extends React.Component {
     });
   }
 
-  getState({ owner, apiToken, imageMode, studiosEnabledByDefault }) {
+  getState({ platform, owner, apiToken, imageMode, studiosEnabledByDefault }) {
     this.setState({
+      platform,
       owner,
       apiToken,
       imageMode,
@@ -102,6 +111,26 @@ class Settings extends React.Component {
       >
         <CardTitle>Settings</CardTitle>
         <CardText>
+          <div>
+            <h6 className="no-margin">
+              Platform
+              <Tooltip
+                label="The chat platform on which the bot will be used."
+              >
+                <Icon className="jbot-inline-icon" name="help" />
+              </Tooltip>
+            </h6>
+            <select
+              className="jbot-select"
+              value={this.state.platform}
+              onChange={this.onChangePlatform}
+            >
+              <option value="" disabled>Select a platform...</option>
+              <option value="slack">Slack</option>
+              <option value="hipchat">Hipchat</option>
+            </select>
+          </div>
+
           <div>
             <h6 className="no-margin">
               Image Storage

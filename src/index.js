@@ -10,6 +10,7 @@ import App from './models/App';
 
 import api, { provideBot } from './api';
 import SlackBot from './slackbot';
+import HipchatBot from './hipchatbot';
 import { ADMIN_USERNAME, ADMIN_PASSWORD, MONGO, PORT } from './config';
 
 // Set log level
@@ -50,10 +51,17 @@ app.get('/admin/*', (req, res) => {
   res.sendFile(join(__dirname, 'admin', 'index.html'));
 });
 
-// TODO: refactor into BotManager:
-// Boot up the slackbot:
-const bot = new SlackBot();
-provideBot(bot);
+// Load the proper bot class based on platform config.
+// TODO: refactor into BotManager
+App.get().then(a => {
+  let bot;
+  if (a.platform === 'hipchat') {
+    bot = new HipchatBot(app);
+  } else if (a.platform === 'slack') {
+    bot = new SlackBot();
+  }
+  provideBot(bot);
+});
 
 // Boot up the jeopardy app:
 app.listen(PORT, () => {

@@ -38,6 +38,7 @@
     "express-restify-mongoose": "^2.3.1",
     "find-remove": "^0.2.8",
     "form-data": "^0.2.0",
+    "hipchatter": "^0.2.0",
     "history": "^1.17.0",
     "html-entities": "^1.2.0",
     "imgur": "^0.1.6",

@@ -32,6 +32,7 @@ const VALID_PROVIDERS = [
 
 const VALID_WHENS = [
   'channel_join',
+  'room_enter',
 ];
 
 export function Trigger(...messages) {

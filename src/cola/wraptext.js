@@ -10,7 +10,7 @@ export default function wrapText(ctx, text, maxWidth) {
   do {
     let fits = false;
     const m = ctx.measureText(lines[activeLine]);
-    if (m.width > maxWidth) {
+    if (m.width > maxWidth && lines[activeLine].length > 1) {
       // Move this word to the beginning of the next line:
       if (!lines[activeLine + 1]) lines.push([]);
       lines[activeLine + 1].unshift(lines[activeLine].pop());

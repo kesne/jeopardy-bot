@@ -2,7 +2,10 @@ import Command from '../Command';
 import { When, Feature, Provide, NoLock } from '../utils';
 
 @NoLock
-@When('channel_join')
+@When(
+  'channel_join',
+  'room_enter'
+)
 @Feature('greetings')
 @Provide('contestant')
 export default class Greeting extends Command {
