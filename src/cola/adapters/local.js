@@ -32,8 +32,6 @@ export default class LocalAdapter {
   CAPTURE_ALL_CLUES = true;
 
   constructor() {
-    // Bootstrap the app:
-    App.get().then(app => this.app = app);
     this.startCleaning();
   }
 
@@ -51,12 +49,13 @@ export default class LocalAdapter {
   }
 
   saveImage(fileName, buf) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
+      const app = await App.get();
       writeFile(join(localPath, fileName), buf, (err) => {
         if (err) {
           reject(err);
         } else {
-          resolve(`${this.app.host}/assets/local/${fileName}`);
+          resolve(`${app.host}/assets/local/${fileName}`);
         }
       });
     });
@@ -64,13 +63,14 @@ export default class LocalAdapter {
 
   // Allows captureAllClues to work:
   getClue(fileName) {
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
+      const app = await App.get();
       stat(join(localPath, fileName), (err) => {
         if (err) {
           resolve(false);
         } else {
-          winston.debug('clue returned from cache', `${this.app.host}/assets/local/${fileName}`);
-          resolve(`${this.app.host}/assets/local/${fileName}`);
+          winston.debug('clue returned from cache', `${app.host}/assets/local/${fileName}`);
+          resolve(`${app.host}/assets/local/${fileName}`);
         }
       });
     });
@@ -83,6 +83,7 @@ export default class LocalAdapter {
   }
 
   async clue(game, clue) {
+    const app = await App.get();
     const fileName = `${game.channel_id}-CLUE-${game.id}-${clue.id}.png`;
 
     // Handle captureAllClues:
@@ -93,7 +94,7 @@ export default class LocalAdapter {
 
     const clueBuffer = await generateClue(game, clue);
 
-    winston.debug('clue generated', `${this.app.host}/assets/local/${fileName}`);
+    winston.debug('clue generated', `${app.host}/assets/local/${fileName}`);
     return await this.saveImage(fileName, clueBuffer);
   }
 }
