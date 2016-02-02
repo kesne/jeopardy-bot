@@ -50,7 +50,7 @@ class Guess extends Command {
       if (e.message.includes('timeout')) {
         // Ignore this message because we're always in bot mode now, and the timeout handles this.
       } else if (e.message.includes('contestant')) {
-        this.say(`You had your chance, ${this.contestant.name}. Let someone else answer.`);
+        this.say(`You had your chance, ${this.contestant.getName()}. Let someone else answer.`);
         if (this.studio.features.guessReactions) {
           const possibleEmojis = ['speak_no_evil', 'no_good', 'no_mouth'];
           const randIndex = Math.floor(Math.random() * possibleEmojis.length);
@@ -86,7 +86,7 @@ class Guess extends Command {
         this.game.answer(this.contestant),
       ]);
 
-      await this.say(`That is correct, ${this.contestant.name}. The answer was \`${clue.answer}\`.\nYour score is now ${currency(this.contestant.channelScore(this.data.channel_id).value)}.`);
+      await this.say(`That is correct, ${this.contestant.getName()}. The answer was \`${clue.answer}\`.\nYour score is now ${currency(this.contestant.channelScore(this.data.channel_id).value)}.`);
 
       if (this.studio.features.guessReactions) {
         this.addReaction('white_check_mark');
@@ -106,7 +106,7 @@ class Guess extends Command {
         channel_id: this.data.channel_id,
       });
 
-      await this.say(`That is incorrect, ${this.contestant.name}. Your score is now ${currency(this.contestant.channelScore(this.data.channel_id).value)}.`);
+      await this.say(`That is incorrect, ${this.contestant.getName()}. Your score is now ${currency(this.contestant.channelScore(this.data.channel_id).value)}.`);
 
       if (this.studio.features.guessReactions) {
         this.addReaction('x');
