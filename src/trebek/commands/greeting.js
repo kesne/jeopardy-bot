@@ -7,6 +7,6 @@ import { When, Feature, Provide, NoLock } from '../utils';
 @Provide('contestant')
 export default class Greeting extends Command {
   async response() {
-    this.say(`Welcome to <#${this.studio.id}>, <@${this.contestant.slackid}>! To learn how to play, just type \`help\`.`);
+    this.say(`Welcome to <#${this.studio.id}>, <@${this.contestant.id}>! To learn how to play, just type \`help\`.`);
   }
 }
