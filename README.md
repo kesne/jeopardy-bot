@@ -8,7 +8,7 @@ A Slack bot that lets you play full Jeopardy! games. Easy to deploy, and highly 
 
 Deploying JeopardyBot on Heroku is extremely simple. Simply click the deploy button below.
 
-Once your instance is deployed, click the "View" button, and the JeopardyBot admin panel will open, and walk you through the setup process for Slack.
+Once your instance is deployed, click the "**View**" button, and the JeopardyBot admin panel will open, and walk you through the setup process for Slack.
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
@@ -48,6 +48,7 @@ You can also ensure that the bot is awake by messaging "poke". This is useful fo
 
 ## Configuring
 
+You can configure the bot by using the admin control panel. You can go to the admin panel directly by navigating to `/admin` on the domain that the bot is deployed to. If you deployed on Heroku, the username and password should be configured during the heroku deploy process, and default to `jeopardy` and `bot`, respectively. Otherwise, you can set the username and password with the `ADMIN_USERNAME` and `ADMIN_PASSWORD` environment variables.
 
 
 ### Configuring MongoDB
