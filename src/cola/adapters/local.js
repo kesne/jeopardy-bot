@@ -55,7 +55,7 @@ export default class LocalAdapter {
         if (err) {
           reject(err);
         } else {
-          resolve(`${app.host}/assets/local/${fileName}`);
+          resolve(`${app.host}/assets/local/${fileName}?t=${Date.now()}`);
         }
       });
     });
@@ -70,7 +70,7 @@ export default class LocalAdapter {
           resolve(false);
         } else {
           winston.debug('clue returned from cache', `${app.host}/assets/local/${fileName}`);
-          resolve(`${app.host}/assets/local/${fileName}`);
+          resolve(`${app.host}/assets/local/${fileName}?t=${Date.now()}`);
         }
       });
     });
