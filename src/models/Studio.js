@@ -149,15 +149,6 @@ export const schema = new Schema({
     //     default: false
     //   }
     // },
-
-    // roomTopic: {
-    //   name: 'Room Topic',
-    //   description: 'Sets the room topic based on the game state.',
-    //   enabled: {
-    //     type: Boolean,
-    //     default: false
-    //   }
-    // },
   },
 
   // The total number of games that have been played in this studio:

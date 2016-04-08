@@ -179,6 +179,7 @@ class Settings extends React.Component {
               {this.state.contestants.map((contestant) => (
                 <option key={contestant._id} value={contestant._id}>
                   {contestant.name}
+                  {contestant.nickname && ` (${contestant.nickname})`}
                 </option>
               ))}
             </select>

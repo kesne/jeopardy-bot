@@ -74,7 +74,7 @@ export default class Challenge extends Command {
       const autoChallengePass = await this.autoChallenge(answer, guess);
       if (autoChallengePass) {
         const { channelScore } = await this.game.endChallenge(true);
-        this.say(`It looks like you're correct, ${this.contestant.name}! Your score is now ${currency(channelScore.value)}.`);
+        this.say(`It looks like you're correct, ${this.contestant.getName()}! Your score is now ${currency(channelScore.value)}.`);
         return;
       }
 
@@ -122,7 +122,10 @@ export default class Challenge extends Command {
 
         try {
           const { channelScore } = await game.endChallenge();
-          this.say(`Congrats, ${this.contestant.name}, your challenge has succeeded. Your score is now ${currency(channelScore.value)}.`);
+          this.say(
+            `Congrats, ${this.contestant.getName()}, your challenge has succeeded. ` +
+            `Your score is now ${currency(channelScore.value)}.`
+          );
         } catch (e) {
           if (e.message.includes('min')) {
             this.say('The challenge failed. There were not enough votes. Carry on!');

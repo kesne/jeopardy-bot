@@ -14,6 +14,11 @@ export const schema = new Schema({
     required: true,
   },
 
+  // Their nickname (what we'll call them when we're not mentioning them):
+  nickname: {
+    type: String,
+  },
+
   // Trebek can be insulting to sassy contestants:
   sassFactory: {
     type: Number,
@@ -55,7 +60,8 @@ export const schema = new Schema({
 });
 
 schema.virtual('nonMentionedName').get(function () {
-  return `${this.name.charAt(0)}.${this.name.substring(1)}`;
+  const name = this.getName();
+  return `${name.charAt(0)}.${name.substring(1)}`;
 });
 
 schema.statics.get = async function({ user_id: id, user_name: name }) {
@@ -73,6 +79,10 @@ schema.statics.get = async function({ user_id: id, user_name: name }) {
     await user.save();
   }
   return user;
+};
+
+schema.methods.getName = function () {
+  return this.nickname || this.name;
 };
 
 schema.methods.channelScore = function (channel_id) {
