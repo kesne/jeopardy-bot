@@ -53,4 +53,4 @@ You can configure the bot by using the admin control panel. You can go to the ad
 
 ### Configuring MongoDB
 
-There are three different environment variables that you can use to set the URL for MongoDB. JeopardyBot will check the environment variables `MONGO_URL`, `MONGOHQ_URL`, and `MONGOLAB_URI` (in that order), before finally defaulting to `mongodb://localhost/jeopardy`.
+There are three different environment variables that you can use to set the URL for MongoDB. JeopardyBot will check the environment variables `MONGO_URL`, `MONGOHQ_URL`, and `MONGODB_URI` (in that order), before finally defaulting to `mongodb://localhost/jeopardy`.
