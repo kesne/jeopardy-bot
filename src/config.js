@@ -8,7 +8,7 @@ export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'bot';
 export const IMGUR_API = process.env.IMGUR_API || '';
 
 // The URL for the mongo database:
-export const MONGO = process.env.MONGO_URL || process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://localhost/jeopardy';
+export const MONGO = process.env.MONGO_URL || process.env.MONGOHQ_URL || process.env.MONGODB_URI || 'mongodb://localhost/jeopardy';
 
 // The port for the application:
 export const PORT = process.env.PORT || 8000;
