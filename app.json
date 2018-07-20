@@ -20,7 +20,7 @@
   ],
   "buildpacks": [
     {
-      "url": "https://github.com/mojodna/heroku-buildpack-cairo"
+      "url": "https://github.com/sky-uk/heroku-buildpack-cairo"
     },
     {
       "url": "https://github.com/heroku/heroku-buildpack-nodejs"
