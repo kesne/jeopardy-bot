@@ -1,0 +1,27 @@
+{
+  "name": "jeopardy-bot",
+  "version": "2.0.0",
+  "description": "A Slack bot that lets you play Jeopardy games.",
+  "main": "lib/index.js",
+  "repository": "https://github.com/kesne/jeopardy-bot",
+  "author": "Jordan Gensler <jordangens@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpileOnly ./src/local.ts"
+  },
+  "dependencies": {
+    "immer": "^1.7.2",
+    "moment": "^2.22.2",
+    "node-nlp": "^2.0.3",
+    "redux": "^4.0.0",
+    "redux-saga": "^0.16.0",
+    "typescript": "^3.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^10.11.3",
+    "@types/vorpal": "^1.11.0",
+    "ts-node-dev": "^1.0.0-pre.30",
+    "vorpal": "^1.12.0"
+  }
+}

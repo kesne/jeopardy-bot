@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "lib": [
+            "esnext"
+        ],
+        "target": "es5",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "strict": true,
+        "noImplicitAny": true,
+        "outDir": "lib",
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true
+    }
+}
