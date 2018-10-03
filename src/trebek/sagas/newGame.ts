@@ -1,18 +1,22 @@
 import { put } from 'redux-saga/effects';
 import { input, requirement, say, Requirement } from './utils';
 import * as gameActions from '../actions/games';
-import { BaseAction } from '../types';
+import { BaseAction } from '../../types';
+import { generateGame } from '../../japi';
 
 function* startNewGame(action: BaseAction) {
     if (yield requirement(Requirement.GAME_INACTIVE, action)) {
         yield say('Starting a new game for you...');
+
+        const episode = yield generateGame();
+        const { clues: questions, categories } = episode.roundOne;
         yield put(
             gameActions.newGame({
                 id: action.studio.id,
+                questions,
+                categories,
             }),
         );
-
-        // TODO: Generate board image and pass it here:
 
         yield say(
             "Let's get this game started! Go ahead and select a category and value.",

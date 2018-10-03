@@ -11,15 +11,26 @@
     "dev": "ts-node-dev --respawn --transpileOnly ./src/local.ts"
   },
   "dependencies": {
+    "axios": "^0.18.0",
+    "cheerio": "^1.0.0-rc.2",
+    "html-entities": "^1.2.1",
     "immer": "^1.7.2",
+    "lodash": "^4.17.11",
     "moment": "^2.22.2",
-    "node-nlp": "^2.0.3",
+    "natural": "^0.6.1",
     "redux": "^4.0.0",
     "redux-saga": "^0.16.0",
-    "typescript": "^3.1.1"
+    "striptags": "^3.1.1",
+    "typescript": "^3.1.1",
+    "unidecode": "^0.1.8"
   },
   "devDependencies": {
+    "@types/cheerio": "^0.22.9",
+    "@types/html-entities": "^1.2.16",
+    "@types/lodash": "^4.14.116",
+    "@types/natural": "^0.2.33",
     "@types/node": "^10.11.3",
+    "@types/unidecode": "^0.1.0",
     "@types/vorpal": "^1.11.0",
     "ts-node-dev": "^1.0.0-pre.30",
     "vorpal": "^1.12.0"

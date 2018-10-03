@@ -10,5 +10,3 @@ export interface BaseAction {
         id: string;
     };
 }
-
-export type SagaHandler = (action: BaseAction) => any;

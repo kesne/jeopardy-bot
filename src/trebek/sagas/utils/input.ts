@@ -1,47 +1,42 @@
-import { take, spawn } from 'redux-saga/effects';
-import { INTENT } from '../../actionTypes';
-import { SagaHandler } from '../../types';
-import languageManager from '../../languageManager';
+import { take } from 'redux-saga/effects';
+import { INPUT } from '../../actionTypes';
+import { BaseAction } from '../../../types';
+import clean from '../../helpers/clean';
 
-const SLOT_REGEX = /%(.*?)%/gi;
+type Handler = (action: BaseAction, matches: string[][]) => void;
 
-// NOTE: I'm not using a takeEvery here, because this handling allows us to implement locks super cleanly using fork instead of spawn
 export default function* input(
-    matchers: string | string[],
-    handler: SagaHandler,
+    matchers: string | string[] | RegExp | RegExp[],
+    handler: Handler,
 ) {
-    //Generate a random identifier:
-    const intent =
-        Math.random()
-            .toString(36)
-            .substring(2, 15) +
-        Math.random()
-            .toString(36)
-            .substring(2, 15);
-    const finalMatchers = Array.isArray(matchers) ? matchers : [matchers];
-
-    finalMatchers.forEach(matcher => {
-        const slots = matcher.match(SLOT_REGEX);
-        if (slots) {
-            slots.forEach(slot => {
-                languageManager.slotManager.addSlot(
-                    intent,
-                    slot.replace('%', ''),
-                    false,
-                );
-            });
+    const finalMatchers: RegExp[] = (Array.isArray(matchers)
+        ? matchers
+        : [matchers]
+    ).map(pattern => {
+        let fullMessage = pattern;
+        if (pattern instanceof RegExp) {
+            fullMessage = pattern.source;
         }
 
-        languageManager.addDocument('en', matcher, intent);
+        return new RegExp(`^${fullMessage}$`, 'i');
     });
 
-    // Re-train the model:
-    languageManager.train();
-
     while (true) {
-        const action = yield take(INTENT);
-        if (action.intent.id === intent) {
-            yield spawn(handler, action);
+        const action = yield take(INPUT);
+
+        let valid = false;
+        const matches = finalMatchers.map(trigger => {
+            const m = trigger.exec(clean(action.payload.text));
+
+            if (m !== null) {
+                valid = true;
+            }
+
+            return m ? m.slice(1) : [];
+        });
+
+        if (valid) {
+            yield handler(action, matches);
         }
     }
 }

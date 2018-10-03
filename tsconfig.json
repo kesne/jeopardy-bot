@@ -10,6 +10,7 @@
         "noImplicitAny": true,
         "outDir": "lib",
         "esModuleInterop": true,
-        "allowSyntheticDefaultImports": true
+        "allowSyntheticDefaultImports": true,
+        "downlevelIteration": true
     }
 }

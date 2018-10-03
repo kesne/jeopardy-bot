@@ -1,7 +1,7 @@
 import { input, say, requirement, Requirement } from './utils';
 import * as gameActions from '../actions/games';
 import { put } from 'redux-saga/effects';
-import { BaseAction } from '../types';
+import { BaseAction } from '../../types';
 
 function* endGame(action: BaseAction) {
     if (yield requirement(Requirement.GAME_ACTIVE, action)) {
