@@ -8,9 +8,10 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpileOnly ./src/local.ts"
+    "dev": "ts-node-dev --respawn --transpileOnly ./src/index.ts"
   },
   "dependencies": {
+    "@slack/client": "^4.8.0",
     "axios": "^0.18.0",
     "cheerio": "^1.0.0-rc.2",
     "html-entities": "^1.2.1",
@@ -31,8 +32,6 @@
     "@types/natural": "^0.2.33",
     "@types/node": "^10.11.3",
     "@types/unidecode": "^0.1.0",
-    "@types/vorpal": "^1.11.0",
-    "ts-node-dev": "^1.0.0-pre.30",
-    "vorpal": "^1.12.0"
+    "ts-node-dev": "^1.0.0-pre.30"
   }
 }
