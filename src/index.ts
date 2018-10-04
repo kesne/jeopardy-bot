@@ -5,12 +5,16 @@ const token = process.env.SLACK_TOKEN || require('../token');
 
 // The client is initialized and then started to get an active connection to the platform
 const rtm = new RTMClient(token);
-rtm.start();
-
-const trebek = new Trebek();
-
-trebek.say((message, id) => {
+const trebek = new Trebek((id, message) => {
     rtm.sendMessage(message, id);
+});
+
+rtm.on('connected', () => {
+    console.log(`JeopardyBot connected to Slack instance.`);
+});
+
+rtm.on('slack_event', (eventType, event) => {
+    trebek.event(eventType, event);
 });
 
 rtm.on('message', message => {
@@ -25,10 +29,4 @@ rtm.on('message', message => {
     trebek.input(message);
 });
 
-// // The RTM client can send simple string messages
-// rtm.sendMessage('Hello there', conversationId)
-//   .then((res) => {
-//     // `res` contains information about the posted message
-//     console.log('Message sent: ', res.ts);
-//   })
-//   .catch(console.error);
+rtm.start();

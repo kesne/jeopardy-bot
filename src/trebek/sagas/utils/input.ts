@@ -1,4 +1,4 @@
-import { take, setContext } from 'redux-saga/effects';
+import { take, setContext, getContext } from 'redux-saga/effects';
 import { INPUT } from '../../actionTypes';
 import { BaseAction } from '../../../types';
 import clean from '../../helpers/clean';
@@ -21,12 +21,13 @@ export default function* input(
         return new RegExp(`^${fullMessage}$`, 'i');
     });
 
+    const studio = yield getContext('studio');
+
     while (true) {
         const action = yield take(INPUT);
 
-        yield setContext({
-            studio: action.studio.id,
-        })
+        // Ensure this is related to us:
+        if (action.studio !== studio) continue;
 
         let valid = false;
         const matches = finalMatchers.map(trigger => {

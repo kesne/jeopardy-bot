@@ -3,10 +3,6 @@ export interface BaseAction {
     payload: {
         [key: string]: any;
     };
-    contestant: {
-        id: string;
-    };
-    studio: {
-        id: string;
-    };
+    contestant: string;
+    studio: string;
 }

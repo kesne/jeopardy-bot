@@ -1,4 +1,3 @@
-import { select, put } from 'redux-saga/effects';
 import { input, requirement, Requirement, say } from '../utils';
 import { BaseAction } from '../../../types';
 import { ClueOptions } from '../../actions/games';
@@ -29,7 +28,7 @@ function* clue(
     ]: string[][],
 ) {
     if (
-        (yield requirement(Requirement.GAME_ACTIVE, action))
+        (yield requirement(Requirement.GAME_ACTIVE))
     ) {
         let category: string | ClueOptions = sameLowest
             ? ClueOptions.SAME_LOWEST

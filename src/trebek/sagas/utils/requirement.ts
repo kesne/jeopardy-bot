@@ -1,16 +1,16 @@
-import { take, select } from 'redux-saga/effects';
-import { BaseAction } from '../../../types';
+import { select, getContext } from 'redux-saga/effects';
 
 export enum Requirement {
     GAME_ACTIVE,
     GAME_INACTIVE,
 }
 
-export default function* requirement(type: Requirement, action: BaseAction) {
+export default function* requirement(type: Requirement) {
     if (type === Requirement.GAME_INACTIVE || type === Requirement.GAME_ACTIVE) {
-        const games = yield select(({ games }) => games);
+        const studio = yield getContext('studio');
+        const game = yield select(({ games }) => games[studio]);
 
-        const hasActiveGame = !!games[action.studio.id];
+        const hasActiveGame = !!game;
 
         return type === Requirement.GAME_ACTIVE
             ? hasActiveGame

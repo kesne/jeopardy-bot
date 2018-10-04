@@ -1,4 +1,4 @@
-import { select, put } from 'redux-saga/effects';
+import { select, put, getContext } from 'redux-saga/effects';
 import { BaseAction } from '../../../types';
 import { ClueOptions, setCurrentQuestion } from '../../actions/games';
 import { Game, Clue, Category } from '../../reducers/games';
@@ -13,7 +13,7 @@ export default function* newClue(
     value: number,
     action: BaseAction,
 ) {
-    const game: Game = yield select(({ games }) => games[action.studio.id]);
+    const game: Game = yield select(({ games }) => games[action.studio]);
 
     let selectedCategory: number;
 
@@ -122,7 +122,7 @@ export default function* newClue(
     // TODO: We really can keep the clue entirely in local state. There's no reason to set it, because if we restart mid-clue we can just assume that it was unanswered.
     yield put(
         setCurrentQuestion({
-            id: action.studio.id,
+            id: action.studio,
             category: selectedCategory,
             question: question.id,
         }),

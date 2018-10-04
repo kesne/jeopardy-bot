@@ -4,10 +4,10 @@ import { put } from 'redux-saga/effects';
 import { BaseAction } from '../../types';
 
 function* endGame(action: BaseAction) {
-    if (yield requirement(Requirement.GAME_ACTIVE, action)) {
+    if (yield requirement(Requirement.GAME_ACTIVE)) {
         yield put(
             gameActions.endGame({
-                id: action.studio.id,
+                id: action.studio,
             }),
         );
         yield say(

@@ -6,13 +6,15 @@ import uptime from './uptime';
 import greeting from './greeting';
 import help from './help';
 import clue from './clue';
+import Trebek from '../';
 
-// TODO: We really need to boot a saga per channel, and then put the studio on the context, rather the action.
-
-export default function* rootSaga(manager) {
+export default function* rootSaga(manager: Trebek, studio: string) {
     yield setContext({
         manager,
+        studio,
     });
+
+    // TODO: Set up the studio in the redux store.
 
     // Install all of the features:
     yield all([
