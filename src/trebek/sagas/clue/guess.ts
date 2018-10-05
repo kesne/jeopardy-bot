@@ -33,14 +33,14 @@ function numbersEqual(input1: string, input2: string) {
         .parse(input2)
         .map(({ resolution }) => resolution);
 
-    return isEqual(numbers1, numbers2);
+    return numbers1.length && isEqual(numbers1, numbers2);
 }
 
 function datesEqual(input1: string, input2: string) {
     const dates1 = dateParser.parse(input1).map(({ resolution }) => resolution);
     const dates2 = dateParser.parse(input2).map(({ resolution }) => resolution);
 
-    return isEqual(dates1, dates2);
+    return dates1.length && isEqual(dates1, dates2);
 }
 
 function stringsEqual(input1: string, input2: string) {
