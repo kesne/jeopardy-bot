@@ -22,6 +22,7 @@ export interface Game {
     categories: Category[],
     recentCategory?: number;
     currentQuestion?: number;
+    guessed: string[];
 }
 
 interface State {
@@ -38,6 +39,7 @@ export default produce<State, BaseAction>((draft, action) => {
                 currentQuestion: undefined,
                 categories: action.payload.categories,
                 questions: action.payload.questions,
+                guessed: [],
             };
             break;
         case END_GAME:

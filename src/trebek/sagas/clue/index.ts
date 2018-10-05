@@ -49,6 +49,9 @@ function* clue(
             `OK, \`${clue.category.title}\` for ${currency(clue.value)}...`,
         );
 
+        // TODO: Generate board image:
+        yield say(`> ${clue.question}`)
+
         yield guess(clue);
     }
 }
