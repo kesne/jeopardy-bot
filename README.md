@@ -9,7 +9,6 @@ A Slack bot that lets you play full Jeopardy! games. Easy to deploy, and highly 
 - Figure out docker image.
 - Update deploy button.
 - Move state selects into selector functions.
-- Re-add the image generation.
 - Build out the admin interface.
 
 ## Deploying

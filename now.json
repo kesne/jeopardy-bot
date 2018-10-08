@@ -1,0 +1,5 @@
+{
+    "name": "jeopardy-bot",
+    "public": true,
+    "type": "docker"
+}

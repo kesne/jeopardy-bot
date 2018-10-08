@@ -1,0 +1,19 @@
+{
+    "name": "JeopardyBot",
+    "description": "A Slack bot that lets you play full Jeopardy! games.",
+    "repository": "https://github.com/kesne/jeopardy-bot",
+    "logo": "http://i.imgur.com/fyUzznF.png",
+    "keywords": ["node", "slack", "jeopardy", "bot", "trebek"],
+    "success_url": "/admin/",
+    "env": {
+      "ADMIN_USERNAME": {
+        "description": "The username for the admin panel (defaults to 'jeopardy').",
+        "required": false
+      },
+      "ADMIN_PASSWORD": {
+        "description": "The password for the admin panel (defaults to 'bot')",
+        "required": false
+      }
+    },
+    "stack": "container"
+  }
