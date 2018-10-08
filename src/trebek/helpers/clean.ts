@@ -1,3 +1,5 @@
+import unidecode from 'unidecode';
+
 export default function clean(text: string): string {
     let cleanText = text;
 
@@ -9,6 +11,8 @@ export default function clean(text: string): string {
     cleanText = cleanText.replace(/['"“”’\-\.,!;:—]/g, '');
     // Ampersands are hard:
     cleanText = cleanText.replace(/&/g, 'and');
+    // Convert to ascii:
+    cleanText = unidecode(cleanText);
 
     return cleanText;
 }

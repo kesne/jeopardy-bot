@@ -4,6 +4,7 @@ import { ClueOptions } from '../../actions/games';
 import currency from '../../helpers/currency';
 import newClue from './newClue';
 import guess from './guess';
+import { clueImage } from '../../../images';
 
 function getCategory(category: string | ClueOptions) {
     if (category === 'same' || category === 'same category') {
@@ -18,7 +19,7 @@ function getValue(inputValue?: string, gimmeValue?: string) {
     return Number.isNaN(value) ? -1 : value;
 }
 
-// TODO: Respect board control:
+// TODO: Respect board control (should be easy with some local saga state):
 function* clue(
     action: BaseAction,
     [
@@ -27,9 +28,7 @@ function* clue(
         [gimme, gimmeValue, gimmeCategory],
     ]: string[][],
 ) {
-    if (
-        (yield requirement(Requirement.GAME_ACTIVE))
-    ) {
+    if (yield requirement(Requirement.GAME_ACTIVE)) {
         let category: string | ClueOptions = sameLowest
             ? ClueOptions.SAME_LOWEST
             : getCategory(inputCategory || gimmeCategory || ClueOptions.RANDOM);
@@ -49,8 +48,8 @@ function* clue(
             `OK, \`${clue.category.title}\` for ${currency(clue.value)}...`,
         );
 
-        // TODO: Generate board image:
-        yield say(`> ${clue.question}`)
+        const image = yield clueImage(clue);
+        yield say("Here's your clue.", image);
 
         yield guess(clue);
     }

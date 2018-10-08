@@ -1,7 +1,8 @@
-import { take, setContext, getContext } from 'redux-saga/effects';
+import { take, getContext, select, put } from 'redux-saga/effects';
 import { INPUT } from '../../actionTypes';
 import { BaseAction } from '../../../types';
 import clean from '../../helpers/clean';
+import { createContestant } from '../../actions/contestants';
 
 type Handler = (action: BaseAction, matches: string[][]) => void;
 
@@ -22,6 +23,7 @@ export default function* input(
     });
 
     const studio = yield getContext('studio');
+    const manager = yield getContext('manager');
 
     while (true) {
         const action = yield take(INPUT);
@@ -41,6 +43,12 @@ export default function* input(
         });
 
         if (valid) {
+            const contestant = yield select(({ contestants }) => contestants[action.contestant]);
+            if (!contestant) {
+                const displayName = yield manager.getDisplayName(action.contestant);
+                yield put(createContestant(action.contestant, displayName));
+            }
+
             // If there is no handler, then we treat this as a returned input:
             if (handler) {
                 yield handler(action, matches);

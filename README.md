@@ -4,6 +4,14 @@ A Slack bot that lets you play full Jeopardy! games. Easy to deploy, and highly 
 
 <img width="383" alt="JeopardyBot Screenshot" src="https://cloud.githubusercontent.com/assets/498479/12258733/9edc2464-b8c5-11e5-8703-3187ced93f15.png">
 
+## TODO:
+
+- Figure out docker image.
+- Update deploy button.
+- Move state selects into selector functions.
+- Re-add the image generation.
+- Build out the admin interface.
+
 ## Deploying
 
 TODO:

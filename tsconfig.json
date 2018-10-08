@@ -1,13 +1,11 @@
 {
     "compilerOptions": {
-        "lib": [
-            "esnext"
-        ],
+        "lib": ["esnext", "dom"],
         "target": "es5",
         "module": "commonjs",
         "moduleResolution": "node",
-        "strict": true,
-        "noImplicitAny": true,
+        "strict": false,
+        "noImplicitAny": false,
         "outDir": "lib",
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,

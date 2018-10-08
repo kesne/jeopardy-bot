@@ -1,7 +1,7 @@
-import { select, put, getContext } from 'redux-saga/effects';
+import { select, put } from 'redux-saga/effects';
 import { BaseAction } from '../../../types';
-import { ClueOptions, setCurrentQuestion } from '../../actions/games';
-import { Game, Clue, Category } from '../../reducers/games';
+import { ClueOptions } from '../../actions/games';
+import { Game } from '../../reducers/games';
 import sample from 'lodash/sample';
 import clean from '../../helpers/clean';
 import { DiceCoefficient } from 'natural';
@@ -12,7 +12,7 @@ export default function* newClue(
     category: string | ClueOptions,
     value: number,
     action: BaseAction,
-) {
+): any {
     const game: Game = yield select(({ games }) => games[action.studio]);
 
     let selectedCategory: number;
@@ -117,16 +117,6 @@ export default function* newClue(
     // if (question.dailyDouble) {
     //     this.dailyDouble.contestant = contestant.id;
     // }
-
-    // Reset the guesses:
-    // TODO: We really can keep the clue entirely in local state. There's no reason to set it, because if we restart mid-clue we can just assume that it was unanswered.
-    yield put(
-        setCurrentQuestion({
-            id: action.studio,
-            category: selectedCategory,
-            question: question.id,
-        }),
-    );
 
     return {
         ...question,

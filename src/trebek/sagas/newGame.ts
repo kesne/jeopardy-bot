@@ -3,6 +3,7 @@ import { input, requirement, say, Requirement } from './utils';
 import * as gameActions from '../actions/games';
 import { BaseAction } from '../../types';
 import { generateGame } from '../../japi';
+import selectClue from './clue/selectClue';
 
 function* startNewGame(action: BaseAction) {
     if (yield requirement(Requirement.GAME_INACTIVE)) {
@@ -18,9 +19,7 @@ function* startNewGame(action: BaseAction) {
             }),
         );
 
-        yield say(
-            "Let's get this game started! Go ahead and select a category and value.",
-        );
+        yield selectClue(true);
     } else {
         yield say(
             'There is already a game in progress! You must finish or end that game before starting a new game.',

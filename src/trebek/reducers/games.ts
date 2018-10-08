@@ -1,5 +1,5 @@
 import produce from 'immer';
-import { NEW_GAME, END_GAME, SET_CURRENT_QUESTION } from '../actionTypes';
+import { NEW_GAME, END_GAME, MARK_QUESTION_ANSWERED } from '../actionTypes';
 import { BaseAction } from '../../types';
 
 export interface Clue {
@@ -21,8 +21,6 @@ export interface Game {
     questions: Clue[],
     categories: Category[],
     recentCategory?: number;
-    currentQuestion?: number;
-    guessed: string[];
 }
 
 interface State {
@@ -36,17 +34,20 @@ export default produce<State, BaseAction>((draft, action) => {
         case NEW_GAME:
             draft[action.payload.id] = {
                 recentCategory: undefined,
-                currentQuestion: undefined,
                 categories: action.payload.categories,
                 questions: action.payload.questions,
-                guessed: [],
             };
             break;
         case END_GAME:
             delete draft[action.payload.id];
             break;
-        case SET_CURRENT_QUESTION:
-            draft[action.payload.id].recentCategory = action.payload.category;
-            draft[action.payload.id].currentQuestion = action.payload.question;
+        case MARK_QUESTION_ANSWERED: {
+            const question = draft[action.payload.id].questions.find(({ id }) => id === action.payload.question);
+            if (question) {
+                question.answered = true;
+                draft[action.payload.id].recentCategory = question.categoryId;
+            }
+            break;
+        }
     }
 }, initialState);

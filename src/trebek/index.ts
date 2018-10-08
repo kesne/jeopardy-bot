@@ -1,21 +1,35 @@
 import { createStore, applyMiddleware } from 'redux';
-import createSagaMiddleware from 'redux-saga';
+import createSagaMiddleware, { Task } from 'redux-saga';
 import reducer from './reducers';
 import sagas from './sagas';
 import { INPUT, EVENT } from './actionTypes';
 
 const sagaMiddleware = createSagaMiddleware();
-
-// mount it on the Store
 const store = createStore(reducer, applyMiddleware(sagaMiddleware));
 
-export default class Trebek {
-    studios = new Map();
+type SendMessage = (id: string, message: string) => any;
+type GetDisplayName = (id: string) => Promise<string>;
 
-    constructor(private sendMessage: (id: string, message: string) => void) {}
+export default class Trebek {
+    studios: Map<String, Task> = new Map();
+
+    public sendMessage: SendMessage;
+    public getDisplayName: GetDisplayName;
+
+    constructor({
+        sendMessage,
+        getDisplayName,
+    }: {
+        sendMessage: SendMessage;
+        getDisplayName: GetDisplayName;
+    }) {
+        this.sendMessage = sendMessage;
+        this.getDisplayName = getDisplayName;
+    }
 
     // Dynamically boot sagas based on events we get:
-    ensureStudioExists(id) {
+    ensureStudioExists(id: string) {
+        // TODO: Create studio in Redux:
         if (!this.studios.has(id)) {
             const studioSaga = sagaMiddleware.run(sagas, this, id);
             this.studios.set(id, studioSaga);

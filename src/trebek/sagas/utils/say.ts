@@ -1,10 +1,11 @@
 import { getContext } from "redux-saga/effects";
+import { JeopardyImage } from "../../../types";
 
-export default function* say(message: string) {
+export default function* say(message: string, image?: JeopardyImage) {
   const studio = yield getContext('studio');
   const manager = yield getContext('manager');
 
-  manager.sendMessage(studio, message);
+  yield manager.sendMessage(studio, message, image);
 
   return;
 }

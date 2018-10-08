@@ -1,39 +1,41 @@
 {
-  "name": "jeopardy-bot",
-  "version": "2.0.0",
-  "description": "A Slack bot that lets you play Jeopardy games.",
-  "main": "lib/index.js",
-  "repository": "https://github.com/kesne/jeopardy-bot",
-  "author": "Jordan Gensler <jordangens@gmail.com>",
-  "license": "MIT",
-  "private": true,
-  "scripts": {
-    "dev": "ts-node-dev --respawn --transpileOnly ./src/index.ts"
-  },
-  "dependencies": {
-    "@microsoft/recognizers-text-date-time": "^1.1.3",
-    "@microsoft/recognizers-text-number": "^1.1.3",
-    "@slack/client": "^4.8.0",
-    "axios": "^0.18.0",
-    "cheerio": "^1.0.0-rc.2",
-    "html-entities": "^1.2.1",
-    "immer": "^1.7.2",
-    "lodash": "^4.17.11",
-    "moment": "^2.22.2",
-    "natural": "^0.6.1",
-    "redux": "^4.0.0",
-    "redux-saga": "^0.16.0",
-    "striptags": "^3.1.1",
-    "typescript": "^3.1.1",
-    "unidecode": "^0.1.8"
-  },
-  "devDependencies": {
-    "@types/cheerio": "^0.22.9",
-    "@types/html-entities": "^1.2.16",
-    "@types/lodash": "^4.14.116",
-    "@types/natural": "^0.2.33",
-    "@types/node": "^10.11.3",
-    "@types/unidecode": "^0.1.0",
-    "ts-node-dev": "^1.0.0-pre.30"
-  }
+    "name": "jeopardy-bot",
+    "version": "2.0.0",
+    "description": "A Slack bot that lets you play Jeopardy games.",
+    "main": "lib/index.js",
+    "repository": "https://github.com/kesne/jeopardy-bot",
+    "author": "Jordan Gensler <jordangens@gmail.com>",
+    "license": "MIT",
+    "private": true,
+    "scripts": {
+        "dev": "ts-node-dev --respawn --transpileOnly ./src/index.ts",
+        "build": "tsc"
+    },
+    "dependencies": {
+        "@microsoft/recognizers-text-date-time": "^1.1.3",
+        "@microsoft/recognizers-text-number": "^1.1.3",
+        "@slack/client": "^4.8.0",
+        "axios": "^0.18.0",
+        "canvas": "^1.6.12",
+        "cheerio": "^1.0.0-rc.2",
+        "html-entities": "^1.2.1",
+        "immer": "^1.7.2",
+        "lodash": "^4.17.11",
+        "moment": "^2.22.2",
+        "natural": "^0.6.1",
+        "redux": "^4.0.0",
+        "redux-saga": "^0.16.0",
+        "striptags": "^3.1.1",
+        "typescript": "^3.1.1",
+        "unidecode": "^0.1.8"
+    },
+    "devDependencies": {
+        "@types/cheerio": "^0.22.9",
+        "@types/html-entities": "^1.2.16",
+        "@types/lodash": "^4.14.116",
+        "@types/natural": "^0.2.33",
+        "@types/node": "^10.11.3",
+        "@types/unidecode": "^0.1.0",
+        "ts-node-dev": "^1.0.0-pre.30"
+    }
 }

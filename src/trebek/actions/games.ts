@@ -1,4 +1,4 @@
-import { NEW_GAME, END_GAME, SET_CURRENT_QUESTION } from '../actionTypes';
+import { NEW_GAME, END_GAME, MARK_QUESTION_ANSWERED } from '../actionTypes';
 import { Category, Clue } from '../reducers/games';
 
 export enum ClueOptions {
@@ -26,30 +26,31 @@ export function newGame({
     };
 }
 
-export function endGame({ id }: { id: string }) {
+export function endGame({ id, winner }: { id: string; winner?: string }) {
     return {
         type: END_GAME,
         payload: {
             id,
+            winner,
         },
     };
 }
 
-export function setCurrentQuestion({
+export function markQuestionAnswered({
     id,
-    category,
     question,
+    contestant,
 }: {
     id: string;
-    category: number;
     question: number;
+    contestant?: string;
 }) {
     return {
-        type: SET_CURRENT_QUESTION,
+        type: MARK_QUESTION_ANSWERED,
         payload: {
             id,
-            category,
             question,
+            contestant,
         },
     };
 }

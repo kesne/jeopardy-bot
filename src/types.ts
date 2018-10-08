@@ -6,3 +6,8 @@ export interface BaseAction {
     contestant: string;
     studio: string;
 }
+
+export interface JeopardyImage {
+    buffer: Buffer;
+    filename: string;
+}

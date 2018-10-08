@@ -74,6 +74,7 @@ async function loadEpisode(url: string) {
             answer,
             value,
             dailyDouble,
+            answered: false,
         });
     });
 
