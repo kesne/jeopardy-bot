@@ -21,6 +21,8 @@ A Slack bot that lets you play full Jeopardy! games. Easy to deploy, and highly 
 
 ### Now
 
+<img alt="Now logo" src="https://assets.zeit.co/image/upload/front/assets/design/black-now-triangle.png">
+
 Deploying with [now](https://zeit.co/now) is simple, and there is a free tier that you can use to run the Jeopardy Bot application.
 
 1. Follow the [Getting Started guide](https://zeit.co/now#get-started).
@@ -30,6 +32,10 @@ Deploying with [now](https://zeit.co/now) is simple, and there is a free tier th
 You're good to go! Invite the bot into a channel on slack, and start a game by saying "**new game**"!
 
 ### Heroku
+
+Deploying with [Heroku](https://heroku.com) is possible, however if you're using a free plan, the deployment will sleep after 30 minutes of inactivity, and you'll need to manually restart the deployment. For this reason, it is not our preferred hosting provider. If you'd like to deploy on Heroku, you can use the button below:
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/kesne/jeopardy-bot)
 
 ### Docker
 
