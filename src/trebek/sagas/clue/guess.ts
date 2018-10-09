@@ -1,8 +1,9 @@
 import { delay } from 'redux-saga';
 import { race, select, put, getContext } from 'redux-saga/effects';
+import sample from 'lodash/sample';
 import { Clue } from '../../reducers/games';
 import clean from '../../helpers/clean';
-import { input, say } from '../utils';
+import { input, say, react } from '../utils';
 import selectClue from './selectClue';
 import { markQuestionAnswered } from '../../actions/games';
 import { adjustScore } from '../../actions/contestants';
@@ -27,7 +28,10 @@ function* guessAnswer(clue: Clue) {
         ]);
 
         if (guessed.has(action.contestant)) {
-            // TODO: Add the no-speaking emoji as a response:
+            yield react(
+                sample(['speak_no_evil', 'no_good', 'no_mouth']) as string,
+                action,
+            );
             yield say(
                 `You had your chance, <@${
                     action.contestant
@@ -59,6 +63,7 @@ function* guessAnswer(clue: Clue) {
                     contestants[action.contestant].scores[action.studio],
             );
 
+            yield react('x', action);
             yield say(
                 `That is incorrect, <@${
                     action.contestant
@@ -78,6 +83,7 @@ function* guessAnswer(clue: Clue) {
                     contestants[action.contestant].scores[action.studio],
             );
 
+            yield react('white_check_mark', action);
             yield say(
                 `That is correct, <@${action.contestant}>. The answer was \`${
                     clue.answer

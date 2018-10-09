@@ -19,8 +19,15 @@ const trebek = new Trebek({
                 initial_comment: message,
             });
         } else {
-            rtm.sendMessage(message, id);
+            return rtm.sendMessage(message, id);
         }
+    },
+    addReaction(id, reaction, ts) {
+        return web.reactions.add({
+            channel: id,
+            timestamp: ts,
+            name: reaction,
+        });
     },
     async getDisplayName(id) {
         const response = await web.users.info({ user: id }) as SlackResponse;

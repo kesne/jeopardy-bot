@@ -22,6 +22,7 @@ export interface SlackMessage {
     text: string;
     channel: string;
     user: string;
+    ts: string;
 }
 
 export interface SlackEvent {

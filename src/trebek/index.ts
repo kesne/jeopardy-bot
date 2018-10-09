@@ -6,6 +6,7 @@ import { INPUT, EVENT } from './actionTypes';
 import { SlackMessage, SlackEvent } from '../types';
 
 type SendMessage = (id: string, message: string) => any;
+type AddReaction = (id: string, reaction: string, ts: string) => any;
 type GetDisplayName = (id: string) => Promise<string>;
 interface PersistenceLayer {
     persist(blob: string): Promise<void>;
@@ -23,17 +24,21 @@ export default class Trebek {
 
     public sendMessage: SendMessage;
     public getDisplayName: GetDisplayName;
+    public addReaction: AddReaction;
 
     constructor({
         sendMessage,
+        addReaction,
         getDisplayName,
         persistence,
     }: {
         sendMessage: SendMessage;
+        addReaction: AddReaction;
         getDisplayName: GetDisplayName;
         persistence: PersistenceLayer;
     }) {
         this.sendMessage = sendMessage;
+        this.addReaction = addReaction;
         this.getDisplayName = getDisplayName;
         this.persistence = persistence;
     }
@@ -59,7 +64,6 @@ export default class Trebek {
 
     // Dynamically boot sagas based on events we get:
     ensureStudioExists(id: string) {
-        // TODO: Create studio in Redux:
         if (!this.studios.has(id)) {
             const studioSaga = this.saga!.run(sagas, this, id);
             this.studios.set(id, studioSaga);
@@ -73,6 +77,7 @@ export default class Trebek {
             type: INPUT,
             payload: {
                 text: message.text,
+                ts: message.ts,
             },
             contestant: message.user,
             studio: message.channel,

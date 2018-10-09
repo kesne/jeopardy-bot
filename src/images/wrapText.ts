@@ -1,5 +1,3 @@
-// TODO: Arbitrary split for non-fitting words. Attempt to split on the dash
-// (tokenize with dash + custom reducer).
 export default function wrapText(
     ctx: CanvasRenderingContext2D,
     text: string,
