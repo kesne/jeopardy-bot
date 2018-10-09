@@ -21,7 +21,9 @@ A Slack bot that lets you play full Jeopardy! games. Easy to deploy, and highly 
 
 ### Now
 
-<img alt="Now logo" src="https://assets.zeit.co/image/upload/front/assets/design/black-now-triangle.png">
+<div style="text-align: center">
+    <img alt="Now logo" src="https://assets.zeit.co/image/upload/front/assets/design/black-now-triangle.png" width="350">
+</div>
 
 Deploying with [now](https://zeit.co/now) is simple, and there is a free tier that you can use to run the Jeopardy Bot application.
 
