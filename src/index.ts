@@ -1,6 +1,7 @@
 import { RTMClient, WebClient } from '@slack/client';
 import Trebek from './trebek';
-import { JeopardyImage } from './types';
+import { JeopardyImage, SlackResponse } from './types';
+import CleverPersistence from './CleverPersistence';
 
 const token = process.env.SLACK_TOKEN || require('../token');
 
@@ -22,30 +23,28 @@ const trebek = new Trebek({
         }
     },
     async getDisplayName(id) {
-        const response = await web.users.info({ user: id });
-        // @ts-ignore This is because the slack client responses are not strongly typed:
+        const response = await web.users.info({ user: id }) as SlackResponse;
         return response.user.profile.display_name;
     },
+    persistence: new CleverPersistence(web, rtm),
 });
 
-rtm.on('connected', () => {
+rtm.on('connected', async () => {
     console.log(`JeopardyBot connected to Slack instance.`);
-});
+    await trebek.start();
 
-rtm.on('slack_event', (eventType, event) => {
-    trebek.event(eventType, event);
-});
+    rtm.on('slack_event', (eventType, event) => {
+        trebek.event(eventType, event);
+    });
 
-rtm.on('message', message => {
-    // Skip messages that are from a bot or my own user ID
-    if (
-        (message.subtype && message.subtype === 'bot_message') ||
-        (!message.subtype && message.user === rtm.activeUserId)
-    ) {
-        return;
-    }
+    rtm.on('message', message => {
+        // Skip messages that have a subtype or are from us:
+        if (message.subtype || message.user === rtm.activeUserId) {
+            return;
+        }
 
-    trebek.input(message);
+        trebek.input(message);
+    });
 });
 
 rtm.start();

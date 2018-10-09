@@ -1,9 +1,8 @@
 import Canvas, { Image } from 'canvas';
 import { join } from 'path';
 import { readFileSync } from 'fs';
-
 import wrapText from './wrapText';
-import { Game } from '../trebek/reducers/games';
+import { Game, Clue } from '../trebek/reducers/games';
 
 const CANVAS_WIDTH = 1200;
 const CANVAS_HEIGHT = 740;
@@ -23,18 +22,32 @@ categoryBackground.src = readFileSync(join(ASSETS, 'blank_category.png'));
 const blankValue = new Image();
 blankValue.src = readFileSync(join(ASSETS, 'blank_value.png'));
 
-const $values = [200, 400, 600, 800, 1000].reduce((obj, val) => {
+function getValueImage(value: number) {
     const image = new Image();
-    image.src = readFileSync(join(ASSETS, 'values', `${val}.png`));
-    obj[val] = image;
-    return obj;
-}, {});
+    image.src = readFileSync(join(ASSETS, 'values', `${value}.png`));
+    return image;
+}
+
+// NOTE: We give this an index type just so that we can easily grab values out of it:
+const $values = {
+    '200': getValueImage(200),
+    '400': getValueImage(400),
+    '600': getValueImage(600),
+    '800': getValueImage(800),
+    '1000': getValueImage(1000),
+} as { [key: string]: Image };
 
 /**
  * CANVAS GENERATION:
  */
 
-function drawLines(ctx, lines, offsetX, lineMidpoint, lineHeight) {
+function drawLines(
+    ctx: CanvasRenderingContext2D,
+    lines: string[][],
+    offsetX: number,
+    lineMidpoint: number,
+    lineHeight: number,
+) {
     const midpoint = lineMidpoint - (lineHeight * lines.length) / 2;
     lines.forEach((lineArray, lineIndex) => {
         const line = lineArray.join(' ');
@@ -42,7 +55,7 @@ function drawLines(ctx, lines, offsetX, lineMidpoint, lineHeight) {
     });
 }
 
-function generateClueImage(clue) {
+function generateClueImage(clue: Clue) {
     return new Promise((resolve, reject) => {
         const canvas = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
         const ctx = canvas.getContext('2d');
@@ -155,7 +168,7 @@ export async function dailyDoubleImage() {
     return `${DAILY_DOUBLE_URL}?random=${random}`;
 }
 
-export async function boardImage(game) {
+export async function boardImage(game: Game) {
     const buffer = await generateBoardImage(game);
     return {
         buffer,
@@ -163,7 +176,7 @@ export async function boardImage(game) {
     };
 }
 
-export async function clueImage(clue) {
+export async function clueImage(clue: Clue) {
     const buffer = await generateClueImage(clue);
     return {
         buffer,

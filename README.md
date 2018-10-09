@@ -9,13 +9,28 @@ A Slack bot that lets you play full Jeopardy! games. Easy to deploy, and highly 
 - Figure out docker image.
 - Update deploy button.
 - Move state selects into selector functions.
-- Build out the admin interface.
+- Build out the configuration via slack.
+    - Ideally this would be something like you pinging it with `config`, and it'll prompt you with some buttons.
+    - Open to anyone, so anyone can configure it.
+- Publish docker file.
+- Persist on exit request.
+- Help should DM the user, or send a message to just that user. (the ephemeral message stuff)
 
 ## Deploying
 
-TODO:
-- Support deploying via Heroku and other simple cloud providers (I'm sure someone has wrapped this up to make it easy)
-- Publish docker file.
+### Now
+
+Deploying with [now](https://zeit.co/now) is simple, and there is a free tier that you can use to run the Jeopardy Bot application.
+
+1. Follow the [Getting Started guide](https://zeit.co/now#get-started).
+2. Clone the project: `$ git clone https://github.com/kesne/jeopardy-bot.git && cd jeopardy-bot`
+3. Run now in the project to deploy it: `$ now`. You will be prompted to provide a `SLACK_TOKEN`.
+
+You're good to go! Invite the bot into a channel on slack, and start a game by saying "**new game**"!
+
+### Heroku
+
+### Docker
 
 ## How to Play
 
@@ -51,9 +66,8 @@ You can also ensure that the bot is awake by messaging "poke". This is useful fo
 
 ## Configuring
 
-You can configure the bot by using the admin control panel. You can go to the admin panel directly by navigating to `/admin` on the domain that the bot is deployed to. If you deployed on Heroku, the username and password should be configured during the heroku deploy process, and default to `jeopardy` and `bot`, respectively. Otherwise, you can set the username and password with the `ADMIN_USERNAME` and `ADMIN_PASSWORD` environment variables.
+The slack bot is configured via slack commands. To explore the configuration options available, simply say "**config**".
 
+### Configuring Persistence
 
-### Configuring MongoDB
-
-There are three different environment variables that you can use to set the URL for MongoDB. JeopardyBot will check the environment variables `MONGO_URL`, `MONGOHQ_URL`, and `MONGOLAB_URI` (in that order), before finally defaulting to `mongodb://localhost/jeopardy`.
+Persistence works out of the box by periodically uploading a dump of the configuration to slack itself. The sync occurs every 5 minutes, and whenever the process is gracefully exited. If the process exits and is unable to sync, it may lose up to 5 minutes of data.

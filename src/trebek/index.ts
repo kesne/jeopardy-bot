@@ -1,17 +1,25 @@
-import { createStore, applyMiddleware } from 'redux';
-import createSagaMiddleware, { Task } from 'redux-saga';
+import { createStore, applyMiddleware, Store } from 'redux';
+import createSagaMiddleware, { Task, SagaMiddleware } from 'redux-saga';
 import reducer from './reducers';
 import sagas from './sagas';
 import { INPUT, EVENT } from './actionTypes';
-
-const sagaMiddleware = createSagaMiddleware();
-const store = createStore(reducer, applyMiddleware(sagaMiddleware));
+import { SlackMessage, SlackEvent } from '../types';
 
 type SendMessage = (id: string, message: string) => any;
 type GetDisplayName = (id: string) => Promise<string>;
+interface PersistenceLayer {
+    persist(blob: string): Promise<void>;
+    revive(): Promise<string>;
+}
+
+// Upload the state every 5 minutes:
+const SYNC_INTERVAL = 5 * 60 * 1000;
 
 export default class Trebek {
-    studios: Map<String, Task> = new Map();
+    private studios: Map<String, Task> = new Map();
+    private persistence: PersistenceLayer;
+    private saga?: SagaMiddleware<{}>;
+    private store?: Store;
 
     public sendMessage: SendMessage;
     public getDisplayName: GetDisplayName;
@@ -19,27 +27,49 @@ export default class Trebek {
     constructor({
         sendMessage,
         getDisplayName,
+        persistence,
     }: {
         sendMessage: SendMessage;
         getDisplayName: GetDisplayName;
+        persistence: PersistenceLayer;
     }) {
         this.sendMessage = sendMessage;
         this.getDisplayName = getDisplayName;
+        this.persistence = persistence;
+    }
+
+    async start() {
+        let initialState = undefined;
+        try {
+            const revivedState = await this.persistence.revive();
+            initialState = JSON.parse(revivedState);
+        } catch(e) {
+            // Ignore failures:
+            console.log('Revive failed.');
+            console.log(e);
+        }
+
+        this.saga = createSagaMiddleware();
+        this.store = createStore(reducer, initialState, applyMiddleware(this.saga));
+
+        setInterval(() => {
+            this.persistence.persist(JSON.stringify(this.store!.getState()));
+        }, SYNC_INTERVAL);
     }
 
     // Dynamically boot sagas based on events we get:
     ensureStudioExists(id: string) {
         // TODO: Create studio in Redux:
         if (!this.studios.has(id)) {
-            const studioSaga = sagaMiddleware.run(sagas, this, id);
+            const studioSaga = this.saga!.run(sagas, this, id);
             this.studios.set(id, studioSaga);
         }
     }
 
-    input(message) {
+    input(message: SlackMessage) {
         this.ensureStudioExists(message.channel);
 
-        store.dispatch({
+        this.store!.dispatch({
             type: INPUT,
             payload: {
                 text: message.text,
@@ -49,12 +79,12 @@ export default class Trebek {
         });
     }
 
-    event(eventName: string, event) {
+    event(eventName: string, event: SlackEvent) {
         // Only process events that have a corresponding channel and user:
         if (event.channel && event.user) {
             this.ensureStudioExists(event.channel);
 
-            store.dispatch({
+            this.store!.dispatch({
                 type: EVENT,
                 payload: {
                     eventName,

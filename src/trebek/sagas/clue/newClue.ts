@@ -6,7 +6,7 @@ import sample from 'lodash/sample';
 import clean from '../../helpers/clean';
 import { DiceCoefficient } from 'natural';
 import { say } from '../utils';
-import { VALUES } from '../../constants';
+import { VALUES } from '../../../constants';
 
 export default function* newClue(
     category: string | ClueOptions,
@@ -15,7 +15,7 @@ export default function* newClue(
 ): any {
     const game: Game = yield select(({ games }) => games[action.studio]);
 
-    let selectedCategory: number;
+    let selectedCategory: null | number = null;
 
     if (
         (category === ClueOptions.SAME ||
@@ -59,8 +59,7 @@ export default function* newClue(
         }
     }
 
-    // @ts-ignore
-    if (!selectedCategory) {
+    if (selectedCategory === null) {
         yield say(
             `I'm sorry, I don't know what category that is. Try being more specific.`,
         );

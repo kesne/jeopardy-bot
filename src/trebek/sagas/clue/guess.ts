@@ -93,7 +93,7 @@ function* guessAnswer(clue: Clue) {
 // const DELAY_AMOUNT = 30;
 const DELAY_AMOUNT = 10;
 
-export default function* guess(clue) {
+export default function* guess(clue: Clue) {
     const { contestant, timeout } = yield race({
         // TODO: Daily doubles don't time out.
         // TODO: Allow configuring delay:

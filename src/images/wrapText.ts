@@ -27,7 +27,7 @@ export default function wrapText(
         if (m.width > maxWidth) {
             // Move this word to the beginning of the next line:
             if (!lines[activeLine + 1]) lines.push([]);
-            lines[activeLine + 1].unshift(lines[activeLine].pop());
+            lines[activeLine + 1].unshift(lines[activeLine].pop() as string);
         } else {
             fits = true;
             activeLine++;
