@@ -1,4 +1,5 @@
-# JeopardyBot
+# JeopardyBot (v2)
+## This branch is a complete rewrite of Jeopardy Bot. It is not complete yet, and I do not currently recommend installing it.
 
 A Slack bot that lets you play full Jeopardy! games. Easy to deploy, and highly configurable to your team's style of play.
 
