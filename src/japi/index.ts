@@ -3,7 +3,7 @@ import striptags from 'striptags';
 import { load } from 'cheerio';
 import { AllHtmlEntities } from 'html-entities';
 import unidecode from 'unidecode';
-import { Clue, Category } from '../trebek/reducers/games';
+import { Clue, Category } from '../types';
 
 const { decode } = new AllHtmlEntities();
 

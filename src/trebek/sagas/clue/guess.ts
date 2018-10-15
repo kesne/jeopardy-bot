@@ -1,7 +1,6 @@
 import { delay } from 'redux-saga';
-import { race, select, put, getContext } from 'redux-saga/effects';
+import { race, put, getContext } from 'redux-saga/effects';
 import sample from 'lodash/sample';
-import { Clue } from '../../reducers/games';
 import clean from '../../helpers/clean';
 import { input, say, react } from '../utils';
 import selectClue from './selectClue';
@@ -9,6 +8,8 @@ import { markQuestionAnswered } from '../../actions/games';
 import { adjustScore } from '../../actions/contestants';
 import currency from '../../helpers/currency';
 import guessMatches from '../../helpers/guessMatches';
+import { selectStudioScore } from '../../selectors';
+import { Clue } from '../../../types';
 
 function* guessAnswer(clue: Clue) {
     // Keep track of people that have already guessed on this clue:
@@ -58,10 +59,7 @@ function* guessAnswer(clue: Clue) {
                 }),
             );
 
-            const score = yield select(
-                ({ contestants }) =>
-                    contestants[action.contestant].scores[action.studio],
-            );
+            const score = yield selectStudioScore(action.studio, action.contestant);
 
             yield react('x', action);
             yield say(
@@ -78,10 +76,7 @@ function* guessAnswer(clue: Clue) {
                 }),
             );
 
-            const score = yield select(
-                ({ contestants }) =>
-                    contestants[action.contestant].scores[action.studio],
-            );
+            const score = yield selectStudioScore(action.studio, action.contestant);
 
             yield react('white_check_mark', action);
             yield say(

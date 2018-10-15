@@ -1,19 +1,18 @@
-import { select, put } from 'redux-saga/effects';
-import { BaseAction } from '../../../types';
+import { BaseAction, Game } from '../../../types';
 import { ClueOptions } from '../../actions/games';
-import { Game } from '../../reducers/games';
 import sample from 'lodash/sample';
 import clean from '../../helpers/clean';
 import { DiceCoefficient } from 'natural';
 import { say } from '../utils';
 import { VALUES } from '../../../constants';
+import { selectGame } from '../../selectors';
 
 export default function* newClue(
     category: string | ClueOptions,
     value: number,
     action: BaseAction,
 ): any {
-    const game: Game = yield select(({ games }) => games[action.studio]);
+    const game: Game = yield selectGame(action.studio);
 
     let selectedCategory: null | number = null;
 

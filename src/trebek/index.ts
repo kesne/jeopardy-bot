@@ -3,9 +3,15 @@ import createSagaMiddleware, { Task, SagaMiddleware } from 'redux-saga';
 import reducer from './reducers';
 import sagas from './sagas';
 import { INPUT, EVENT } from './actionTypes';
-import { SlackMessage, SlackEvent } from '../types';
+import { SlackMessage, SlackEvent, JeopardyImage } from '../types';
 
-type SendMessage = (id: string, message: string) => any;
+interface Message {
+    id: string;
+    message: string;
+    image?: JeopardyImage;
+    ephemeral?: string;
+}
+type SendMessage = (payload: Message) => any;
 type AddReaction = (id: string, reaction: string, ts: string) => any;
 type GetDisplayName = (id: string) => Promise<string>;
 interface PersistenceLayer {
@@ -98,9 +104,5 @@ export default class Trebek {
                 studio: event.channel,
             });
         }
-    }
-
-    say(id: string, message: string) {
-        this.sendMessage(id, message);
     }
 }

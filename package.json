@@ -18,6 +18,7 @@
         "axios": "^0.18.0",
         "canvas": "^1.6.12",
         "cheerio": "^1.0.0-rc.2",
+        "dedent": "^0.7.0",
         "html-entities": "^1.2.1",
         "immer": "^1.7.2",
         "lodash": "^4.17.11",
@@ -31,6 +32,7 @@
     },
     "devDependencies": {
         "@types/cheerio": "^0.22.9",
+        "@types/dedent": "^0.7.0",
         "@types/html-entities": "^1.2.16",
         "@types/lodash": "^4.14.116",
         "@types/natural": "^0.2.33",

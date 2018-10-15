@@ -1,6 +1,6 @@
 import { RTMClient, WebClient } from '@slack/client';
 import Trebek from './trebek';
-import { JeopardyImage, SlackResponse } from './types';
+import { SlackResponse } from './types';
 import CleverPersistence from './CleverPersistence';
 
 const token = process.env.SLACK_TOKEN as string;
@@ -10,16 +10,22 @@ const rtm = new RTMClient(token);
 const web = new WebClient(token);
 
 const trebek = new Trebek({
-    sendMessage(id, message, image?: JeopardyImage) {
-        if (image) {
+    sendMessage(payload) {
+        if (payload.image) {
             return web.files.upload({
-                file: image.buffer,
-                filename: image.filename,
-                channels: id,
-                initial_comment: message,
+                file: payload.image.buffer,
+                filename: payload.image.filename,
+                channels: payload.id,
+                initial_comment: payload.message,
+            });
+        } else if (payload.ephemeral) {
+            return web.chat.postEphemeral({
+                text: payload.message,
+                user: payload.ephemeral,
+                channel: payload.id,
             });
         } else {
-            return rtm.sendMessage(message, id);
+            return rtm.sendMessage(payload.message, payload.id);
         }
     },
     addReaction(id, reaction, ts) {
@@ -30,7 +36,7 @@ const trebek = new Trebek({
         });
     },
     async getDisplayName(id) {
-        const response = await web.users.info({ user: id }) as SlackResponse;
+        const response = (await web.users.info({ user: id })) as SlackResponse;
         return response.user.profile.display_name;
     },
     persistence: new CleverPersistence(web, rtm),
@@ -41,6 +47,7 @@ rtm.on('connected', async () => {
     await trebek.start();
 
     rtm.on('slack_event', (eventType, event) => {
+        console.log('got event!', event);
         trebek.event(eventType, event);
     });
 

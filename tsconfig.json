@@ -9,6 +9,7 @@
         "outDir": "lib",
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
-        "downlevelIteration": true
+        "downlevelIteration": true,
+        "noUnusedLocals": true
     }
 }

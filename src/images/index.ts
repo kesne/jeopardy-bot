@@ -2,7 +2,7 @@ import Canvas, { Image } from 'canvas';
 import { join } from 'path';
 import { readFileSync } from 'fs';
 import wrapText from './wrapText';
-import { Game, Clue } from '../trebek/reducers/games';
+import { Game, Clue } from '../types';
 
 const CANVAS_WIDTH = 1200;
 const CANVAS_HEIGHT = 740;

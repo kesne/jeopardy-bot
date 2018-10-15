@@ -1,4 +1,4 @@
-import { takeEvery, spawn, setContext, getContext } from 'redux-saga/effects';
+import { takeEvery, spawn, getContext } from 'redux-saga/effects';
 import { EVENT } from '../../actionTypes';
 import { BaseAction } from '../../../types';
 

@@ -1,11 +1,9 @@
 import { ADJUST_SCORE, CREATE_CONTESTANT } from '../actionTypes';
 
-export function createContestant(contestant: string, name: string) {
+export function createContestant(contestant: string) {
     return {
         type: CREATE_CONTESTANT,
-        payload: {
-            name,
-        },
+        payload: {},
         contestant,
     }
 }

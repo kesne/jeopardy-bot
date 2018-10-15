@@ -49,7 +49,7 @@ function* clue(
         );
 
         const image = yield clueImage(clue);
-        yield say("Here's your clue.", image);
+        yield say("Here's your clue.", { image });
 
         yield guess(clue);
     }

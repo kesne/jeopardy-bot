@@ -1,5 +1,5 @@
 import { NEW_GAME, END_GAME, MARK_QUESTION_ANSWERED } from '../actionTypes';
-import { Category, Clue } from '../reducers/games';
+import { Category, Clue } from '../../types';
 
 export enum ClueOptions {
     SAME,

@@ -1,32 +1,8 @@
 import produce from 'immer';
 import { NEW_GAME, END_GAME, MARK_QUESTION_ANSWERED } from '../actionTypes';
-import { BaseAction } from '../../types';
+import { BaseAction, ReduxState } from '../../types';
 
-export interface Clue {
-    id: number;
-    categoryId: number;
-    question: string;
-    answer: string;
-    value: number;
-    dailyDouble: boolean;
-    answered: boolean;
-}
-
-export interface Category {
-    id: number;
-    title: string;
-}
-
-export interface Game {
-    questions: Clue[],
-    categories: Category[],
-    recentCategory?: number;
-}
-
-interface State {
-    [key: string]: Game;
-}
-
+type State = ReduxState['games'];
 const initialState: State = {};
 
 export default produce<State, BaseAction>((draft, action) => {
