@@ -25,8 +25,8 @@ export default produce<State, BaseAction>((draft, action) => {
             break;
         case END_GAME:
             Object.values(draft).forEach((contestant) => {
-                if (contestant.scores[action.payload.id]) {
-                    contestant.stats.money += contestant.scores[action.payload.id];
+                if (contestant.scores[action.studio]) {
+                    contestant.stats.money += contestant.scores[action.studio];
                     if (action.payload.winner) {
                         if (action.payload.winner === contestant.id) {
                             contestant.stats.won += 1;
@@ -34,7 +34,7 @@ export default produce<State, BaseAction>((draft, action) => {
                             contestant.stats.lost += 1;
                         }
                     }
-                    delete contestant.scores[action.payload.id];
+                    delete contestant.scores[action.studio];
                 }
             });
             break;

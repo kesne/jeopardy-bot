@@ -1,4 +1,6 @@
-import { all, setContext, cancel, spawn } from 'redux-saga/effects';
+import { all, setContext, cancel, spawn, put, select } from 'redux-saga/effects';
+import { selectStudio, selectConfig } from '../selectors';
+import { createStudio } from '../actions/studios';
 import Trebek from '../';
 import poke from './poke';
 import endGame from './endGame';
@@ -18,7 +20,11 @@ export default function* rootSaga(manager: Trebek, studio: string) {
         studio,
     });
 
-    // TODO: Set up the studio in the redux store.
+    const studioInStore = yield selectStudio(studio);
+    if (!studioInStore) {
+        const config = yield selectConfig();
+        yield put(createStudio(studio, config.studiosEnabledByDefault || true));
+    }
 
     // The current clue can be abandoned if the game is ended, so we need to
     // spawn it so that we can cancel in the future.

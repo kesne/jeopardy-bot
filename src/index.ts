@@ -24,6 +24,12 @@ const trebek = new Trebek({
                 user: payload.ephemeral,
                 channel: payload.id,
             });
+        } else if (payload.attachments) {
+            return web.chat.postMessage({
+                channel: payload.id,
+                text: payload.message,
+                attachments: payload.attachments,
+            })
         } else {
             return rtm.sendMessage(payload.message, payload.id);
         }
@@ -47,7 +53,6 @@ rtm.on('connected', async () => {
     await trebek.start();
 
     rtm.on('slack_event', (eventType, event) => {
-        console.log('got event!', event);
         trebek.event(eventType, event);
     });
 

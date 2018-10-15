@@ -8,8 +8,8 @@ import { markQuestionAnswered } from '../../actions/games';
 import { adjustScore } from '../../actions/contestants';
 import currency from '../../helpers/currency';
 import guessMatches from '../../helpers/guessMatches';
-import { selectStudioScore } from '../../selectors';
-import { Clue } from '../../../types';
+import { selectStudioScore, selectStudio } from '../../selectors';
+import { Clue, Studio } from '../../../types';
 
 function* guessAnswer(clue: Clue) {
     // Keep track of people that have already guessed on this clue:
@@ -90,21 +90,19 @@ function* guessAnswer(clue: Clue) {
     }
 }
 
-// Clues are active for 30 seconds:
-// const DELAY_AMOUNT = 30;
-const DELAY_AMOUNT = 10;
-
 export default function* guess(clue: Clue) {
+    const studioId = yield getContext('studio');
+    const studio: Studio = yield selectStudio(studioId);
+
     const { contestant, timeout } = yield race({
         // TODO: Daily doubles don't time out.
-        // TODO: Allow configuring delay:
-        timeout: delay(DELAY_AMOUNT * 1000),
+        timeout: delay(studio.timeouts.clue * 1000),
         contestant: guessAnswer(clue),
     });
 
     yield put(
         markQuestionAnswered({
-            id: yield getContext('studio'),
+            id: studioId,
             question: clue.id,
             contestant,
         }),

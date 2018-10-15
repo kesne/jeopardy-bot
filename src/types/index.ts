@@ -83,12 +83,37 @@ export interface Contestant {
     };
 }
 
+export interface Studio {
+    id: string;
+    enabled: boolean;
+    timeouts: {
+        clue: number;
+        challenge: number;
+        boardControl: number;
+        dailyDouble: number;
+    };
+    // Feature flags:
+    features: {
+        challenges: boolean;
+        boardControl: boolean;
+        dailyDoubles: boolean;
+        greetings: boolean;
+    };
+    stats: {
+        games: number;
+        guesses: number;
+    };
+}
+
 export interface ReduxState {
     contestants: {
         [id: string]: Contestant;
     };
     games: {
         [id: string]: Game;
+    };
+    studios: {
+        [id: string]: Studio;
     };
     config: {
         studiosEnabledByDefault: boolean;

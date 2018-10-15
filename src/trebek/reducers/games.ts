@@ -8,20 +8,20 @@ const initialState: State = {};
 export default produce<State, BaseAction>((draft, action) => {
     switch (action.type) {
         case NEW_GAME:
-            draft[action.payload.id] = {
+            draft[action.studio] = {
                 recentCategory: undefined,
                 categories: action.payload.categories,
                 questions: action.payload.questions,
             };
             break;
         case END_GAME:
-            delete draft[action.payload.id];
+            delete draft[action.studio];
             break;
         case MARK_QUESTION_ANSWERED: {
-            const question = draft[action.payload.id].questions.find(({ id }) => id === action.payload.question);
+            const question = draft[action.studio].questions.find(({ id }) => id === action.payload.question);
             if (question) {
                 question.answered = true;
-                draft[action.payload.id].recentCategory = question.categoryId;
+                draft[action.studio].recentCategory = question.categoryId;
             }
             break;
         }

@@ -18,8 +18,8 @@ export function newGame({
 }) {
     return {
         type: NEW_GAME,
+        studio: id,
         payload: {
-            id,
             questions,
             categories,
         },
@@ -29,8 +29,8 @@ export function newGame({
 export function endGame({ id, winner }: { id: string; winner?: string }) {
     return {
         type: END_GAME,
+        studio: id,
         payload: {
-            id,
             winner,
         },
     };
@@ -47,10 +47,10 @@ export function markQuestionAnswered({
 }) {
     return {
         type: MARK_QUESTION_ANSWERED,
+        studio: id,
+        contestant,
         payload: {
-            id,
             question,
-            contestant,
         },
     };
 }

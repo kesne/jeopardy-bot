@@ -1,6 +1,14 @@
 import { select } from 'redux-saga/effects';
 import { ReduxState } from '../types';
 
+export function selectConfig() {
+    return select(({ config }: ReduxState) => config);
+}
+
+export function selectStudio(studio: string) {
+    return select(({ studios }: ReduxState) => studios[studio]);
+}
+
 export function selectContestants() {
     return select(({ contestants }: ReduxState) => Object.values(contestants));
 }

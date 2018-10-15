@@ -10,6 +10,7 @@ interface Message {
     message: string;
     image?: JeopardyImage;
     ephemeral?: string;
+    attachments?: any[];
 }
 type SendMessage = (payload: Message) => any;
 type AddReaction = (id: string, reaction: string, ts: string) => any;

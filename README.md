@@ -7,14 +7,10 @@ A Slack bot that lets you play full Jeopardy! games. Easy to deploy, and highly 
 
 ## TODO:
 
-- Build out the configuration via slack.
-    - Ideally this would be something like you pinging it with `config`, and it'll prompt you with some buttons.
-    - Open to anyone, so anyone can configure it.
 - Publish docker file.
 - Persist on exit request.
-- Help should DM the user, or send a message to just that user. (the ephemeral message stuff)
-- Move around reducer types so that we don't need to constantly import out of reducers.
 - Challenges
+- Daily Doubles
 
 ## Deploying
 

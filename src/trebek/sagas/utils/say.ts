@@ -6,9 +6,11 @@ export default function* say(
     {
         image,
         ephemeral,
+        attachments,
     }: {
         image?: JeopardyImage;
         ephemeral?: string;
+        attachments?: any[];
     } = {},
 ) {
     const studio = yield getContext('studio');
@@ -19,6 +21,7 @@ export default function* say(
         message,
         image,
         ephemeral,
+        attachments,
     });
 
     return;
