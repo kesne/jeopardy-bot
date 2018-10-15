@@ -7,7 +7,6 @@ A Slack bot that lets you play full Jeopardy! games. Easy to deploy, and highly 
 
 ## TODO:
 
-- Publish docker file.
 - Persist on exit request.
 - Challenges
 - Board Control
@@ -35,6 +34,13 @@ Deploying with [Heroku](https://heroku.com) is possible, however if you're using
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/kesne/jeopardy-bot)
 
 ### Docker
+
+A docker image containing the bot is published and can easily be used as well. You will need to create a `SLACK_TOKEN` for the bot, and provide it via an environment variable when running the container.
+
+```
+$ docker pull jeopardybot/bot
+$ docker run -e "SLACK_TOKEN=<slack-token-here>" -d jeopardybot/bot
+```
 
 ## How to Play
 
@@ -64,6 +70,9 @@ When in doubt, just type "help" in the channel and a message will appear to help
     “scores” - Shows the scores for the current game.
     “leaderboard” - Shows the scores for the top players.
     “loserboard” - Shows the scores for the bottom players.
+*Configuration*
+    “config” - Shows the configuration for the current channel
+    “config global” - Shows the global configuration
  ```
 
 You can also ensure that the bot is awake by messaging "poke". This is useful for free Heroku dynos, which may get shut down after inactivity.
@@ -72,6 +81,6 @@ You can also ensure that the bot is awake by messaging "poke". This is useful fo
 
 The slack bot is configured via slack commands. To explore the configuration options available, simply say "**config**".
 
-### Configuring Persistence
+### Persistence
 
 Persistence works out of the box by periodically uploading a dump of the configuration to slack itself. The sync occurs every 5 minutes, and whenever the process is gracefully exited. If the process exits and is unable to sync, it may lose up to 5 minutes of data.

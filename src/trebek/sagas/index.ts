@@ -1,4 +1,4 @@
-import { all, setContext, cancel, spawn, put, select } from 'redux-saga/effects';
+import { all, setContext, cancel, spawn, put } from 'redux-saga/effects';
 import { selectStudio, selectConfig } from '../selectors';
 import { createStudio } from '../actions/studios';
 import Trebek from '../';

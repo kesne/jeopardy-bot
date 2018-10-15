@@ -1,7 +1,7 @@
 import { say, input, Requirement, requirement } from './utils';
 import { selectChannelContestants } from '../selectors';
-import { Contestant } from '../reducers/contestants';
 import currency from '../helpers/currency';
+import { Contestant } from '../../types';
 
 export default function* scores() {
     yield input(/scores?/, function*(action) {

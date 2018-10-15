@@ -26,6 +26,9 @@ const helpText = dedent`
         “scores” - Shows the scores for the current game.
         “leaderboard” - Shows the scores for the top players.
         “loserboard” - Shows the scores for the bottom players.
+    *Configuration*
+        “config” - Shows the configuration for the current channel
+        “config global” - Shows the global configuration
 `;
 
 export default function* help() {

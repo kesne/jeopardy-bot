@@ -6,7 +6,7 @@ import { delay } from 'redux-saga';
 
 const AFFIRMATIVE = ['yes', 'sure', 'yep', 'y', 'yeah'];
 
-export default function* endGame(endClue) {
+export default function* endGame(endClue: Function) {
     yield input('end game', function* (action: BaseAction) {
         if (yield requirement(Requirement.GAME_ACTIVE)) {
             yield say('*Are you sure that you want to end the game?*');
