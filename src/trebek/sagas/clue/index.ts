@@ -1,10 +1,11 @@
-import { input, requirement, Requirement, say } from '../utils';
+import { input, requirement, Requirement, say, feature } from '../utils';
 import { BaseAction } from '../../../types';
 import { ClueOptions } from '../../actions/games';
 import currency from '../../helpers/currency';
 import newClue from './newClue';
 import guess from './guess';
-import { clueImage } from '../../../images';
+import wager from './wager';
+import { clueImage, dailyDoubleImage } from '../../../images';
 
 function getCategory(category: string | ClueOptions) {
     if (category === 'same' || category === 'same category') {
@@ -43,15 +44,28 @@ function* clue(
         // Bail if we were unable to get a clue:
         if (!clue) return;
 
-        // // Give the user a little more feedback when we can:
+        // Give the user a little more feedback when we can:
         yield say(
             `OK, \`${clue.category.title}\` for ${currency(clue.value)}...`,
         );
 
-        const image = yield clueImage(clue);
-        yield say("Here's your clue.", { image });
+        let dailyDoubleWager = null;
+        if (clue.dailyDouble && (yield feature('dailyDoubles'))) {
+            const image = yield dailyDoubleImage();
+            yield say('Answer: Daily Double', { image });
 
-        yield guess(clue);
+            dailyDoubleWager = yield wager(action, clue);
+        }
+
+        const image = yield clueImage(clue);
+
+        if (dailyDoubleWager) {
+            yield say(`For ${currency(dailyDoubleWager)}, here's your clue.`, { image });
+        } else {
+            yield say("Here's your clue.", { image });
+        }
+
+        yield guess(action, clue, dailyDoubleWager);
     }
 }
 

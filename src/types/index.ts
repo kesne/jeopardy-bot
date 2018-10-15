@@ -90,7 +90,7 @@ export interface Studio {
         clue: number;
         challenge: number;
         boardControl: number;
-        dailyDouble: number;
+        wager: number;
     };
     // Feature flags:
     features: {

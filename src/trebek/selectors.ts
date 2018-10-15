@@ -27,7 +27,7 @@ export function selectChannelContestants(studio: string) {
 
 export function selectStudioScore(studio: string, contestant: string) {
     return select(
-        ({ contestants }: ReduxState) => contestants[contestant].scores[studio],
+        ({ contestants }: ReduxState) => contestants[contestant].scores[studio] || 0,
     );
 }
 

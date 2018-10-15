@@ -110,12 +110,6 @@ export default function* newClue(
         return;
     }
 
-    // TODO: Adjust to handle daily doubles:
-    // // If the question is a daily double, add in the contestant:
-    // if (question.dailyDouble) {
-    //     this.dailyDouble.contestant = contestant.id;
-    // }
-
     return {
         ...question,
         category: game.categories.find(({ id }) => id === selectedCategory),

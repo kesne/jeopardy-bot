@@ -40,7 +40,7 @@ function getTimeoutName(name: string): keyof Studio['timeouts'] {
         clue: 'clue',
         challenge: 'challenge',
         boardcontrol: 'boardControl',
-        dailydouble: 'dailyDouble',
+        wager: 'wager',
     } as any;
 
     if (!timeouts.hasOwnProperty(name)) {
@@ -164,10 +164,8 @@ export default function* config() {
                                         ),
                                     },
                                     {
-                                        title: 'Daily double (`dailyDouble`)',
-                                        ...printTimeout(
-                                            studio.timeouts.dailyDouble,
-                                        ),
+                                        title: 'Daily double wager (`wager`)',
+                                        ...printTimeout(studio.timeouts.wager),
                                     },
                                 ],
                                 footer:

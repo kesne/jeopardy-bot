@@ -14,7 +14,7 @@ export default produce<State, BaseAction>((draft, action) => {
                 timeouts: {
                     clue: 30,
                     challenge: 15,
-                    dailyDouble: 10,
+                    wager: 10,
                     boardControl: 5,
                 },
                 features: {

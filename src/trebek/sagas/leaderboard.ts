@@ -3,7 +3,7 @@ import orderBy from 'lodash/orderBy';
 import { input, say } from './utils';
 import { selectContestants } from '../selectors';
 import currency from '../helpers/currency';
-import { Contestant } from '../reducers/contestants';
+import { Contestant } from '../../types';
 
 const MAX_PLAYERS = 10;
 
@@ -15,7 +15,6 @@ export default function* leaderboard() {
         const leaders = match.includes('leader');
         const contestants: Contestant[] = yield selectContestants();
         const sortedOrderedContestants = take(
-            // TODO: Flip the order based on leaders or losers.
             orderBy(
                 contestants.filter(
                     contestant =>
@@ -24,6 +23,7 @@ export default function* leaderboard() {
                             : contestant.stats.money < 0,
                 ),
                 'stats.money',
+                leaders ? 'desc' : 'asc',
             ),
             Math.min(Number(num), MAX_PLAYERS),
         );

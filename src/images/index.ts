@@ -161,11 +161,12 @@ function generateBoardImage(game: Game) {
     });
 }
 
-const DAILY_DOUBLE_URL = 'http://i.imgur.com/EqH6Fgw.png';
-
+const DAILY_DOUBLE_BUFFER = readFileSync(join(ASSETS, 'dailydouble.png'))
 export async function dailyDoubleImage() {
-    const random = Math.round(Math.random() * 1000000);
-    return `${DAILY_DOUBLE_URL}?random=${random}`;
+    return {
+        buffer: DAILY_DOUBLE_BUFFER,
+        filename: 'Daily Double',
+    }
 }
 
 export async function boardImage(game: Game) {

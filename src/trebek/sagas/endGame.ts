@@ -13,7 +13,7 @@ export default function* endGame(endClue) {
 
             const { confirm, timeout } = yield race({
                 confirm: input(/(.*)/),
-                timeout: delay(5000),
+                timeout: delay(5000, true),
             });
 
             if (timeout) return;

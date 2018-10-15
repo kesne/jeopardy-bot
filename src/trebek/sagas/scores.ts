@@ -27,7 +27,7 @@ export default function* scores() {
                 })
                 .map(
                     (contestant, i) =>
-                        `${i + 1}. ${contestant.id}: ${currency(
+                        `${i + 1}. <@${contestant.id}>: ${currency(
                             contestant.scores[action.studio],
                         )}`,
                 )

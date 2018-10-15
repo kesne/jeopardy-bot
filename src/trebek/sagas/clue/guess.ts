@@ -1,5 +1,5 @@
 import { delay } from 'redux-saga';
-import { race, put, getContext } from 'redux-saga/effects';
+import { race, put } from 'redux-saga/effects';
 import sample from 'lodash/sample';
 import clean from '../../helpers/clean';
 import { input, say, react } from '../utils';
@@ -9,9 +9,9 @@ import { adjustScore } from '../../actions/contestants';
 import currency from '../../helpers/currency';
 import guessMatches from '../../helpers/guessMatches';
 import { selectStudioScore, selectStudio } from '../../selectors';
-import { Clue, Studio } from '../../../types';
+import { Clue, Studio, BaseAction } from '../../../types';
 
-function* guessAnswer(clue: Clue) {
+function* guessAnswer(rootAction: BaseAction, clue: Clue, wager: number) {
     // Keep track of people that have already guessed on this clue:
     let guessed: Set<string> = new Set();
 
@@ -27,6 +27,15 @@ function* guessAnswer(clue: Clue) {
             /(?:whats?|wheres?|whos?|whens?) (?:(?:is|are|was|were|the|an?) ){1,2}(.*)/,
             /w (.*)/,
         ]);
+
+        // If there's a wager, this is a daily double, and the only person that
+        // can guess is the contestant that selected it:
+        if (wager && rootAction.contestant !== action.contestant) {
+            yield say(
+                `This daily double is not for you, <@${action.contestant}>!`,
+            );
+            continue;
+        }
 
         if (guessed.has(action.contestant)) {
             yield react(
@@ -48,6 +57,8 @@ function* guessAnswer(clue: Clue) {
             guessMatches(guess, answer),
         );
 
+        const value = wager || clue.value;
+
         if (!correctAnswer) {
             guessed.add(action.contestant);
 
@@ -55,11 +66,14 @@ function* guessAnswer(clue: Clue) {
                 adjustScore({
                     contestant: action.contestant,
                     studio: action.studio,
-                    amount: -1 * clue.value,
+                    amount: -1 * value,
                 }),
             );
 
-            const score = yield selectStudioScore(action.studio, action.contestant);
+            const score = yield selectStudioScore(
+                action.studio,
+                action.contestant,
+            );
 
             yield react('x', action);
             yield say(
@@ -72,11 +86,14 @@ function* guessAnswer(clue: Clue) {
                 adjustScore({
                     contestant: action.contestant,
                     studio: action.studio,
-                    amount: clue.value,
+                    amount: value,
                 }),
             );
 
-            const score = yield selectStudioScore(action.studio, action.contestant);
+            const score = yield selectStudioScore(
+                action.studio,
+                action.contestant,
+            );
 
             yield react('white_check_mark', action);
             yield say(
@@ -87,22 +104,25 @@ function* guessAnswer(clue: Clue) {
 
             return action.contestant;
         }
+
+        // If there is a wager then we can only process one guess:
+        if (wager) {
+            return;
+        }
     }
 }
 
-export default function* guess(clue: Clue) {
-    const studioId = yield getContext('studio');
-    const studio: Studio = yield selectStudio(studioId);
+export default function* guess(action: BaseAction, clue: Clue, wager: number) {
+    const studio: Studio = yield selectStudio(action.studio);
 
     const { contestant, timeout } = yield race({
-        // TODO: Daily doubles don't time out.
-        timeout: delay(studio.timeouts.clue * 1000),
-        contestant: guessAnswer(clue),
+        timeout: delay(studio.timeouts.clue * 1000, true),
+        contestant: guessAnswer(action, clue, wager),
     });
 
     yield put(
         markQuestionAnswered({
-            id: studioId,
+            id: action.studio,
             question: clue.id,
             contestant,
         }),
@@ -110,6 +130,29 @@ export default function* guess(clue: Clue) {
 
     if (timeout) {
         yield say(`Time's up! The correct answer was \`${clue.answer}\`.`);
+
+        if (wager) {
+            yield put(
+                adjustScore({
+                    contestant: action.contestant,
+                    studio: action.studio,
+                    amount: -1 * wager,
+                }),
+            );
+
+            const score = yield selectStudioScore(
+                action.studio,
+                action.contestant,
+            );
+
+            yield say(
+                `You didn't guess in time, <@${
+                    action.contestant
+                }>, and your wager of ${currency(
+                    wager,
+                )} was deducted. Your score is now ${currency(score)}.`,
+            );
+        }
     }
 
     // Prompt selection of a new clue:

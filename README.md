@@ -10,7 +10,7 @@ A Slack bot that lets you play full Jeopardy! games. Easy to deploy, and highly 
 - Publish docker file.
 - Persist on exit request.
 - Challenges
-- Daily Doubles
+- Board Control
 
 ## Deploying
 
