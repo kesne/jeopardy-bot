@@ -156,5 +156,7 @@ export default function* guess(action: BaseAction, clue: Clue, wager: number) {
     }
 
     // Prompt selection of a new clue:
-    yield selectClue();
+    yield selectClue({ contestant });
+
+    return contestant;
 }

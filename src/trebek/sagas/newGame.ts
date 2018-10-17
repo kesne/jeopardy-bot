@@ -19,7 +19,7 @@ export default function* watchNewGame() {
                 }),
             );
 
-            yield selectClue(true);
+            yield selectClue({ initial: true });
         } else {
             yield say(
                 'There is already a game in progress! You must finish or end that game before starting a new game.',
