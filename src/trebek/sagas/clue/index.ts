@@ -1,5 +1,5 @@
 import { input, requirement, Requirement, say, feature } from '../utils';
-import { BaseAction } from '../../../types';
+import { BaseAction, ClueWithCategory } from '../../../types';
 import { ClueOptions } from '../../actions/games';
 import currency from '../../helpers/currency';
 import newClue from './newClue';
@@ -39,7 +39,7 @@ function* clue(
                 ? -1
                 : getValue(inputValue, gimmeValue);
 
-        const clue = yield newClue(category, value, action);
+        const clue: ClueWithCategory = yield newClue(category, value, action);
 
         // Bail if we were unable to get a clue:
         if (!clue) return;
@@ -63,6 +63,16 @@ function* clue(
             yield say(`For ${currency(dailyDoubleWager)}, here's your clue.`, { image });
         } else {
             yield say("Here's your clue.", { image });
+        }
+
+        // TODO: Turn video clues into gifs:
+        if (clue.media.length && (yield feature('clueMedia'))) {
+            yield say('Here is the media for the clue.', {
+                attachments: clue.media.map((url) => ({
+                    title: 'Clue Media',
+                    image_url: url,
+                })),
+            });
         }
 
         yield guess(action, clue, dailyDoubleWager);

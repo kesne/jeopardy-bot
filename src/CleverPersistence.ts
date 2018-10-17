@@ -58,7 +58,7 @@ export default class CleverPersistence {
         await Promise.all(
             history.messages
                 // Make sure we don't delete the file we literally just uploaded:
-                .filter((_, index) => index !== history.messages.length - 1)
+                .filter((_, index) => index !== history.messages.length - 2)
                 .map(message =>
                     // @ts-ignore
                     Promise.all([

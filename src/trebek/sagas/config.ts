@@ -26,6 +26,7 @@ function getFeature(name: string): keyof Studio['features'] {
         boardcontrol: 'boardControl',
         challenges: 'challenges',
         dailydoubles: 'dailyDoubles',
+        cluemedia: 'clueMedia',
     } as any;
 
     if (!features.hasOwnProperty(name)) {
@@ -137,6 +138,10 @@ export default function* config() {
                                             studio.features.dailyDoubles,
                                         ),
                                     },
+                                    {
+                                        title: 'Clue Media (`clueMedia`)',
+                                        ...yesOrNo(studio.features.clueMedia),
+                                    }
                                 ],
                                 footer:
                                     'You can toggle any channel-specific features with `config set <name> [on|off]`',

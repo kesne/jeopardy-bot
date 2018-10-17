@@ -34,7 +34,7 @@ export default function* rootSaga(manager: Trebek, studio: string) {
         currentClue = yield spawn(clue);
     }
 
-    // Install all of the features:
+    // Install all of the commands:
     yield all([
         poke(),
         newGame(),

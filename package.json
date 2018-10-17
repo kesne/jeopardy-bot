@@ -19,6 +19,7 @@
         "canvas": "^1.6.12",
         "cheerio": "^1.0.0-rc.2",
         "dedent": "^0.7.0",
+        "gfycat-sdk": "^1.4.18",
         "html-entities": "^1.2.1",
         "immer": "^1.7.2",
         "lodash": "^4.17.11",

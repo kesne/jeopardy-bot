@@ -58,6 +58,14 @@ async function loadEpisode(url: string) {
         question = simplifyText(striptags(question, ['br']));
         question = question.replace(/<br\s*\/?>/gi, '\n');
 
+        const media: string[] = [];
+        $clueText.find('a').each((_, aTag) => {
+            const href = $(aTag).attr('href');
+            if (href) {
+                media.push(href);
+            }
+        });
+
         // Extract the answer and strip HTML tags:
         let [, answer] = /ponse">(.*)<\/e/.exec(
             $clue.find('td:first-child > div').attr('onmouseover'),
@@ -73,6 +81,7 @@ async function loadEpisode(url: string) {
             question,
             answer,
             value,
+            media,
             dailyDouble,
             answered: false,
         });
@@ -115,7 +124,11 @@ async function randomEpisode() {
 }
 
 // Force-generate a new game:
-export async function generateGame() {
+export async function generateGame(gameId?: string) {
+    if (gameId) {
+        return loadEpisode(`http://www.j-archive.com/showgame.php?game_id=${gameId}`);
+    }
+
     let game;
     do {
         try {

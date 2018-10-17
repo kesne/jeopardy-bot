@@ -22,6 +22,7 @@ export default produce<State, BaseAction>((draft, action) => {
                     boardControl: true,
                     dailyDoubles: true,
                     greetings: true,
+                    clueMedia: true,
                 },
                 stats: {
                     games: 0,

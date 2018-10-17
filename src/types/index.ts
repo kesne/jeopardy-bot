@@ -50,6 +50,7 @@ export interface Clue {
     question: string;
     answer: string;
     value: number;
+    media: string[];
     dailyDouble: boolean;
     answered: boolean;
 }
@@ -57,6 +58,10 @@ export interface Clue {
 export interface Category {
     id: number;
     title: string;
+}
+
+export interface ClueWithCategory extends Clue {
+    category: Category;
 }
 
 export interface Game {
@@ -98,6 +103,7 @@ export interface Studio {
         boardControl: boolean;
         dailyDoubles: boolean;
         greetings: boolean;
+        clueMedia: boolean;
     };
     stats: {
         games: number;

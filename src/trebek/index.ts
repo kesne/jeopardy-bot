@@ -67,6 +67,16 @@ export default class Trebek {
         setInterval(() => {
             this.persistence.persist(JSON.stringify(this.store!.getState()));
         }, SYNC_INTERVAL);
+
+        const persistThenExit = async () => {
+            console.log('Detected app exit, attempting to persist the store state...');
+            await this.persistence.persist(JSON.stringify(this.store!.getState()));
+            console.log('Store state successfully persisted!');
+            process.exit(0);
+        };
+
+        process.on('SIGINT', persistThenExit);
+        process.on('SIGTERM', persistThenExit);
     }
 
     // Dynamically boot sagas based on events we get:
