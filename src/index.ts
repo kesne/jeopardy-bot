@@ -1,3 +1,4 @@
+import http from 'http';
 import { RTMClient, WebClient } from '@slack/client';
 import Trebek from './trebek';
 import { SlackResponse } from './types';
@@ -29,7 +30,7 @@ const trebek = new Trebek({
                 channel: payload.id,
                 text: payload.message,
                 attachments: payload.attachments,
-            })
+            });
         } else {
             return rtm.sendMessage(payload.message, payload.id);
         }
@@ -67,3 +68,11 @@ rtm.on('connected', async () => {
 });
 
 rtm.start();
+
+const port = process.env.PORT || 8080;
+http.createServer((_, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('ok');
+}).listen(port, () => {
+    console.log('HTTP server started.');
+});

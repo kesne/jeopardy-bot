@@ -21,4 +21,6 @@ COPY . .
 RUN npm run build
 
 EXPOSE 8080
+ENV PORT 8080
+ENV SLACK_TOKEN $SLACK_TOKEN
 CMD [ "node", "lib/index.js" ]
