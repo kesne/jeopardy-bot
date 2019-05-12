@@ -1,8 +1,7 @@
+import { put, race, delay } from 'redux-saga/effects';
 import { input, say, requirement, Requirement } from './utils';
 import * as gameActions from '../actions/games';
-import { put, race } from 'redux-saga/effects';
 import { BaseAction } from '../../types';
-import { delay } from 'redux-saga';
 
 const AFFIRMATIVE = ['yes', 'sure', 'yep', 'y', 'yeah'];
 

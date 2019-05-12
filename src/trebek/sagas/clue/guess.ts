@@ -1,5 +1,4 @@
-import { delay } from 'redux-saga';
-import { race, put } from 'redux-saga/effects';
+import { race, put, delay } from 'redux-saga/effects';
 import sample from 'lodash/sample';
 import clean from '../../helpers/clean';
 import { input, say, react } from '../utils';

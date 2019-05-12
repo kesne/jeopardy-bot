@@ -8,8 +8,9 @@ RUN apt-get -y install libcairo2-dev libjpeg-dev libpango1.0-dev libgif-dev buil
 WORKDIR /app
 
 # Install app dependencies
-COPY package*.json ./
-RUN npm install
+COPY package.json ./
+COPY yarn.lock ./
+RUN yarn
 
 # Install fonts:
 COPY assets/fonts/*.ttf /usr/share/fonts/truetype/
@@ -18,7 +19,7 @@ RUN fc-cache -f -v /app/assets/fonts/
 # Bundle app source
 COPY . .
 
-RUN npm run build
+RUN yarn run build
 
 EXPOSE 8080
 ENV PORT 8080

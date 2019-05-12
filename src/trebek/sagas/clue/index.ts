@@ -6,8 +6,7 @@ import newClue from './newClue';
 import guess from './guess';
 import wager from './wager';
 import { clueImage, dailyDoubleImage } from '../../../images';
-import { spawn } from 'redux-saga/effects';
-import { delay } from 'redux-saga';
+import { spawn, delay } from 'redux-saga/effects';
 import { selectStudio } from '../../selectors';
 
 function getCategory(category: string | ClueOptions) {

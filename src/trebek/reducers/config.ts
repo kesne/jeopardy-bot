@@ -7,9 +7,10 @@ const initialState: State = {
     studiosEnabledByDefault: true,
 };
 
-export default produce<State, BaseAction>((draft, action) => {
-    switch (action.type) {
-        case SET_STUDIOS_ENABLED_BY_DEFAULT:
-            draft.studiosEnabledByDefault = action.payload.enabled;
-    }
-}, initialState);
+export default (state = initialState, action: BaseAction) =>
+    produce(state, draft => {
+        switch (action.type) {
+            case SET_STUDIOS_ENABLED_BY_DEFAULT:
+                draft.studiosEnabledByDefault = action.payload.enabled;
+        }
+    });

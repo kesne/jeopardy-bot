@@ -1,9 +1,8 @@
+import { race, delay } from 'redux-saga/effects';
 import { input, say } from '../utils';
 import { selectStudioScore, selectStudio } from '../../selectors';
 import { Clue, BaseAction, Studio } from '../../../types';
-import { race } from 'redux-saga/effects';
 import currency from '../../helpers/currency';
-import { delay } from '@slack/client/dist/util';
 
 function* wagerInput(rootAction: BaseAction, clue: Clue) {
     while (true) {
