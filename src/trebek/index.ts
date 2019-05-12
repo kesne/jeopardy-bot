@@ -82,10 +82,12 @@ export default class Trebek {
             }
         }, SYNC_INTERVAL);
 
-        const persistThenExit = async () => {
+        const persistThenExit = async (e: any) => {
             console.log(
                 'Detected app exit, attempting to persist the store state...',
             );
+            console.log('Exit Cause:');
+            console.log(e);
             await this.persistence.persist(
                 JSON.stringify(this.store!.getState()),
             );
