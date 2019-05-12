@@ -14,7 +14,7 @@ RUN yarn
 
 # Install fonts:
 COPY assets/fonts/*.ttf /usr/share/fonts/truetype/
-RUN fc-cache -f -v /app/assets/fonts/
+RUN fc-cache -f -v /usr/share/fonts/truetype/
 
 # Bundle app source
 COPY . .
