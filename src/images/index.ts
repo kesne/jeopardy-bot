@@ -1,4 +1,4 @@
-import Canvas, { Image } from 'canvas';
+import { createCanvas, Canvas, Image } from 'canvas';
 import { join } from 'path';
 import { readFileSync } from 'fs';
 import wrapText from './wrapText';
@@ -57,7 +57,7 @@ function drawLines(
 
 function generateClueImage(clue: Clue) {
     return new Promise((resolve, reject) => {
-        const canvas = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+        const canvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
         const ctx = canvas.getContext('2d');
 
         const midpoint = CANVAS_HEIGHT / 2 + 37;
@@ -96,7 +96,7 @@ function generateClueImage(clue: Clue) {
 
 function generateBoardImage(game: Game) {
     return new Promise((resolve, reject) => {
-        const canvas = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+        const canvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
         const ctx = canvas.getContext('2d');
 
         // Black background:

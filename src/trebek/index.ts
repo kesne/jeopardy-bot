@@ -53,24 +53,42 @@ export default class Trebek {
     async start() {
         let initialState = undefined;
         try {
+            console.log('Attempting to revive from persistence...');
             const revivedState = await this.persistence.revive();
             initialState = JSON.parse(revivedState);
-        } catch(e) {
+            console.log('Store state revived.');
+        } catch (e) {
             // Ignore failures:
-            console.log('Revive failed.');
-            console.log(e);
+            console.error('Revive failed.');
+            console.error(e);
         }
 
         this.saga = createSagaMiddleware();
-        this.store = createStore(reducer, initialState, applyMiddleware(this.saga));
+        this.store = createStore(
+            reducer,
+            initialState,
+            applyMiddleware(this.saga),
+        );
 
-        setInterval(() => {
-            this.persistence.persist(JSON.stringify(this.store!.getState()));
+        setInterval(async () => {
+            console.log('Persisting Jeopardy state...');
+            try {
+                await this.persistence.persist(
+                    JSON.stringify(this.store!.getState()),
+                );
+            } catch (e) {
+                console.error('Failed to perist game state.');
+                console.error(e);
+            }
         }, SYNC_INTERVAL);
 
         const persistThenExit = async () => {
-            console.log('Detected app exit, attempting to persist the store state...');
-            await this.persistence.persist(JSON.stringify(this.store!.getState()));
+            console.log(
+                'Detected app exit, attempting to persist the store state...',
+            );
+            await this.persistence.persist(
+                JSON.stringify(this.store!.getState()),
+            );
             console.log('Store state successfully persisted!');
             process.exit(0);
         };

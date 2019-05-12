@@ -30,10 +30,15 @@ export default class CleverPersistence {
         this.channelForSelf = channel;
 
         // Delete the marker message:
-        await this.web.chat.delete({
-            channel,
-            ts,
-        });
+        try {
+            await this.web.chat.delete({
+                channel,
+                ts,
+            });
+        } catch (e) {
+            console.error('Failed at deleting the marker message.');
+            console.error(e);
+        }
 
         return channel;
     }
@@ -55,22 +60,27 @@ export default class CleverPersistence {
             limit: 5,
         })) as SlackResponse;
 
-        await Promise.all(
-            history.messages
-                // Make sure we don't delete the file we literally just uploaded:
-                .filter((_, index) => index !== history.messages.length - 2)
-                .map(message =>
-                    // @ts-ignore
-                    Promise.all([
-                        this.web.chat.delete({ channel, ts: message.ts }),
-                        message.files
-                            ? this.web.files.delete({
-                                  file: message.files[0].id,
-                              })
-                            : Promise.resolve(),
-                    ]),
-                ),
-        );
+        try {
+            await Promise.all(
+                history.messages
+                    // Make sure we don't delete the file we literally just uploaded:
+                    .filter((_, index) => index !== history.messages.length - 2)
+                    .map(message =>
+                        // @ts-ignore
+                        Promise.all([
+                            this.web.chat.delete({ channel, ts: message.ts }),
+                            message.files
+                                ? this.web.files.delete({
+                                      file: message.files[0].id,
+                                  })
+                                : Promise.resolve(),
+                        ]),
+                    ),
+            );
+        } catch (e) {
+            console.error('Failed at deleting old history messages.');
+            console.error(e);
+        }
     }
 
     async revive(): Promise<string> {
@@ -92,7 +102,7 @@ export default class CleverPersistence {
                 // Don't attempt to parse the response as JSON.
                 // We want the persistence layer to always operate on strings
                 // so that we can swap the underlying data representation.
-                transformResponse: (req) => req,
+                transformResponse: req => req,
                 responseType: 'text',
                 headers: {
                     Authorization: `Bearer ${this.web.token}`,

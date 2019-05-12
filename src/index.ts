@@ -69,10 +69,11 @@ rtm.on('connected', async () => {
 
 rtm.start();
 
+// Start a HTTP server just to make people happy:
 const port = process.env.PORT || 8080;
 http.createServer((_, res) => {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('ok');
+    res.end('What is healthy?');
 }).listen(port, () => {
     console.log('HTTP server started.');
 });
