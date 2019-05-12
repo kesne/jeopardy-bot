@@ -1,4 +1,4 @@
-import { createCanvas, Canvas, Image } from 'canvas';
+import { createCanvas, Image } from 'canvas';
 import { join } from 'path';
 import { readFileSync } from 'fs';
 import wrapText from './wrapText';
