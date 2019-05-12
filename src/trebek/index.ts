@@ -82,16 +82,21 @@ export default class Trebek {
             }
         }, SYNC_INTERVAL);
 
-        const persistThenExit = async (e: any) => {
+        const persistThenExit = async (cause: any) => {
             console.log(
                 'Detected app exit, attempting to persist the store state...',
             );
             console.log('Exit Cause:');
-            console.log(e);
-            await this.persistence.persist(
-                JSON.stringify(this.store!.getState()),
-            );
-            console.log('Store state successfully persisted!');
+            console.log(cause);
+            try {
+                await this.persistence.persist(
+                    JSON.stringify(this.store!.getState()),
+                );
+                console.log('Store state successfully persisted!');
+            } catch (e) {
+                console.error('Failed to persist during exist.');
+                console.error(e);
+            }
             process.exit(0);
         };
 
