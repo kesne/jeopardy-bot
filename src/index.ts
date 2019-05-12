@@ -1,5 +1,7 @@
+import path from 'path';
 import http from 'http';
 import { RTMClient, WebClient } from '@slack/client';
+import { registerFont } from 'canvas';
 import Trebek from './trebek';
 import { SlackResponse } from './types';
 import CleverPersistence from './CleverPersistence';
@@ -9,6 +11,20 @@ const token = process.env.SLACK_TOKEN as string;
 // The client is initialized and then started to get an active connection to the platform
 const rtm = new RTMClient(token);
 const web = new WebClient(token);
+
+// Set up fonts:
+registerFont(
+    path.join(__dirname, '..', 'assets', 'fonts', 'Korinna-Bold.ttf'),
+    { family: 'Korinna', weight: 'bold' },
+);
+registerFont(
+    path.join(__dirname, '..', 'assets', 'fonts', 'Korinna-Regular.ttf'),
+    { family: 'Korinna' },
+);
+registerFont(
+    path.join(__dirname, '..', 'assets', 'fonts', 'LeagueGothic-Regular.ttf'),
+    { family: 'League Gothic' },
+);
 
 const trebek = new Trebek({
     sendMessage(payload) {

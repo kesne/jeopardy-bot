@@ -1,8 +1,15 @@
-FROM node:10
+FROM node:10-alpine
 
 # Install system dependencies:
-RUN apt-get -y update; apt-get -y upgrade
-RUN apt-get -y install libcairo2-dev libjpeg-dev libpango1.0-dev libgif-dev build-essential g++
+RUN apk add --no-cache \
+    build-base \
+    g++ \
+    python \
+    cairo-dev \
+    jpeg-dev \
+    pango-dev \
+    bash \
+    imagemagick
 
 # Create app directory
 WORKDIR /app
@@ -11,10 +18,6 @@ WORKDIR /app
 COPY package.json ./
 COPY yarn.lock ./
 RUN yarn
-
-# Install fonts:
-COPY assets/fonts/*.ttf /usr/share/fonts/truetype/
-RUN fc-cache -f -v /usr/share/fonts/truetype/
 
 # Bundle app source
 COPY . .
