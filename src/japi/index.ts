@@ -18,6 +18,7 @@ const seasons = 32;
 // Selector to get seasons URLs from
 const episodeRegex = /Show #([0-9]+) -/;
 const clueRegex = /clue_J_([0-9]+)_([0-9]+)/;
+const answerRegex = /ponse">(.*)<\/e/;
 
 async function loadEpisode(url: string) {
     const response = await axios.get(url, { responseType: 'text' });
@@ -25,7 +26,8 @@ async function loadEpisode(url: string) {
 
     // Extract the episode number:
     const headerText = $('#game_title > *').text();
-    const [, episode] = episodeRegex.exec(headerText);
+    const episodeMatches = episodeRegex.exec(headerText) || [];
+    const [, episode] = episodeMatches;
 
     // Extract categories:
     const categories: Category[] = [];
@@ -47,7 +49,8 @@ async function loadEpisode(url: string) {
         const $clue = $(clue);
         const $clueText = $clue.find('.clue_text');
 
-        let [, parsedCategoryId, parsedNum] = clueRegex.exec($clueText.attr('id'));
+        const clueMatches = clueRegex.exec($clueText.attr('id')) || [];
+        const [, parsedCategoryId, parsedNum] = clueMatches;
         const categoryId = parseInt(parsedCategoryId, 10);
         const num = parseInt(parsedNum, 10);
 
@@ -67,9 +70,11 @@ async function loadEpisode(url: string) {
         });
 
         // Extract the answer and strip HTML tags:
-        let [, answer] = /ponse">(.*)<\/e/.exec(
-            $clue.find('td:first-child > div').attr('onmouseover'),
-        );
+        const answerMatches =
+            answerRegex.exec(
+                $clue.find('td:first-child > div').attr('onmouseover'),
+            ) || [];
+        let [, answer] = answerMatches;
         answer = simplifyText(striptags(answer));
 
         // Extract if this question was a daily double:
@@ -101,7 +106,7 @@ async function randomEpisode() {
     const season = Math.ceil(Math.random() * seasons);
     const response = await axios.get(
         `http://www.j-archive.com/showseason.php?season=${season}`,
-        { responseType: 'text' }
+        { responseType: 'text' },
     );
     const $ = load(response.data);
     const links = $('td:first-child > a');
@@ -126,7 +131,9 @@ async function randomEpisode() {
 // Force-generate a new game:
 export async function generateGame(gameId?: string) {
     if (gameId) {
-        return loadEpisode(`http://www.j-archive.com/showgame.php?game_id=${gameId}`);
+        return loadEpisode(
+            `http://www.j-archive.com/showgame.php?game_id=${gameId}`,
+        );
     }
 
     let game;
