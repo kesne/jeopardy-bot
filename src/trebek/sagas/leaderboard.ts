@@ -14,7 +14,7 @@ export default function* leaderboard() {
     ) {
         const leaders = match.includes('leader');
         const contestants: Contestant[] = yield selectContestants();
-        const sortedOrderedContestants = take(
+        const orderedContestants = take(
             orderBy(
                 contestants.filter(
                     contestant =>
@@ -28,14 +28,15 @@ export default function* leaderboard() {
             Math.min(Number(num), MAX_PLAYERS),
         );
 
-        if (sortedOrderedContestants.length === 0) {
+        if (orderedContestants.length === 0) {
             yield say(
                 `There are no ${
                     leaders ? 'leaders' : 'losers'
                 } yet. Get out there and play some games!`,
             );
         } else {
-            const players = contestants.map((contestant, i) => {
+            const players = orderedContestants.map((contestant, i) => {
+
                 return (
                     `${i + 1}. <@${contestant.id}>:` +
                     `\n> _${currency(contestant.stats.money)}_ *|* _${
