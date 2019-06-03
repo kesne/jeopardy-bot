@@ -24,6 +24,11 @@ async function loadEpisode(url: string) {
     const response = await axios.get(url, { responseType: 'text' });
     const $ = load(response.data);
 
+    // Incomplete episode?
+    if ($('#jeopardy_round .clue').length !== $('#jeopardy_round .clue_text').length) {
+      throw new ReferenceError('Incomplete episode!');
+    }
+
     // Extract the episode number:
     const headerText = $('#game_title > *').text();
     const episodeMatches = episodeRegex.exec(headerText) || [];
@@ -141,7 +146,7 @@ export async function generateGame(gameId?: string) {
         try {
             game = await randomEpisode();
         } catch (e) {
-            console.error('Unable to generate game.', game, e);
+            console.error('Unable to generate game.', e);
         }
     } while (!game);
     return game;
