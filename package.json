@@ -21,7 +21,7 @@
         "dedent": "^0.7.0",
         "gfycat-sdk": "^1.4.18",
         "html-entities": "^1.2.1",
-        "immer": "^3.1.1",
+        "immer": "^8.0.1",
         "lodash": "^4.17.11",
         "moment": "^2.24.0",
         "natural": "^0.6.3",
